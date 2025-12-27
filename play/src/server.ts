@@ -1,3 +1,4 @@
+import "dotenv/config";
 import fs from "fs";
 import process from "process";
 import * as Sentry from "@sentry/node";

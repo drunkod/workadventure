@@ -269,6 +269,14 @@ export class RoomConnection implements RoomConnection {
         const urlObj = new URL("ws/room", ABSOLUTE_PUSHER_URL);
         urlObj.protocol = urlObj.protocol.replace("http", "ws");
 
+        // Workaround for local development without Traefik:
+        // Pusher HTTP is on 3000, but WS is on 3001.
+        if (urlObj.hostname === "localhost" || urlObj.hostname === "127.0.0.1") {
+            if (urlObj.port === "3000" || urlObj.port === "8080") {
+                urlObj.port = "3001";
+            }
+        }
+
         const params = urlObj.searchParams;
         params.set("roomId", roomUrl);
         params.set("name", name);
@@ -771,9 +779,9 @@ export class RoomConnection implements RoomConnection {
             } catch (e) {
                 console.error(
                     "Unable to unserialize value received from server for a variable. " +
-                        'Value received: "' +
-                        serializedValue +
-                        '". Error: ',
+                    'Value received: "' +
+                    serializedValue +
+                    '". Error: ',
                     e
                 );
             }
@@ -1656,8 +1664,7 @@ export class RoomConnection implements RoomConnection {
         } catch (error) {
             // FIWME: delete me when the fresh token query and answer are stable
             Debug(
-                `RoomConnection => getOauthRefreshToken => Error getting oauth refresh token: ${
-                    (error as Error).message
+                `RoomConnection => getOauthRefreshToken => Error getting oauth refresh token: ${(error as Error).message
                 }`
             );
             throw error;
@@ -1965,8 +1972,8 @@ export class RoomConnection implements RoomConnection {
                 // Let's do nothing when the query answer actually finishes
                 this.queries.set(queryId, {
                     answerType,
-                    resolve: () => {},
-                    reject: () => {},
+                    resolve: () => { },
+                    reject: () => { },
                 });
                 // After 10 seconds, let's remove the query to avoid memory leaks. If the answer arrives after that, we will have a warning in the console, but it's better than a memory leak.
                 setTimeout(() => {

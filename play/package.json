@@ -14,9 +14,10 @@
   "scripts": {
     "start": "if [ -n \"$STARTUP_COMMAND\" ]; then sh -c \"$STARTUP_COMMAND\"; fi && TSX_TSCONFIG_PATH=tsconfig-pusher.json tsx ./src/server.ts",
     "old_start": "node -r source-map-support/register --max-old-space-size=4096 ./dist/server.js",
-    "dev": "cross-env concurrently --kill-others-on-fail \"npm:dev-front\" \"npm:typesafe-i18n-watch\" \"npm:watch-iframe-api\" \"npm:svelte-check-watch\" \"npm:dev-pusher\"",
+    "dev": "cross-env concurrently --kill-others-on-fail \"npm:dev-front\" \"npm:typesafe-i18n-watch\" \"npm:watch-iframe-api\" \"npm:svelte-check-watch\" \"npm:dev-pusher\" \"npm:dev-back\"",
     "dev-front": "cross-env vite",
     "dev-pusher": "TSX_TSCONFIG_PATH=tsconfig-pusher.json tsx watch --clear-screen=false --inspect=0.0.0.0:9229 ./src/server.ts",
+    "dev-back": "cd ../back && HTTP_PORT=8081 PLAY_URL=http://127.0.0.1:3000 npm run dev",
     "build": "echo \"Compiling with options: $NODE_OPTIONS \" && cross-env vite build",
     "typecheck": "cross-env tsc --noEmit",
     "profile": "tsc && node --prof ./dist/server.js",

@@ -63,13 +63,13 @@ export default defineConfig(({ mode }) => {
             ...(env.DISABLE_LEGACY_BROWSERS === "true"
                 ? []
                 : [
-                      legacy({
-                          //targets: ['defaults', 'not IE 11', 'iOS > 14.3']
-                          // Structured clone is needed for Safari < 15.4
-                          polyfills: ["web.structured-clone"],
-                          modernPolyfills: ["web.structured-clone"],
-                      }),
-                  ]),
+                    legacy({
+                        //targets: ['defaults', 'not IE 11', 'iOS > 14.3']
+                        // Structured clone is needed for Safari < 15.4
+                        polyfills: ["web.structured-clone"],
+                        modernPolyfills: ["web.structured-clone"],
+                    }),
+                ]),
             tsconfigPaths(),
         ],
         resolve: {
