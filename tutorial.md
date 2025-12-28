@@ -41,7 +41,33 @@ START_ROOM_URL=/_/global/127.0.0.1:8080/maps/starter/map.json
 # ADMIN_API_URL=http://localhost:8081  <-- REMOVE or COMMENT OUT this line
 ```
 
-## Step 2: Running the Server
+## Step 2: Generate Required Files
+
+Before starting the server for the first time, you need to generate protocol buffers and typings.
+
+### 1. Generate Protocol Buffer Files
+```bash
+# From messages directory
+cd messages
+npm install
+npm run proto-all
+cd ..
+```
+
+### 2. Generate i18n Typings
+```bash
+# From play directory
+cd play
+npm run typesafe-i18n
+```
+
+### 3. Build Iframe API (Optional but recommended)
+```bash
+# From play directory
+npm run build-iframe-api
+```
+
+## Step 3: Running the Server
 
 We have updated the `play/package.json` scripts to launch everything for you.
 
@@ -60,7 +86,7 @@ We have updated the `play/package.json` scripts to launch everything for you.
     - Starts **Back** (Wait for `WorkAdventure HTTP/2 API starting on port 50051!`).
     - Starts **Vite** (Wait for `Local: http://localhost:8080/`).
 
-## Step 3: Accessing the Game
+## Step 4: Accessing the Game
 
 1.  Open your browser.
 2.  Navigate to **[http://127.0.0.1:3000](http://127.0.0.1:3000)**.
