@@ -2,27 +2,29 @@
  * Jazz Tools Configuration for WorkAdventure
  * 
  * This module configures Jazz for local-first state management.
- * By default, sync is disabled (local-only mode).
+ * With Jazz Cloud sync enabled, multiple players can see each other.
  */
 
-// API key for Jazz Cloud (can be a placeholder when not syncing)
+// API key for Jazz Cloud (use email for dev, real key for production)
 export const JAZZ_API_KEY = 'workadventure-local@localhost';
 
-// Sync configuration - set to null for local-only mode
+// Sync configuration - Enable Jazz Cloud for multi-player
 export const JAZZ_SYNC_CONFIG = {
-    // To enable cloud sync, change to: `wss://cloud.jazz.tools/?key=${JAZZ_API_KEY}`
-    peer: null as string | null,
+    // Jazz Cloud peer for multi-player sync
+    peer: `wss://cloud.jazz.tools/?key=${JAZZ_API_KEY}`,
     when: 'always' as const,
 };
 
-// Enable this to use Jazz Cloud sync
+// Get sync config for Jazz initialization
 export function getJazzSyncConfig() {
-    if (JAZZ_SYNC_CONFIG.peer) {
-        return {
-            peer: JAZZ_SYNC_CONFIG.peer,
-            when: JAZZ_SYNC_CONFIG.when,
-        };
-    }
-    // Local-only mode - no sync
-    return undefined;
+    return {
+        peer: JAZZ_SYNC_CONFIG.peer,
+        when: JAZZ_SYNC_CONFIG.when,
+    };
 }
+
+// Check if sync is enabled
+export function isSyncEnabled(): boolean {
+    return JAZZ_SYNC_CONFIG.peer !== null;
+}
+

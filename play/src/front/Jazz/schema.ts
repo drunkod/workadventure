@@ -76,10 +76,42 @@ export const UserPreferences = co.map({
 export type UserPreferencesType = co.loaded<typeof UserPreferences>;
 
 /**
+ * Local Player State - replaces WebSocket position updates
+ * Stores player position and movement state locally via Jazz
+ */
+export const LocalPlayerState = co.map({
+    x: z.number(),
+    y: z.number(),
+    direction: z.string(),  // 'up' | 'down' | 'left' | 'right'
+    moving: z.boolean(),
+    wokaTextureId: z.optional(z.string()),
+});
+
+export type LocalPlayerStateType = co.loaded<typeof LocalPlayerState>;
+
+/**
+ * Local Room State - replaces Pusher room/map management
+ * Stores current map URL and viewport state locally
+ */
+export const LocalRoomState = co.map({
+    mapUrl: z.optional(z.string()),
+    lastJoined: z.optional(z.string()),  // ISO timestamp
+    viewportX: z.number(),
+    viewportY: z.number(),
+    viewportWidth: z.number(),
+    viewportHeight: z.number(),
+});
+
+export type LocalRoomStateType = co.loaded<typeof LocalRoomState>;
+
+/**
  * WorkAdventure Account Root - container for all user data
+ * Now includes player state and room state for local-first operation
  */
 export const WaAccountRoot = co.map({
     preferences: UserPreferences,
+    playerState: LocalPlayerState,
+    roomState: LocalRoomState,
 });
 
 /**
@@ -111,8 +143,21 @@ export const WaAccount = co
                     chatSounds: true,
                     helpCameraSettingsShown: false,
                 },
+                playerState: {
+                    x: 0,
+                    y: 0,
+                    direction: 'down',
+                    moving: false,
+                },
+                roomState: {
+                    viewportX: 0,
+                    viewportY: 0,
+                    viewportWidth: 800,
+                    viewportHeight: 600,
+                },
             });
         }
     });
 
 export type WaAccountType = co.loaded<typeof WaAccount>;
+

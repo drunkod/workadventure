@@ -23,6 +23,7 @@
     import { canvasSize, coWebsiteManager, coWebsites, fullScreenCowebsite } from "../Stores/CoWebsiteStore";
     import { urlManager } from "../Url/UrlManager";
     import { FileListener } from "../Phaser/FileUpload/FileListener";
+    import { initializeJazz, cleanupJazz } from "../Jazz";
     import GameOverlay from "./GameOverlay.svelte";
     import CoWebsitesContainer from "./EmbedScreens/CoWebsitesContainer.svelte";
 
@@ -35,6 +36,11 @@
     let handleCanvasClick: () => void;
 
     onMount(() => {
+        // Initialize Jazz for local-first state management
+        initializeJazz().catch(err => {
+            console.warn('[Jazz] Initialization error (falling back to localStorage):', err);
+        });
+
         if (SENTRY_DSN_FRONT != undefined) {
             try {
                 const sentryOptions: Sentry.BrowserOptions = {
@@ -235,6 +241,8 @@
         if (canvas && handleCanvasClick) {
             canvas.removeEventListener("click", handleCanvasClick);
         }
+        // Cleanup Jazz context
+        cleanupJazz();
     });
 </script>
 

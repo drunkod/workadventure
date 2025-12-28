@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/svelte";
 import { connectionManager } from "../../Connection/ConnectionManager";
 import { localUserStore } from "../../Connection/LocalUserStore";
 import type { Room } from "../../Connection/Room";
+import { LocalRoom, isLocalModeEnabled, getLocalModeMapUrl } from "../../Connection/LocalRoom";
 import { showHelpCameraSettings } from "../../Stores/HelpSettingsStore";
 import {
     availabilityStatusStore,
@@ -57,6 +58,38 @@ export class GameManager {
 
     public async init(scenePlugin: Phaser.Scenes.ScenePlugin): Promise<string> {
         this.scenePlugin = scenePlugin;
+
+        // LOCAL MODE: Skip connectionManager entirely
+        if (isLocalModeEnabled()) {
+            console.log('[GameManager] 🎷 Local mode enabled - bypassing Pusher/Back');
+            const mapUrl = getLocalModeMapUrl();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            this.startRoom = await LocalRoom.createRoom(mapUrl) as any;
+            this.loadMap(this.startRoom);
+
+            // Show login scene if player name not set
+            if (!this.playerName) {
+                console.log('[GameManager] No player name - showing login scene');
+                return LoginSceneName;
+            }
+
+            // Show character selection if no textures set
+            if (!this.characterTextureIds || this.characterTextureIds.length === 0) {
+                console.log('[GameManager] No character textures - showing character selection');
+                return SelectCharacterSceneName;
+            }
+
+            // Show companion selection if not chosen yet
+            if (this.companionTextureId === null && !localUserStore.wasCompanionSet()) {
+                console.log('[GameManager] No companion set - showing companion selection');
+                return SelectCompanionSceneName;
+            }
+
+            this.activeMenuSceneAndHelpCameraSettings();
+            return this.startRoom.key;
+        }
+
+        // NORMAL MODE: Use connectionManager
         const result = await connectionManager.initGameConnexion();
         if (result instanceof URL) {
             window.location.assign(result.toString());

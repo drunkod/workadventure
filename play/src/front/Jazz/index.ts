@@ -1,18 +1,49 @@
 /**
  * Jazz Module Index
- * Re-exports all Jazz-related functionality
+ * 
+ * Re-exports all Jazz-related functionality for easy imports.
+ * 
+ * Usage:
+ *   import { initializeJazz, jazzInitialized, setPlayerPosition } from '../Jazz';
  */
 
-export { WaAccount, UserPreferences, type UserPreferencesType } from './schema';
-export { JAZZ_API_KEY, getJazzSyncConfig } from './jazz-config';
+// Schema exports
 export {
-    initializeJazz,
-    cleanupJazz,
+    UserPreferences,
+    LocalPlayerState,
+    LocalRoomState,
+    WaAccountRoot,
+    WaAccount,
+    type UserPreferencesType,
+    type LocalPlayerStateType,
+    type LocalRoomStateType,
+    type WaAccountType,
+} from './schema';
+
+// Config exports
+export {
+    JAZZ_API_KEY,
+    JAZZ_SYNC_CONFIG,
+    getJazzSyncConfig,
+    isSyncEnabled,
+} from './jazz-config';
+
+// Store exports
+export {
     jazzInitialized,
     jazzAccount,
+    initializeJazz,
+    cleanupJazz,
+    getJazzAccount,
     getUserPreferencesStore,
     getPreference,
     setPreference,
-    getJazzAccount,
+    // Player state (replaces WebSocket position)
+    getPlayerPosition,
+    setPlayerPosition,
+    getPlayerPositionStore,
+    // Room state (replaces Pusher room management)
+    getRoomState,
+    setRoomMapUrl,
+    setViewport,
 } from './jazzStore';
-

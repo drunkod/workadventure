@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jazz Tools Test - WorkAdventure</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { 
+            text-align: center; 
+            margin-bottom: 2rem;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+        .card h2 { margin-bottom: 1rem; color: #e94560; font-size: 1.2rem; }
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            margin-bottom: 0.5rem;
+        }
+        .status.success { border-left: 3px solid #4ade80; }
+        .status.pending { border-left: 3px solid #fbbf24; }
+        .status.error { border-left: 3px solid #f87171; }
+        .controls { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: #e94560;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        .position-display {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .pos-item {
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .pos-item .label { font-size: 0.8rem; opacity: 0.7; }
+        .pos-item .value { font-size: 1.5rem; font-weight: bold; color: #4ade80; }
+        pre {
+            background: rgba(0,0,0,0.4);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            max-height: 200px;
+        }
+        #log { margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎷 Jazz Tools Test</h1>
+        
+        <div class="card">
+            <h2>Jazz Status</h2>
+            <div id="jazz-status" class="status pending">⏳ Initializing...</div>
+            <div id="sync-status" class="status pending">⏳ Checking sync...</div>
+        </div>
+        
+        <div class="card">
+            <h2>Player Position (Jazz State)</h2>
+            <div class="position-display">
+                <div class="pos-item">
+                    <div class="label">X</div>
+                    <div class="value" id="pos-x">0</div>
+                </div>
+                <div class="pos-item">
+                    <div class="label">Y</div>
+                    <div class="value" id="pos-y">0</div>
+                </div>
+                <div class="pos-item">
+                    <div class="label">Direction</div>
+                    <div class="value" id="pos-dir">down</div>
+                </div>
+                <div class="pos-item">
+                    <div class="label">Moving</div>
+                    <div class="value" id="pos-moving">false</div>
+                </div>
+            </div>
+            <div class="controls">
+                <button onclick="moveUp()">⬆️ Up</button>
+                <button onclick="moveDown()">⬇️ Down</button>
+                <button onclick="moveLeft()">⬅️ Left</button>
+                <button onclick="moveRight()">➡️ Right</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Room State</h2>
+            <div id="room-info" class="status pending">Loading...</div>
+            <div class="controls">
+                <button onclick="setMap('starter')">Set Starter Map</button>
+                <button onclick="setMap('test')">Set Test Map</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Console Log</h2>
+            <pre id="log"></pre>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Import Jazz modules
+        const log = (msg) => {
+            const el = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            el.textContent = `[${time}] ${msg}\n` + el.textContent;
+            console.log(msg);
+        };
+        
+        let jazzModule = null;
+        
+        async function initJazz() {
+            log('Loading Jazz modules...');
+            
+            try {
+                // Dynamic import of Jazz store
+                jazzModule = await import('/src/front/Jazz/jazzStore.ts');
+                log('Jazz module loaded');
+                
+                // Initialize Jazz
+                await jazzModule.initializeJazz();
+                log('Jazz initialization complete');
+                
+                // Check status
+                const initialized = jazzModule.jazzInitialized;
+                initialized.subscribe(val => {
+                    const statusEl = document.getElementById('jazz-status');
+                    if (val) {
+                        statusEl.className = 'status success';
+                        statusEl.textContent = '✅ Jazz Initialized';
+                        log('Jazz is ready!');
+                        updateUI();
+                    } else {
+                        statusEl.className = 'status error';
+                        statusEl.textContent = '❌ Jazz using fallback (localStorage)';
+                    }
+                });
+                
+                // Check sync config
+                const configModule = await import('/src/front/Jazz/jazz-config.ts');
+                const syncEnabled = configModule.isSyncEnabled();
+                const syncStatusEl = document.getElementById('sync-status');
+                if (syncEnabled) {
+                    syncStatusEl.className = 'status success';
+                    syncStatusEl.textContent = '✅ Jazz Cloud Sync Enabled (Multi-player)';
+                } else {
+                    syncStatusEl.className = 'status pending';
+                    syncStatusEl.textContent = '⚠️ Local-only mode (no sync)';
+                }
+                
+            } catch (err) {
+                log('Error: ' + err.message);
+                document.getElementById('jazz-status').className = 'status error';
+                document.getElementById('jazz-status').textContent = '❌ ' + err.message;
+            }
+        }
+        
+        function updateUI() {
+            if (!jazzModule) return;
+            
+            const pos = jazzModule.getPlayerPosition();
+            if (pos) {
+                document.getElementById('pos-x').textContent = pos.x;
+                document.getElementById('pos-y').textContent = pos.y;
+                document.getElementById('pos-dir').textContent = pos.direction;
+                document.getElementById('pos-moving').textContent = pos.moving;
+            }
+            
+            const room = jazzModule.getRoomState();
+            const roomEl = document.getElementById('room-info');
+            roomEl.className = 'status success';
+            roomEl.textContent = `Map: ${room.mapUrl || '(none)'} | Viewport: ${room.viewport.width}x${room.viewport.height}`;
+        }
+        
+        // Expose functions globally
+        window.moveUp = () => {
+            if (!jazzModule) return;
+            const pos = jazzModule.getPlayerPosition() || { x: 0, y: 0 };
+            jazzModule.setPlayerPosition(pos.x, pos.y - 32, 'up', true);
+            log(`Moved UP to (${pos.x}, ${pos.y - 32})`);
+            setTimeout(updateUI, 100);
+        };
+        
+        window.moveDown = () => {
+            if (!jazzModule) return;
+            const pos = jazzModule.getPlayerPosition() || { x: 0, y: 0 };
+            jazzModule.setPlayerPosition(pos.x, pos.y + 32, 'down', true);
+            log(`Moved DOWN to (${pos.x}, ${pos.y + 32})`);
+            setTimeout(updateUI, 100);
+        };
+        
+        window.moveLeft = () => {
+            if (!jazzModule) return;
+            const pos = jazzModule.getPlayerPosition() || { x: 0, y: 0 };
+            jazzModule.setPlayerPosition(pos.x - 32, pos.y, 'left', true);
+            log(`Moved LEFT to (${pos.x - 32}, ${pos.y})`);
+            setTimeout(updateUI, 100);
+        };
+        
+        window.moveRight = () => {
+            if (!jazzModule) return;
+            const pos = jazzModule.getPlayerPosition() || { x: 0, y: 0 };
+            jazzModule.setPlayerPosition(pos.x + 32, pos.y, 'right', true);
+            log(`Moved RIGHT to (${pos.x + 32}, ${pos.y})`);
+            setTimeout(updateUI, 100);
+        };
+        
+        window.setMap = (name) => {
+            if (!jazzModule) return;
+            const url = `/maps/${name}/map.json`;
+            jazzModule.setRoomMapUrl(url);
+            log(`Set map to: ${url}`);
+            setTimeout(updateUI, 100);
+        };
+        
+        // Start
+        initJazz();
+    </script>
+</body>
+</html>

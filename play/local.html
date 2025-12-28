@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>WorkAdventure - Local Mode</title>
+    <meta charset="UTF-8" />
+    <meta name="title" content="WorkAdventure - Local Mode" />
+    <meta name="description" content="WorkAdventure running in local-first mode without backend" />
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <base href="/" />
+
+    <!-- Local mode env injection (replaces Pusher's window.env) -->
+    <script>
+        window.env = {
+            DEBUG_MODE: true,
+            LOCAL_MODE_ENABLED: true,
+            PUSHER_URL: 'http://localhost:3000',
+            UPLOADER_URL: 'http://localhost:3000',
+            ICON_URL: 'http://localhost:3000',
+            STUN_SERVER: 'stun:stun.l.google.com:19302',
+            TURN_SERVER: '',
+            TURN_USER: '',
+            TURN_PASSWORD: '',
+            MAX_USERNAME_LENGTH: 20,
+            MAX_PER_GROUP: 4,
+            DISPLAY_TERMS_OF_USE: false,
+            SKIP_RENDER_OPTIMIZATIONS: false,
+            DISABLE_NOTIFICATIONS: true,
+            SENTRY_DSN_FRONT: '',
+            LOGROCKET_ID: '',
+            START_ROOM_URL: '/_/global/localhost/maps/starter/map.json',
+            FALLBACK_LOCALE: 'en-US',
+            PEER_VIDEO_RECOMMENDED_BANDWIDTH: 250,
+            PEER_SCREEN_SHARE_RECOMMENDED_BANDWIDTH: 1000,
+            // Disable features that need backend
+            ENABLE_CHAT: false,
+            ENABLE_CHAT_UPLOAD: false,
+            MATRIX_DOMAIN: '',
+            MATRIX_HOME_SERVER_URL: '',
+            KLAXOON_ENABLED: false,
+            YOUTUBE_ENABLED: false,
+            GOOGLE_DOCS_ENABLED: false,
+            GOOGLE_SHEETS_ENABLED: false,
+            GOOGLE_SLIDES_ENABLED: false,
+            ERASER_ENABLED: false,
+            EXCALIDRAW_ENABLED: false,
+            EXCALIDRAW_DOMAINS: '',
+            P2P_DISABLED: true,
+            TLDRAW_ENABLED: false,
+        };
+        console.log('[Local Mode] Environment injected:', window.env);
+    </script>
+
+    <style>
+        /*hide cowebsite container before scss is loaded*/
+        #cowebsite,
+        #chat-aside {
+            visibility: collapse;
+        }
+
+        /* Loading indicator */
+        .local-mode-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .local-mode-loader h1 {
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .local-mode-loader .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .local-mode-loader.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body id="body" style="margin: 0;background-color:rgb(27, 42, 65);" class="text-white">
+    <!-- Loading screen (will be hidden when app starts) -->
+    <div id="local-loader" class="local-mode-loader">
+        <h1>🎷 WorkAdventure Local Mode</h1>
+        <div class="spinner"></div>
+        <p style="margin-top: 1rem; opacity: 0.7;">Loading with Jazz Tools...</p>
+    </div>
+
+    <!-- Hidden inputs for compatibility -->
+    <input type="hidden" id="authToken" value="" name="authToken">
+    <input type="hidden" id="matrixLoginToken" value="" name="matrixLoginToken">
+
+    <div id="app"></div>
+
+    <script type="module">
+        // Hide loader after a short delay
+        setTimeout(() => {
+            const loader = document.getElementById('local-loader');
+            if (loader) loader.classList.add('hidden');
+        }, 2000);
+    </script>
+
+    <script type="module" src="/src/svelte.ts"></script>
+</body>
+
+</html>

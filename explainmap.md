@@ -57,3 +57,65 @@ When you run `npm run dev` in the `play` directory:
 *   **"Connecting..." Stuck**: Usually means WebSocket (3001) is blocked or misconfigured.
 *   **404 on Map**: The map file path is wrong or the backend is trying to fetch it from an external "Admin" API instead of locally.
 *   **Port Conflicts**: If 8080 or 3000 are taken, the app won't start correctly. Check logs for `EADDRINUSE`.
+
+---
+
+## Local-First Mode (Jazz Tools)
+
+The frontend can now work **without Pusher and Back** using Jazz Tools for local-first state management.
+
+### How It Works
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   Frontend (Vite)                        │
+│                    Port: 8080                            │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │                 Jazz Tools                        │    │
+│  │  ┌────────────────┐  ┌─────────────────────────┐ │    │
+│  │  │ LocalPlayerState│  │ LocalRoomState         │ │    │
+│  │  │ - x, y, direction│ │ - mapUrl, viewport     │ │    │
+│  │  └────────────────┘  └─────────────────────────┘ │    │
+│  │                      ↕                            │    │
+│  │              Jazz Cloud Sync                      │    │
+│  │         wss://cloud.jazz.tools                    │    │
+│  └─────────────────────────────────────────────────┘    │
+│                                                          │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │              Mock Services                         │    │
+│  │  - MockMapService (loads maps directly)          │    │
+│  │  - MockWebSocketService (player sync via Jazz)   │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `Jazz/schema.ts` | CoValue schemas for player/room state |
+| `Jazz/jazzStore.ts` | Svelte stores backed by Jazz |
+| `Jazz/jazz-config.ts` | Jazz Cloud sync configuration |
+| `Connection/LocalRoomConnection.ts` | Mock room connection |
+| `Connection/LocalModeConnectionManager.ts` | Local mode manager |
+| `Services/MockMapService.ts` | Direct map loading |
+| `Services/MockWebSocketService.ts` | Player sync via Jazz |
+
+### Running in Local Mode
+
+1. Start frontend only:
+   ```bash
+   cd play && npm run dev-front
+   ```
+
+2. Open `http://localhost:8080?localMode=true`
+
+3. Jazz automatically syncs player state to Jazz Cloud for multi-player.
+
+### Benefits
+
+- **No backend required** - Works offline or without Pusher/Back
+- **Multi-player via Jazz Cloud** - Real-time sync between browsers
+- **Local-first** - Data persists in IndexedDB, syncs when online
+- **Simpler development** - Test frontend changes without full stack
+
