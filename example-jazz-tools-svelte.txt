@@ -1,0 +1,2366 @@
+Directory structure:
+└── chat-svelte/
+    ├── README.md
+    ├── CHANGELOG.md
+    ├── eslint.config.js
+    ├── package.json
+    ├── playwright.config.ts
+    ├── svelte.config.js
+    ├── tsconfig.json
+    ├── vite.config.ts
+    ├── .npmrc
+    ├── .prettierignore
+    ├── .prettierrc
+    ├── src/
+    │   ├── apiKey.ts
+    │   ├── app.css
+    │   ├── app.d.ts
+    │   ├── app.html
+    │   ├── lib/
+    │   │   ├── schema.ts
+    │   │   ├── utils.ts
+    │   │   └── components/
+    │   │       ├── AppContainer.svelte
+    │   │       ├── BubbleBody.svelte
+    │   │       ├── BubbleContainer.svelte
+    │   │       ├── BubbleImage.svelte
+    │   │       ├── BubbleInfo.svelte
+    │   │       ├── BubbleText.svelte
+    │   │       ├── ChatBody.svelte
+    │   │       ├── ChatBubble.svelte
+    │   │       ├── EmptyChatMessage.svelte
+    │   │       ├── ImageIcon.svelte
+    │   │       ├── ImageInput.svelte
+    │   │       ├── InputBar.svelte
+    │   │       ├── TextInput.svelte
+    │   │       └── TopBar.svelte
+    │   └── routes/
+    │       ├── +layout.svelte
+    │       ├── +page.svelte
+    │       └── chat/
+    │           └── [id]/
+    │               └── +page.svelte
+    └── tests/
+        ├── chat.spec.ts
+        └── pages/
+            └── ChatPage.ts
+
+================================================
+FILE: examples/chat-svelte/README.md
+================================================
+# Chat example with Jazz and Svelte
+
+## Getting started
+
+You can either
+
+1. Clone the jazz repository, and run the app within the monorepo.
+2. Or create a new Jazz project using this example as a template.
+
+### Using the example as a template
+
+Create a new Jazz project, and use this example as a template.
+
+```bash
+npx create-jazz-app@latest chat-app --example chat-svelte
+```
+
+Go to the new project directory.
+
+```bash
+cd chat-app
+```
+
+Run the dev server.
+
+```bash
+npm run dev
+```
+
+### Using the monorepo
+
+This requires `pnpm` to be installed, see [https://pnpm.io/installation](https://pnpm.io/installation).
+
+Clone the jazz repository.
+
+```bash
+git clone https://github.com/garden-co/jazz.git
+```
+
+Install and build dependencies.
+
+```bash
+pnpm i && npx turbo build
+```
+
+Go to the example directory.
+
+```bash
+cd jazz/examples/chat-svelte/
+```
+
+Start the dev server.
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
+
+## Questions / problems / feedback
+
+If you have feedback, let us know on [Discord](https://discord.gg/utDMjHYg42) or open an issue or PR to fix something that seems wrong.
+
+## Configuration: sync server
+
+By default, the example app uses [Jazz Cloud](https://jazz.tools/cloud) (`wss://cloud.jazz.tools`) - so cross-device use, invites and collaboration should just work.
+
+You can also run a local sync server by running `npx jazz-run sync`, and setting the `sync` parameter of `JazzSvelteProvider` in [./src/routes/+layout.svelte](./src/routes/+layout.svelte) to `{ peer: "ws://localhost:4200" }`.
+
+
+
+================================================
+FILE: examples/chat-svelte/CHANGELOG.md
+================================================
+# passkey-svelte
+
+## 0.0.181
+
+### Patch Changes
+
+- jazz-tools@0.19.14
+
+## 0.0.180
+
+### Patch Changes
+
+- Updated dependencies [bef1cc6]
+- Updated dependencies [b839147]
+  - jazz-tools@0.19.13
+
+## 0.0.179
+
+### Patch Changes
+
+- Updated dependencies [9ca9e72]
+- Updated dependencies [5b0bb7d]
+- Updated dependencies [fa0759b]
+- Updated dependencies [a2372db]
+  - jazz-tools@0.19.12
+
+## 0.0.178
+
+### Patch Changes
+
+- Updated dependencies [68acca4]
+- Updated dependencies [c00a454]
+  - jazz-tools@0.19.11
+
+## 0.0.177
+
+### Patch Changes
+
+- jazz-tools@0.19.10
+
+## 0.0.176
+
+### Patch Changes
+
+- Updated dependencies [d901caa]
+- Updated dependencies [a2bb9f0]
+  - jazz-tools@0.19.9
+
+## 0.0.175
+
+### Patch Changes
+
+- Updated dependencies [21f7d34]
+- Updated dependencies [b22ad89]
+- Updated dependencies [28b23dd]
+  - jazz-tools@0.19.8
+
+## 0.0.174
+
+### Patch Changes
+
+- Updated dependencies [e113a79]
+  - jazz-tools@0.19.7
+
+## 0.0.173
+
+### Patch Changes
+
+- Updated dependencies [23782f0]
+- Updated dependencies [56d74e4]
+- Updated dependencies [bc9120b]
+  - jazz-tools@0.19.6
+
+## 0.0.172
+
+### Patch Changes
+
+- jazz-tools@0.19.5
+
+## 0.0.171
+
+### Patch Changes
+
+- Updated dependencies [78dfffd]
+- Updated dependencies [de2f8b5]
+- Updated dependencies [763977a]
+- Updated dependencies [e02e14c]
+- Updated dependencies [3aaba61]
+  - jazz-tools@0.19.4
+
+## 0.0.170
+
+### Patch Changes
+
+- Updated dependencies [cddbfdb]
+- Updated dependencies [114e4ce]
+  - jazz-tools@0.19.3
+
+## 0.0.169
+
+### Patch Changes
+
+- Updated dependencies [ef24afb]
+- Updated dependencies [5f2b34b]
+  - jazz-tools@0.19.2
+
+## 0.0.168
+
+### Patch Changes
+
+- Updated dependencies [f444bd9]
+  - jazz-tools@0.19.1
+
+## 0.0.167
+
+### Patch Changes
+
+- 26386d9: Add explicit CoValue loading states:
+  - Add `$isLoaded` field to discriminate between loaded and unloaded CoValues
+  - Add `$jazz.loadingState` field to provide additional info about the loading state
+  - All methods and functions that load CoValues now return a `MaybeLoaded<CoValue>` instead of `CoValue | null | undefined`
+  - Rename `$onError: null` to `$onError: "catch"`
+  - Split the `useAccount` hook into three separate hooks:
+    - `useAccount`: now only returns an Account CoValue
+    - `useLogOut`: returns a function for logging out of the current account
+    - `useAgent`: returns the current agent
+  - Add a `select` option (and an optional `equalityFn`) to `useAccount` and `useCoState`, and remove `useAccountWithSelector` and `useCoStateWithSelector`.
+  - Allow specifying resolve queries at the schema level. Those queries will be used when loading CoValues, if no other resolve query is provided.
+- Updated dependencies [26386d9]
+  - jazz-tools@0.19.0
+
+## 0.0.166
+
+### Patch Changes
+
+- Updated dependencies [349ca48]
+  - jazz-tools@0.18.38
+
+## 0.0.165
+
+### Patch Changes
+
+- Updated dependencies [feecdae]
+- Updated dependencies [a841071]
+- Updated dependencies [68e0b26]
+  - jazz-tools@0.18.37
+
+## 0.0.164
+
+### Patch Changes
+
+- jazz-tools@0.18.36
+
+## 0.0.163
+
+### Patch Changes
+
+- jazz-tools@0.18.35
+
+## 0.0.162
+
+### Patch Changes
+
+- Updated dependencies [7a64465]
+  - jazz-tools@0.18.34
+
+## 0.0.161
+
+### Patch Changes
+
+- Updated dependencies [df0045e]
+- Updated dependencies [5ffe0a9]
+  - jazz-tools@0.18.33
+
+## 0.0.160
+
+### Patch Changes
+
+- Updated dependencies [314c199]
+  - jazz-tools@0.18.32
+
+## 0.0.159
+
+### Patch Changes
+
+- jazz-tools@0.18.31
+
+## 0.0.158
+
+### Patch Changes
+
+- Updated dependencies [b3dbcaa]
+- Updated dependencies [75d452e]
+- Updated dependencies [346c5fb]
+- Updated dependencies [354895b]
+- Updated dependencies [162757c]
+- Updated dependencies [d08b7e2]
+- Updated dependencies [ad19280]
+  - jazz-tools@0.18.30
+
+## 0.0.157
+
+### Patch Changes
+
+- Updated dependencies [cc7efc8]
+- Updated dependencies [f55d17f]
+  - jazz-tools@0.18.29
+
+## 0.0.156
+
+### Patch Changes
+
+- Updated dependencies [8cbbe0e]
+- Updated dependencies [14806c8]
+  - jazz-tools@0.18.28
+
+## 0.0.155
+
+### Patch Changes
+
+- Updated dependencies [6c6eb35]
+- Updated dependencies [6ca0b59]
+- Updated dependencies [88c5f1c]
+  - jazz-tools@0.18.27
+
+## 0.0.154
+
+### Patch Changes
+
+- Updated dependencies [4e0ea26]
+  - jazz-tools@0.18.26
+
+## 0.0.153
+
+### Patch Changes
+
+- Updated dependencies [4036737]
+- Updated dependencies [8ae7d71]
+- Updated dependencies [b1d0081]
+- Updated dependencies [36a5c58]
+- Updated dependencies [94e7d89]
+  - jazz-tools@0.18.25
+
+## 0.0.152
+
+### Patch Changes
+
+- Updated dependencies [f4c4ee9]
+- Updated dependencies [a15e2ba]
+  - jazz-tools@0.18.24
+
+## 0.0.151
+
+### Patch Changes
+
+- Updated dependencies [a0c8a2d]
+  - jazz-tools@0.18.23
+
+## 0.0.150
+
+### Patch Changes
+
+- Updated dependencies [22200ac]
+- Updated dependencies [1e20db6]
+  - jazz-tools@0.18.22
+
+## 0.0.149
+
+### Patch Changes
+
+- Updated dependencies [6819f20]
+  - jazz-tools@0.18.21
+
+## 0.0.148
+
+### Patch Changes
+
+- Updated dependencies [c34a793]
+- Updated dependencies [2c01529]
+- Updated dependencies [7b0facc]
+- Updated dependencies [47c7dd3]
+- Updated dependencies [d0e2210]
+  - jazz-tools@0.18.20
+
+## 0.0.147
+
+### Patch Changes
+
+- Updated dependencies [f88db5f]
+- Updated dependencies [8eac2fc]
+- Updated dependencies [08b6c03]
+  - jazz-tools@0.18.19
+
+## 0.0.146
+
+### Patch Changes
+
+- Updated dependencies [f2f478a]
+- Updated dependencies [ed7e353]
+- Updated dependencies [1698d41]
+  - jazz-tools@0.18.18
+
+## 0.0.145
+
+### Patch Changes
+
+- Updated dependencies [75d1afa]
+- Updated dependencies [8aa4acd]
+  - jazz-tools@0.18.17
+
+## 0.0.144
+
+### Patch Changes
+
+- Updated dependencies [67b95b7]
+  - jazz-tools@0.18.16
+
+## 0.0.143
+
+### Patch Changes
+
+- Updated dependencies [a584ab3]
+  - jazz-tools@0.18.15
+
+## 0.0.142
+
+### Patch Changes
+
+- Updated dependencies [a04435e]
+  - jazz-tools@0.18.14
+
+## 0.0.141
+
+### Patch Changes
+
+- Updated dependencies [2ddf4d9]
+- Updated dependencies [45981cf]
+  - jazz-tools@0.18.13
+
+## 0.0.140
+
+### Patch Changes
+
+- Updated dependencies [c16ce4b]
+- Updated dependencies [0b1b050]
+  - jazz-tools@0.18.12
+
+## 0.0.139
+
+### Patch Changes
+
+- Updated dependencies [06b4617]
+- Updated dependencies [70eb465]
+  - jazz-tools@0.18.11
+
+## 0.0.138
+
+### Patch Changes
+
+- jazz-tools@0.18.10
+
+## 0.0.137
+
+### Patch Changes
+
+- Updated dependencies [c8167de]
+- Updated dependencies [910b8d6]
+  - jazz-tools@0.18.9
+
+## 0.0.136
+
+### Patch Changes
+
+- Updated dependencies [700fe46]
+- Updated dependencies [aba0d55]
+  - jazz-tools@0.18.8
+
+## 0.0.135
+
+### Patch Changes
+
+- Updated dependencies [cf26739]
+- Updated dependencies [a3cd9c8]
+- Updated dependencies [ca5cd26]
+- Updated dependencies [32d1444]
+  - jazz-tools@0.18.7
+
+## 0.0.134
+
+### Patch Changes
+
+- Updated dependencies [975d1c3]
+- Updated dependencies [ccbb795]
+- Updated dependencies [0dae338]
+- Updated dependencies [934679c]
+- Updated dependencies [28defd0]
+- Updated dependencies [e0f17ed]
+- Updated dependencies [88ef339]
+  - jazz-tools@0.18.6
+
+## 0.0.133
+
+### Patch Changes
+
+- Updated dependencies [ff35d8c]
+- Updated dependencies [f23a7a7]
+- Updated dependencies [f5d8424]
+- Updated dependencies [4e976b8]
+  - jazz-tools@0.18.5
+
+## 0.0.132
+
+### Patch Changes
+
+- Updated dependencies [84313aa]
+- Updated dependencies [89aab7b]
+  - jazz-tools@0.18.4
+
+## 0.0.131
+
+### Patch Changes
+
+- Updated dependencies [b526ab6]
+- Updated dependencies [d69aa68]
+  - jazz-tools@0.18.3
+
+## 0.0.130
+
+### Patch Changes
+
+- jazz-tools@0.18.2
+
+## 0.0.129
+
+### Patch Changes
+
+- Updated dependencies [af5fbe7]
+- Updated dependencies [9837459]
+  - jazz-tools@0.18.1
+
+## 0.0.128
+
+### Patch Changes
+
+- f263856: Add `$jazz` field to CoValues:
+  - This field contains Jazz methods that cluttered CoValues' API, as well as Jazz internal properties. This field is not enumerable, to allow CoValues to behave similarly to JSON objects.
+  - Added a `$jazz.set` method to update a CoValue's fields. When updating collaborative fields, you can pass in JSON objects instead of CoValues and Jazz will create
+    the CoValues automatically (similarly to CoValue `create` methods).
+  - All CoMap methods have been moved into `$jazz`, to allow defining any arbitrary key in the CoMap (except for `$jazz`) without conflicts.
+    - For CoMaps created with `co.map`, fields are now `readonly` to prevent setting properties directly. Use the `$jazz.set` method instead.
+    - CoMaps created with class schemas don't get type errors on direct property assignments, but they get a runtime errors prompting indicating to use `$jazz.set`.
+    - the `delete` operator can no longer be used to delete CoRecord properties. Use `$jazz.delete` instead.
+  - CoList's array-mutation methods have been moved into `$jazz`, in order to prevent using methods
+    - CoLists are now readonly arrays. Trying to use any mutation method yields a type error.
+    - `$jazz.set` can be used in place of direct element assignments.
+    - Added two new utility methods: `$jazz.remove` and `$jazz.retain`. They allow editing a CoList in-place with a simpler API than `$jazz.splice`.
+    - `sort`, `reverse`, `fill` and `copyWithin` have been deprecated, given that they could behave inconsistently with CoLists. `$jazz` replacements may be introduced
+      in future releases.
+  - `.$jazz.owner` now always returns a Group (instead of a Group or an Account). We'll be migrating away of having Accounts as CoValue owners in future releases.
+  - Removed `castAs`, since it's an inherently unsafe operation that bypassed typechecking and enabled using CoValues in unsupported ways.
+  - Removed the `id` and `_type` fields from `toJSON()`'s output in Account, CoMap, CoFeed & FileStream, to make CoValues behave more similarly to JSON objects.
+  - Removed the `root` and `profile` fields from Group.
+- Updated dependencies [f263856]
+  - jazz-tools@0.18.0
+
+## 0.0.127
+
+### Patch Changes
+
+- Updated dependencies [cc2f774]
+  - jazz-tools@0.17.14
+
+## 0.0.126
+
+### Patch Changes
+
+- Updated dependencies [d208cd1]
+- Updated dependencies [7821a8b]
+  - jazz-tools@0.17.13
+
+## 0.0.125
+
+### Patch Changes
+
+- 1ccae1a: RN Expo E2E dependency fixes w catalog
+- Updated dependencies [1ccae1a]
+  - jazz-tools@0.17.12
+
+## 0.0.124
+
+### Patch Changes
+
+- Updated dependencies [8f3852b]
+- Updated dependencies [bb9d837]
+  - jazz-tools@0.17.11
+
+## 0.0.123
+
+### Patch Changes
+
+- jazz-tools@0.17.10
+
+## 0.0.122
+
+### Patch Changes
+
+- Updated dependencies [52ea0c7]
+  - jazz-tools@0.17.9
+
+## 0.0.121
+
+### Patch Changes
+
+- Updated dependencies [ac3e694]
+- Updated dependencies [6dbb053]
+- Updated dependencies [1a182f0]
+  - jazz-tools@0.17.8
+
+## 0.0.120
+
+### Patch Changes
+
+- jazz-tools@0.17.7
+
+## 0.0.119
+
+### Patch Changes
+
+- Updated dependencies [82de51c]
+- Updated dependencies [694b168]
+  - jazz-tools@0.17.6
+
+## 0.0.118
+
+### Patch Changes
+
+- Updated dependencies [5963658]
+  - jazz-tools@0.17.5
+
+## 0.0.117
+
+### Patch Changes
+
+- Updated dependencies [7dd3d00]
+  - jazz-tools@0.17.4
+
+## 0.0.116
+
+### Patch Changes
+
+- jazz-tools@0.17.3
+
+## 0.0.115
+
+### Patch Changes
+
+- Updated dependencies [794681a]
+- Updated dependencies [83fc22f]
+  - jazz-tools@0.17.2
+
+## 0.0.114
+
+### Patch Changes
+
+- Updated dependencies [0bcbf55]
+- Updated dependencies [d1bdbf5]
+- Updated dependencies [4b73834]
+  - jazz-tools@0.17.1
+
+## 0.0.113
+
+### Patch Changes
+
+- Updated dependencies [fcaf4b9]
+  - jazz-tools@0.17.0
+
+## 0.0.112
+
+### Patch Changes
+
+- Updated dependencies [67e0968]
+- Updated dependencies [2c8120d]
+  - jazz-tools@0.16.6
+
+## 0.0.111
+
+### Patch Changes
+
+- Updated dependencies [3cd1586]
+- Updated dependencies [33ebbf0]
+  - jazz-tools@0.16.5
+
+## 0.0.110
+
+### Patch Changes
+
+- Updated dependencies [16764f6]
+  - jazz-tools@0.16.4
+
+## 0.0.109
+
+### Patch Changes
+
+- Updated dependencies [43d3511]
+  - jazz-tools@0.16.3
+
+## 0.0.108
+
+### Patch Changes
+
+- jazz-tools@0.16.2
+
+## 0.0.107
+
+### Patch Changes
+
+- Updated dependencies [c62abef]
+  - jazz-tools@0.16.1
+
+## 0.0.106
+
+### Patch Changes
+
+- 2bbb07b: Introduce a cleaner separation between Zod and CoValue schemas:
+  - Zod schemas and CoValue schemas are fully separated. Zod schemas can only be composed with other Zod schemas. CoValue schemas can be composed with either Zod or other CoValue schemas.
+  - `z.optional()` and `z.discriminatedUnion()` no longer work with CoValue schemas. Use `co.optional()` and `co.discriminatedUnion()` instead.
+  - Internal schema access is now simpler. You no longer need to use Zod’s `.def` to access internals. Use properties like `CoMapSchema.shape`, `CoListSchema.element`, and `CoOptionalSchema.innerType` directly.
+  - CoValue schema types are now namespaced under `co.`. Non-namespaced exports have been removed
+  - CoMap schemas no longer incorrectly inherit from Zod. Previously, methods like `.extend()` and `.partial()` appeared available but could cause unexpected behavior. These methods are now disabled. In their place, `.optional()` has been added, and more Zod-like methods will be introduced in future releases.
+  - Upgraded Zod from `3.25.28` to `3.25.76`.
+  - Removed deprecated `withHelpers` method from CoValue schemas
+  - Removed deprecated `createCoValueObservable` function
+- Updated dependencies [c09dcdf]
+- Updated dependencies [2bbb07b]
+  - jazz-tools@0.16.0
+
+## 0.0.105
+
+### Patch Changes
+
+- Updated dependencies [9633d01]
+- Updated dependencies [4beafb7]
+  - jazz-tools@0.15.16
+
+## 0.0.104
+
+### Patch Changes
+
+- Updated dependencies [3fe53a3]
+  - jazz-tools@0.15.15
+
+## 0.0.103
+
+### Patch Changes
+
+- Updated dependencies [a584590]
+- Updated dependencies [9acccb5]
+  - jazz-tools@0.15.14
+
+## 0.0.102
+
+### Patch Changes
+
+- Updated dependencies [6c76ff8]
+  - jazz-tools@0.15.13
+
+## 0.0.101
+
+### Patch Changes
+
+- Updated dependencies [d1c1b0c]
+- Updated dependencies [cf4ad72]
+  - jazz-tools@0.15.12
+
+## 0.0.100
+
+### Patch Changes
+
+- Updated dependencies [bdc9aee]
+  - jazz-tools@0.15.11
+
+## 0.0.99
+
+### Patch Changes
+
+- Updated dependencies [9815ec6]
+- Updated dependencies [b4fdab4]
+  - jazz-tools@0.15.10
+
+## 0.0.98
+
+### Patch Changes
+
+- Updated dependencies [27b4837]
+  - jazz-tools@0.15.9
+
+## 0.0.97
+
+### Patch Changes
+
+- Updated dependencies [3844666]
+  - jazz-tools@0.15.8
+
+## 0.0.96
+
+### Patch Changes
+
+- Updated dependencies [c09b636]
+  - jazz-tools@0.15.7
+
+## 0.0.95
+
+### Patch Changes
+
+- Updated dependencies [a5ceaff]
+  - jazz-tools@0.15.6
+
+## 0.0.94
+
+### Patch Changes
+
+- Updated dependencies [23bfea5]
+- Updated dependencies [e4ba23c]
+- Updated dependencies [4b89838]
+  - jazz-tools@0.15.5
+
+## 0.0.93
+
+### Patch Changes
+
+- jazz-tools@0.15.4
+
+## 0.0.92
+
+### Patch Changes
+
+- Updated dependencies [45f73a7]
+  - jazz-tools@0.15.3
+
+## 0.0.91
+
+### Patch Changes
+
+- Updated dependencies [0e7e532]
+  - jazz-tools@0.15.2
+
+## 0.0.90
+
+### Patch Changes
+
+- Updated dependencies [0e3a4d2]
+- Updated dependencies [b110f00]
+  - jazz-tools@0.15.1
+
+## 0.0.89
+
+### Patch Changes
+
+- Updated dependencies [1378a1f]
+- Updated dependencies [0fa051a]
+  - jazz-tools@0.15.0
+
+## 0.0.88
+
+### Patch Changes
+
+- Updated dependencies [06c5a1c]
+  - jazz-tools@0.14.28
+  - jazz-browser-media-images@0.14.28
+  - jazz-svelte@0.14.28
+
+## 0.0.87
+
+### Patch Changes
+
+- Updated dependencies [a026073]
+  - jazz-tools@0.14.27
+  - jazz-browser-media-images@0.14.27
+  - jazz-svelte@0.14.27
+
+## 0.0.86
+
+### Patch Changes
+
+- Updated dependencies [e35a380]
+  - jazz-svelte@0.14.26
+  - jazz-tools@0.14.26
+  - jazz-browser-media-images@0.14.26
+
+## 0.0.85
+
+### Patch Changes
+
+- Updated dependencies [99a2d9b]
+  - jazz-tools@0.14.25
+  - jazz-browser-media-images@0.14.25
+  - jazz-svelte@0.14.25
+
+## 0.0.84
+
+### Patch Changes
+
+- jazz-svelte@0.13.30
+- jazz-tools@0.13.30
+
+## 0.0.83
+
+### Patch Changes
+
+- jazz-svelte@0.13.29
+- jazz-tools@0.13.29
+
+## 0.0.82
+
+### Patch Changes
+
+- jazz-svelte@0.13.28
+- jazz-tools@0.13.28
+
+## 0.0.81
+
+### Patch Changes
+
+- jazz-svelte@0.13.27
+- jazz-tools@0.13.27
+
+## 0.0.80
+
+### Patch Changes
+
+- Updated dependencies [ff846d9]
+  - jazz-tools@0.13.26
+  - jazz-svelte@0.13.26
+
+## 0.0.79
+
+### Patch Changes
+
+- jazz-svelte@0.13.25
+- jazz-tools@0.13.25
+
+## 0.0.78
+
+### Patch Changes
+
+- Updated dependencies [ec546b4]
+  - jazz-svelte@0.13.24
+
+## 0.0.77
+
+### Patch Changes
+
+- Updated dependencies [3431076]
+- Updated dependencies [02a240c]
+  - jazz-svelte@0.13.23
+  - jazz-tools@0.13.23
+
+## 0.0.76
+
+### Patch Changes
+
+- jazz-svelte@0.13.21
+- jazz-tools@0.13.21
+
+## 0.0.75
+
+### Patch Changes
+
+- Updated dependencies [439f0fe]
+  - jazz-tools@0.13.20
+  - jazz-svelte@0.13.20
+
+## 0.0.74
+
+### Patch Changes
+
+- Updated dependencies [80530a4]
+  - jazz-tools@0.13.19
+  - jazz-svelte@0.13.19
+
+## 0.0.73
+
+### Patch Changes
+
+- Updated dependencies [761759c]
+  - jazz-tools@0.13.18
+  - jazz-svelte@0.13.18
+
+## 0.0.72
+
+### Patch Changes
+
+- jazz-svelte@0.13.17
+- jazz-tools@0.13.17
+
+## 0.0.71
+
+### Patch Changes
+
+- jazz-svelte@0.13.16
+- jazz-tools@0.13.16
+
+## 0.0.70
+
+### Patch Changes
+
+- jazz-svelte@0.13.15
+- jazz-tools@0.13.15
+
+## 0.0.69
+
+### Patch Changes
+
+- jazz-svelte@0.13.14
+- jazz-tools@0.13.14
+
+## 0.0.68
+
+### Patch Changes
+
+- jazz-svelte@0.13.13
+- jazz-tools@0.13.13
+
+## 0.0.67
+
+### Patch Changes
+
+- Updated dependencies [4547525]
+  - jazz-tools@0.13.12
+  - jazz-svelte@0.13.12
+
+## 0.0.66
+
+### Patch Changes
+
+- Updated dependencies [17273a6]
+  - jazz-tools@0.13.11
+  - jazz-svelte@0.13.11
+
+## 0.0.65
+
+### Patch Changes
+
+- jazz-svelte@0.13.10
+- jazz-tools@0.13.10
+
+## 0.0.64
+
+### Patch Changes
+
+- Updated dependencies [a6cf01f]
+  - jazz-tools@0.13.9
+  - jazz-svelte@0.13.9
+
+## 0.0.63
+
+### Patch Changes
+
+- jazz-svelte@0.13.7
+
+## 0.0.62
+
+### Patch Changes
+
+- jazz-svelte@0.13.5
+
+## 0.0.61
+
+### Patch Changes
+
+- jazz-svelte@0.13.4
+
+## 0.0.60
+
+### Patch Changes
+
+- jazz-svelte@0.13.3
+
+## 0.0.59
+
+### Patch Changes
+
+- jazz-svelte@0.13.2
+
+## 0.0.58
+
+### Patch Changes
+
+- jazz-svelte@0.13.0
+
+## 0.0.57
+
+### Patch Changes
+
+- jazz-svelte@0.12.2
+
+## 0.0.56
+
+### Patch Changes
+
+- jazz-svelte@0.12.1
+
+## 0.0.55
+
+### Patch Changes
+
+- jazz-svelte@0.12.0
+
+## 0.0.54
+
+### Patch Changes
+
+- jazz-svelte@0.11.8
+
+## 0.0.53
+
+### Patch Changes
+
+- jazz-svelte@0.11.7
+
+## 0.0.52
+
+### Patch Changes
+
+- 1bfa9bb: Removed when="singedUp" from examples apps' Jazz providers. This is a really niche use-case option and can lead to broken-feeling experiences when anonymous users try to load something.
+  - jazz-svelte@0.11.6
+
+## 0.0.51
+
+### Patch Changes
+
+- jazz-svelte@0.11.5
+
+## 0.0.50
+
+### Patch Changes
+
+- jazz-svelte@0.11.4
+
+## 0.0.49
+
+### Patch Changes
+
+- jazz-svelte@0.11.3
+
+## 0.0.48
+
+### Patch Changes
+
+- jazz-svelte@0.11.2
+
+## 0.0.47
+
+### Patch Changes
+
+- jazz-svelte@0.11.0
+
+## 0.0.46
+
+### Patch Changes
+
+- jazz-svelte@0.10.15
+
+## 0.0.45
+
+### Patch Changes
+
+- jazz-svelte@0.10.14
+
+## 0.0.44
+
+### Patch Changes
+
+- jazz-svelte@0.10.13
+
+## 0.0.43
+
+### Patch Changes
+
+- Updated dependencies [4612e05]
+  - jazz-svelte@0.10.12
+
+## 0.0.42
+
+### Patch Changes
+
+- jazz-svelte@0.10.9
+
+## 0.0.41
+
+### Patch Changes
+
+- jazz-svelte@0.10.8
+
+## 0.0.40
+
+### Patch Changes
+
+- Updated dependencies [1136d9b]
+  - jazz-svelte@0.10.7
+
+## 0.0.39
+
+### Patch Changes
+
+- jazz-svelte@0.10.6
+
+## 0.0.38
+
+### Patch Changes
+
+- jazz-svelte@0.10.5
+
+## 0.0.37
+
+### Patch Changes
+
+- jazz-svelte@0.10.4
+
+## 0.0.36
+
+### Patch Changes
+
+- jazz-svelte@0.10.3
+
+## 0.0.35
+
+### Patch Changes
+
+- jazz-svelte@0.10.2
+
+## 0.0.34
+
+### Patch Changes
+
+- jazz-svelte@0.10.1
+
+## 0.0.33
+
+### Patch Changes
+
+- Updated dependencies [b426342]
+  - jazz-svelte@0.10.0
+
+## 0.0.32
+
+### Patch Changes
+
+- jazz-svelte@0.9.23
+
+## 0.0.31
+
+### Patch Changes
+
+- jazz-svelte@0.9.22
+
+## 0.0.30
+
+### Patch Changes
+
+- jazz-svelte@0.9.21
+
+## 0.0.29
+
+### Patch Changes
+
+- jazz-svelte@0.9.20
+
+## 0.0.28
+
+### Patch Changes
+
+- jazz-svelte@0.9.19
+
+## 0.0.27
+
+### Patch Changes
+
+- jazz-svelte@0.9.18
+
+## 0.0.26
+
+### Patch Changes
+
+- jazz-svelte@0.9.17
+
+## 0.0.25
+
+### Patch Changes
+
+- jazz-svelte@0.9.16
+
+## 0.0.24
+
+### Patch Changes
+
+- jazz-svelte@0.9.15
+
+## 0.0.23
+
+### Patch Changes
+
+- jazz-svelte@0.9.14
+
+## 0.0.22
+
+### Patch Changes
+
+- jazz-svelte@0.9.13
+
+## 0.0.21
+
+### Patch Changes
+
+- jazz-svelte@0.9.12
+
+## 0.0.20
+
+### Patch Changes
+
+- jazz-svelte@0.9.11
+
+## 0.0.19
+
+### Patch Changes
+
+- jazz-svelte@0.9.10
+
+## 0.0.18
+
+### Patch Changes
+
+- jazz-svelte@0.9.9
+
+## 0.0.17
+
+### Patch Changes
+
+- jazz-svelte@0.9.8
+
+## 0.0.16
+
+### Patch Changes
+
+- jazz-svelte@0.9.1
+
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [9dd8d95]
+  - jazz-svelte@0.9.0
+
+## 0.0.14
+
+### Patch Changes
+
+- jazz-svelte@0.8.51
+
+## 0.0.13
+
+### Patch Changes
+
+- jazz-svelte@0.8.50
+
+## 0.0.12
+
+### Patch Changes
+
+- jazz-svelte@0.8.49
+
+## 0.0.11
+
+### Patch Changes
+
+- jazz-svelte@0.8.48
+
+## 0.0.10
+
+### Patch Changes
+
+- jazz-svelte@0.8.45
+
+## 0.0.9
+
+### Patch Changes
+
+- jazz-svelte@0.8.44
+
+## 0.0.8
+
+### Patch Changes
+
+- jazz-svelte@0.8.41
+
+## 0.0.7
+
+### Patch Changes
+
+- jazz-svelte@0.8.40
+
+## 0.0.6
+
+### Patch Changes
+
+- Updated dependencies [aa21072]
+  - jazz-svelte@0.8.39
+
+## 0.0.5
+
+### Patch Changes
+
+- jazz-svelte@0.8.38
+
+## 0.0.4
+
+### Patch Changes
+
+- jazz-svelte@0.0.4
+
+## 0.0.3
+
+### Patch Changes
+
+- jazz-svelte@0.0.3
+
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [0e59e65]
+  - jazz-svelte@0.0.2
+
+
+
+================================================
+FILE: examples/chat-svelte/eslint.config.js
+================================================
+import prettier from 'eslint-config-prettier';
+import js from '@eslint/js';
+import svelte from 'eslint-plugin-svelte';
+import globals from 'globals';
+import ts from 'typescript-eslint';
+
+export default ts.config(
+  js.configs.recommended,
+  ...ts.configs.recommended,
+  ...svelte.configs['flat/recommended'],
+  prettier,
+  ...svelte.configs['flat/prettier'],
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      }
+    }
+  },
+  {
+    files: ['**/*.svelte'],
+
+    languageOptions: {
+      parserOptions: {
+        parser: ts.parser
+      }
+    }
+  },
+  {
+    ignores: ['build/', '.svelte-kit/', 'dist/']
+  }
+);
+
+
+
+================================================
+FILE: examples/chat-svelte/package.json
+================================================
+{
+  "name": "chat-svelte",
+  "version": "0.0.181",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "pnpm check && vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "prettier --write .",
+    "lint": "prettier --check . && eslint .",
+    "format-and-lint": "pnpm run format && pnpm run lint",
+    "format-and-lint:fix": "pnpm run format --write && pnpm run lint --fix",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "packageManager": "pnpm@10.16.1",
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.3.1",
+    "@sveltejs/kit": "catalog:svelte",
+    "@sveltejs/vite-plugin-svelte": "catalog:svelte",
+    "@types/eslint": "^9.6.1",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-svelte": "^2.46.1",
+    "globals": "^15.15.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-svelte": "^3.4.0",
+    "svelte": "catalog:svelte",
+    "svelte-check": "catalog:svelte",
+    "typescript": "5.6.2",
+    "typescript-eslint": "^8.32.1",
+    "vite": "6.0.11",
+    "zod": "^4.1.11"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.7",
+    "jazz-tools": "workspace:*",
+    "tailwindcss": "^4.1.7"
+  }
+}
+
+
+
+================================================
+FILE: examples/chat-svelte/playwright.config.ts
+================================================
+import { defineConfig, devices } from '@playwright/test';
+
+import isCI from 'is-ci';
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// import dotenv from 'dotenv';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
+export default defineConfig({
+  testDir: './tests',
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: isCI,
+  /* Retry on CI only */
+  retries: isCI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: isCI ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: 'html',
+
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  use: {
+    /* Base URL to use in actions like `await page.goto('/')`. */
+    baseURL: 'http://localhost:5173/',
+
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    trace: 'on-first-retry',
+    permissions: ['clipboard-read', 'clipboard-write']
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] }
+    }
+  ],
+
+  /* Run your local dev server before starting the tests */
+  webServer: [
+    {
+      command: 'pnpm preview --port 5173',
+      url: 'http://localhost:5173/',
+      reuseExistingServer: !isCI
+    }
+  ]
+});
+
+
+
+================================================
+FILE: examples/chat-svelte/svelte.config.js
+================================================
+import adapter from '@sveltejs/adapter-auto';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+  // Consult https://svelte.dev/docs/kit/integrations
+  // for more information about preprocessors
+  preprocess: vitePreprocess(),
+
+  kit: {
+    // adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
+    // If your environment is not supported, or you settled on a specific environment, switch out the adapter.
+    // See https://svelte.dev/docs/kit/adapters for more information about adapters.
+    adapter: adapter()
+  }
+};
+
+export default config;
+
+
+
+================================================
+FILE: examples/chat-svelte/tsconfig.json
+================================================
+{
+  "extends": "./.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "bundler"
+  }
+  // Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
+  // except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
+  //
+  // If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes
+  // from the referenced tsconfig.json - TypeScript does not merge them in
+}
+
+
+
+================================================
+FILE: examples/chat-svelte/vite.config.ts
+================================================
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+  plugins: [tailwindcss(), sveltekit()]
+});
+
+
+
+================================================
+FILE: examples/chat-svelte/.npmrc
+================================================
+engine-strict=true
+
+
+
+================================================
+FILE: examples/chat-svelte/.prettierignore
+================================================
+# Package Managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+
+
+================================================
+FILE: examples/chat-svelte/.prettierrc
+================================================
+{
+  "useTabs": false,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "printWidth": 100,
+  "plugins": ["prettier-plugin-svelte"],
+  "overrides": [
+    {
+      "files": "*.svelte",
+      "options": {
+        "parser": "svelte"
+      }
+    }
+  ]
+}
+
+
+
+================================================
+FILE: examples/chat-svelte/src/apiKey.ts
+================================================
+export const apiKey = 'svelte-chat-example@garden.co';
+
+
+
+================================================
+FILE: examples/chat-svelte/src/app.css
+================================================
+@import 'tailwindcss';
+@theme {
+  --color-stone-50: oklch(0.988281 0.002 75);
+  --color-stone-75: oklch(0.980563 0.002 75);
+  --color-stone-100: oklch(0.964844 0.002 75);
+  --color-stone-200: oklch(0.917969 0.002 75);
+  --color-stone-300: oklch(0.853516 0.002 75);
+  --color-stone-400: oklch(0.789063 0.002 75);
+  --color-stone-500: oklch(0.726563 0.002 75);
+  --color-stone-600: oklch(0.613281 0.002 75);
+  --color-stone-700: oklch(0.523438 0.002 75);
+  --color-stone-800: oklch(0.412109 0.002 75);
+  --color-stone-900: oklch(0.302734 0.002 75);
+  --color-stone-925: oklch(0.22 0.002 75);
+  --color-stone-950: oklch(0.193359 0.002 75);
+  --color-blue: oklch(0.57 0.2346 261.2);
+}
+
+:focus {
+  @apply outline-hidden;
+}
+
+
+
+================================================
+FILE: examples/chat-svelte/src/app.d.ts
+================================================
+// See https://svelte.dev/docs/kit/types#app.d.ts
+// for information about these interfaces
+declare global {
+  namespace App {
+    // interface Error {}
+    // interface Locals {}
+    // interface PageData {}
+    // interface PageState {}
+    // interface Platform {}
+  }
+}
+
+export {};
+
+
+
+================================================
+FILE: examples/chat-svelte/src/app.html
+================================================
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/jazz-icon.png" type="image/png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/schema.ts
+================================================
+import { co } from 'jazz-tools';
+
+export const Message = co.map({
+  text: co.plainText(),
+  image: co.optional(co.image())
+});
+
+export const Chat = co.list(Message);
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/utils.ts
+================================================
+const animals = [
+  'elephant',
+  'penguin',
+  'giraffe',
+  'octopus',
+  'kangaroo',
+  'dolphin',
+  'cheetah',
+  'koala',
+  'platypus',
+  'pangolin'
+];
+
+export function getRandomUsername() {
+  return `Anonymous ${animals[Math.floor(Math.random() * animals.length)]}`;
+}
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/AppContainer.svelte
+================================================
+<script lang="ts">
+  let { children } = $props();
+</script>
+
+<div
+  class="flex flex-col justify-between w-screen h-screen bg-stone-50 dark:bg-stone-925 dark:text-white"
+>
+  {@render children()}
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/BubbleBody.svelte
+================================================
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  let { children, fromMe }: { children: Snippet; fromMe: boolean | undefined } = $props();
+</script>
+
+<div
+  class="line-clamp-10 text-ellipsis rounded-2xl overflow-hidden max-w-[calc(100%-5rem)] shadow-sm p-1 {fromMe
+    ? 'bg-white dark:bg-stone-900 dark:text-white'
+    : 'bg-blue text-white'}"
+>
+  {@render children()}
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/BubbleContainer.svelte
+================================================
+<script lang="ts">
+  import type { Snippet } from 'svelte';
+  let { children, fromMe }: { children: Snippet; fromMe: boolean | undefined } = $props();
+  const align = fromMe ? 'items-end' : 'items-start';
+</script>
+
+<div class="{align} flex flex-col m-3" role="row">
+  {@render children()}
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/BubbleImage.svelte
+================================================
+<script lang="ts">
+  import { ImageDefinition, type Loaded } from 'jazz-tools';
+  import { Image } from 'jazz-tools/svelte';
+  let { image }: { image: Loaded<typeof ImageDefinition> } = $props();
+</script>
+
+<Image
+  imageId={image.$jazz.id}
+  alt=""
+  class="h-auto max-h-[20rem] max-w-full rounded-t-xl mb-1"
+/>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/BubbleInfo.svelte
+================================================
+<script lang="ts">
+  let { by, madeAt }: { by: string | undefined; madeAt: Date } = $props();
+</script>
+
+<div class="text-xs text-neutral-500 mt-1.5">
+  {by} · {madeAt.toLocaleTimeString()}
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/BubbleText.svelte
+================================================
+<script lang="ts">
+  import type { CoPlainText } from 'jazz-tools';
+
+  let { text, className }: { text: CoPlainText | string | null; className?: string } = $props();
+</script>
+
+<div class="whitespace-pre-wrap"><p class="px-2 leading-relaxed {className}">{text}</p></div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/ChatBody.svelte
+================================================
+<script lang="ts">
+  let { children } = $props();
+</script>
+
+<div class="flex flex-col-reverse flex-1 overflow-y-auto" role="application">
+  {@render children()}
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/ChatBubble.svelte
+================================================
+<script lang="ts">
+  import BubbleBody from '$lib/components/BubbleBody.svelte';
+  import BubbleContainer from '$lib/components/BubbleContainer.svelte';
+  import BubbleImage from '$lib/components/BubbleImage.svelte';
+  import BubbleInfo from '$lib/components/BubbleInfo.svelte';
+  import BubbleText from '$lib/components/BubbleText.svelte';
+  import type { Message } from '$lib/schema';
+  import type { Account, Loaded, MaybeLoaded } from 'jazz-tools';
+  let {
+    me,
+    msg
+  }: {
+    me: MaybeLoaded<Loaded<typeof Account>>;
+    msg: Loaded<typeof Message, { text: true }>;
+  } = $props();
+  const lastEdit = $derived(msg.$jazz.getEdits().text);
+  const fromMe = $derived(lastEdit?.by?.isMe);
+  const { text, image } = $derived(msg);
+</script>
+
+{#if me.$isLoaded && (!me.canRead(msg) || !msg.text?.toString())}
+  <BubbleContainer fromMe={false}>
+    <BubbleBody fromMe={false}>
+      <BubbleText text="Message not readable" className="italic text-gray-500"></BubbleText>
+    </BubbleBody>
+  </BubbleContainer>
+{:else}
+  <BubbleContainer {fromMe}>
+    <BubbleBody {fromMe}>
+      {#if image?.$isLoaded}
+        <BubbleImage {image} />{/if}
+      <BubbleText {text} />
+    </BubbleBody>
+    {#if lastEdit?.by?.profile?.$isLoaded}
+      <BubbleInfo by={lastEdit.by.profile.name} madeAt={lastEdit.madeAt} />
+    {/if}
+  </BubbleContainer>
+{/if}
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/EmptyChatMessage.svelte
+================================================
+<div class="flex items-center justify-center h-full px-3 text-base text-stone-500 md:text-2xl">
+  Start a conversation below.
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/ImageIcon.svelte
+================================================
+<script lang="ts">
+  let { size = 24, strokeWidth = 2 } = $props();
+</script>
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width={strokeWidth}
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="lucide lucide-image-icon lucide-image"
+  ><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><circle cx="9" cy="9" r="2" /><path
+    d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+  /></svg
+>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/ImageInput.svelte
+================================================
+<script lang="ts">
+  import type { ChangeEventHandler } from 'svelte/elements';
+
+  import ImageIcon from '$lib/components/ImageIcon.svelte';
+  let { onImageChange }: { onImageChange?: ChangeEventHandler<HTMLInputElement> } = $props();
+
+  let input = $state<HTMLInputElement>();
+
+  const onUploadClick = () => {
+    input?.click();
+  };
+</script>
+
+<button
+  type="button"
+  aria-label="Send image"
+  title="Send image"
+  onclick={onUploadClick}
+  class="text-stone-500 p-1.5 rounded-full hover:bg-stone-100 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-stone-200 transition-colors"
+>
+  <ImageIcon size={24} strokeWidth={1.5} />
+</button>
+
+<label class="sr-only">
+  Image
+  <input
+    bind:this={input}
+    type="file"
+    accept="image/png, image/jpeg, image/gif"
+    onchange={onImageChange}
+  />
+</label>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/InputBar.svelte
+================================================
+<script lang="ts">
+  let { children } = $props();
+</script>
+
+<div
+  class="flex gap-1 p-3 mt-auto bg-white border-t shadow-2xl border-stone-200 dark:bg-transparent dark:border-stone-900"
+>
+  {@render children()}
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/TextInput.svelte
+================================================
+<script lang="ts">
+  let { onSubmit }: { onSubmit: (text: string) => void } = $props();
+  const inputId = $props.id();
+</script>
+
+<div class="flex-1">
+  <label class="sr-only" for={inputId}> Type a message and press Enter </label>
+  <input
+    id={inputId}
+    class="block w-full px-3 py-1 border rounded-full border-stone-200 placeholder:text-stone-500 dark:bg-stone-925 dark:text-white dark:border-stone-900"
+    placeholder="Type a message and press Enter"
+    maxLength={2048}
+    type="text"
+    onkeydown={({ key, currentTarget: input }) => {
+      if (key !== 'Enter' || !input.value) return;
+      onSubmit(input.value);
+      input.value = '';
+    }}
+  />
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/lib/components/TopBar.svelte
+================================================
+<script lang="ts">
+  let { children } = $props();
+</script>
+
+<div
+  class="flex justify-between w-full gap-2 p-3 bg-white border-b border-stone-200 dark:bg-transparent dark:border-stone-900"
+>
+  {@render children()}
+</div>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/routes/+layout.svelte
+================================================
+<script lang="ts">
+  import 'jazz-tools/inspector/register-custom-element';
+
+  import '../app.css';
+  import { JazzSvelteProvider } from 'jazz-tools/svelte';
+  import { apiKey } from '../apiKey';
+  import { getRandomUsername } from '$lib/utils';
+  let { children } = $props();
+  const defaultProfileName = getRandomUsername();
+</script>
+
+<svelte:head>
+  <title>Jazz Chat Example</title>
+</svelte:head>
+
+<div class="h-full bg-white text-stone-700 dark:text-stone-400 dark:bg-stone-925">
+  <JazzSvelteProvider
+    sync={{
+      peer: `wss://cloud.jazz.tools/?key=${apiKey}`
+    }}
+    {defaultProfileName}
+  >
+    {@render children?.()}
+  </JazzSvelteProvider>
+  <jazz-inspector></jazz-inspector>
+</div>
+
+<style>
+  :global(html, body) {
+    margin: 0;
+  }
+</style>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/routes/+page.svelte
+================================================
+<script lang="ts">
+  import { goto } from '$app/navigation';
+  import { Chat } from '$lib/schema';
+  import { AccountCoState } from 'jazz-tools/svelte';
+  import { Account, Group } from 'jazz-tools';
+
+  const account = new AccountCoState(Account);
+  const me = $derived(account.current);
+  $effect(() => {
+    if (!me.$isLoaded) return;
+    const group = Group.create();
+    group.addMember('everyone', 'writer');
+    const chat = Chat.create([], group);
+    goto(`/chat/${chat.$jazz.id}`);
+  });
+</script>
+
+
+
+================================================
+FILE: examples/chat-svelte/src/routes/chat/[id]/+page.svelte
+================================================
+<script lang="ts">
+  import { createImage } from 'jazz-tools/media';
+  import { AccountCoState, CoState } from 'jazz-tools/svelte';
+  import { Account, CoPlainText, getLoadedOrUndefined, type ID } from 'jazz-tools';
+
+  import { page } from '$app/state';
+
+  import { Chat, Message } from '$lib/schema';
+
+  import AppContainer from '$lib/components/AppContainer.svelte';
+  import ChatBody from '$lib/components/ChatBody.svelte';
+  import ChatBubble from '$lib/components/ChatBubble.svelte';
+  import EmptyChatMessage from '$lib/components/EmptyChatMessage.svelte';
+  import ImageInput from '$lib/components/ImageInput.svelte';
+  import InputBar from '$lib/components/InputBar.svelte';
+  import TopBar from '$lib/components/TopBar.svelte';
+  import TextInput from '$lib/components/TextInput.svelte';
+
+  const chatId = $derived(page.params.id) as ID<typeof Chat>;
+  const chat = $derived(
+    new CoState(Chat, chatId, {
+      resolve: {
+        $each: {
+          text: true
+        }
+      }
+    })
+  );
+  const account = new AccountCoState(Account, {
+    resolve: {
+      profile: true
+    }
+  });
+  const me = $derived(account.current);
+  let showNLastMessages = $state(30);
+  const sendImage = (event: Event & { currentTarget: HTMLInputElement }) => {
+    const file = event.currentTarget.files?.[0];
+
+    if (!file || !chat.current.$isLoaded) return;
+
+    if (file.size > 5000000) {
+      alert('Please upload an image less than 5MB.');
+      return;
+    }
+
+    createImage(file, { owner: chat.current.$jazz.owner }).then((image) => {
+      if (!chat.current.$isLoaded) return;
+      chat.current.$jazz.push(
+        Message.create(
+          {
+            text: CoPlainText.create(file.name, chat.current.$jazz.owner),
+            image: image
+          },
+          chat.current.$jazz.owner
+        )
+      );
+    });
+  };
+</script>
+
+<AppContainer>
+  <TopBar>
+    <input
+      type="text"
+      value={getLoadedOrUndefined(me)?.profile?.name ?? ''}
+      class="bg-transparent"
+      onchange={(e) => {
+        if (!me.$isLoaded) return;
+        const target = e.target as HTMLInputElement;
+        me.profile.$jazz.set('name', target.value);
+      }}
+      placeholder="Set username"
+    />
+    <button
+      onclick={() => {
+        account.logOut();
+        window.location.reload(); // Otherwise the provider will not update with default profile name
+      }}>Log out</button
+    >
+  </TopBar>
+  {#if !chat}
+    <div class="flex items-center justify-center flex-1">Loading...</div>
+  {:else}
+    <ChatBody>
+      {#if chat.current.$isLoaded && chat.current.length > 0}
+        {#each chat.current.slice(-showNLastMessages).reverse() as msg (msg.$jazz.id)}
+          <ChatBubble {me} {msg} />
+        {/each}
+      {:else}
+        <EmptyChatMessage />
+      {/if}
+      {#if chat.current.$isLoaded && chat.current.length > showNLastMessages}
+        <button
+          class="block px-4 py-1 mx-auto my-2 border rounded"
+          onclick={() => (showNLastMessages += 10)}
+        >
+          Show more
+        </button>
+      {/if}
+    </ChatBody>
+    <InputBar>
+      <ImageInput onImageChange={sendImage} />
+      <TextInput
+        onSubmit={(text: string) => {
+          console.log({text})
+          if (!chat.current.$isLoaded) return;
+          chat.current.$jazz.push(
+            Message.create(
+              { text: CoPlainText.create(text, chat.current.$jazz.owner) },
+              chat.current.$jazz.owner
+            )
+          );
+        }}
+      />
+    </InputBar>
+  {/if}
+</AppContainer>
+
+
+
+================================================
+FILE: examples/chat-svelte/tests/chat.spec.ts
+================================================
+import { ChatPage } from './pages/ChatPage';
+import { test } from '@playwright/test';
+
+test('chat works between two windows', async ({ page: marioPage, browser }) => {
+  await marioPage.goto('/');
+  const context = await browser.newContext();
+  const luigiPage = await context.newPage();
+
+  await marioPage.waitForURL('/chat/**');
+  const roomUrl = marioPage.url();
+  await luigiPage.goto(roomUrl);
+
+  const marioChat = new ChatPage(marioPage);
+  const luigiChat = new ChatPage(luigiPage);
+
+
+  await marioChat.setUsername('Mario');
+
+  const message1ByMario = 'Hello Luigi, are you ready to save the princess?';
+
+  await marioChat.sendMessage(message1ByMario);
+  await marioChat.expectMessageRow(message1ByMario);
+
+  const roomURL = marioPage.url();
+  await luigiPage.goto(roomURL);
+
+  await luigiChat.setUsername('Luigi');
+
+  await luigiChat.expectMessageRow(message1ByMario);
+
+  const message2ByLuigi = "No, I'm not ready yet. I'm still trying to find the key to the castle.";
+
+  await luigiChat.sendMessage(message2ByLuigi);
+  await luigiChat.expectMessageRow(message2ByLuigi);
+
+  await marioChat.expectMessageRow(message1ByMario);
+  await luigiChat.expectMessageRow(message2ByLuigi);
+  await context.close();
+});
+
+
+
+================================================
+FILE: examples/chat-svelte/tests/pages/ChatPage.ts
+================================================
+import { type Locator, type Page, expect } from '@playwright/test';
+
+export class ChatPage {
+  readonly page: Page;
+  readonly messageInput: Locator;
+  readonly logoutButton: Locator;
+  readonly usernameInput: Locator;
+  constructor(page: Page) {
+    this.page = page;
+    this.messageInput = page.getByRole('textbox', {
+      name: 'Type a message and press Enter'
+    });
+    this.logoutButton = page.getByRole('button', {
+      name: 'Log out'
+    });
+    this.usernameInput = page.getByPlaceholder('Set username');
+  }
+
+  async setUsername(username: string) {
+    await this.usernameInput.fill(username);
+  }
+
+  async sendMessage(message: string) {
+    await this.messageInput.fill(message);
+    await this.messageInput.press('Enter');
+  }
+
+  async expectMessageRow(message: string) {
+    await expect(this.page.getByText(message)).toBeVisible();
+  }
+
+  async expectUserNameNotToBeAnonymousUser() {
+    await expect(this.usernameInput).not.toHaveValue(/anonymous user/i);
+    await expect(this.usernameInput).toHaveValue(/^Anonymous \w+/);
+  }
+
+  async logout() {
+    await this.logoutButton.click();
+    await this.page.goto('/');
+  }
+}
+
+
