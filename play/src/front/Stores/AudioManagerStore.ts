@@ -1,7 +1,7 @@
 import type { Writable } from "svelte/store";
 import { get, writable } from "svelte/store";
 import { Subject } from "rxjs";
-import { localUserStore } from "../Connection/LocalUserStore";
+import { localUserStoreAdapter } from "../Connection/LocalUserStoreAdapter";
 import { videoStreamElementsStore } from "./PeerStore";
 import { activeSecondaryZoneActionBarStore } from "./MenuStore";
 
@@ -127,7 +127,7 @@ export const audioManagerPlayerState: Writable<"loading" | "playing" | "not_allo
 export const audioManagerRetryPlaySubject = new Subject<void>();
 
 // Store for bubble sound preference
-export const bubbleSoundStore = writable<"ding" | "wobble">(localUserStore.getBubbleSound());
+export const bubbleSoundStore = writable<"ding" | "wobble">(localUserStoreAdapter.getBubbleSound());
 
 // Not unsubscribing is ok, this is a singleton.
 //eslint-disable-next-line svelte/no-ignored-unsubscribe

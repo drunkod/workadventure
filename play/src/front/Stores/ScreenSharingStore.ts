@@ -2,10 +2,11 @@ import type { Readable } from "svelte/store";
 import { get, derived, readable, writable } from "svelte/store";
 import type { DesktopCapturerSource } from "../Interfaces/DesktopAppInterfaces";
 import { localUserStore } from "../Connection/LocalUserStore";
+import { localUserStoreAdapter } from "../Connection/LocalUserStoreAdapter";
 import LL from "../../i18n/i18n-svelte";
 import { isSpeakerStore, type LocalStreamStoreValue } from "./MediaStore";
 import { inExternalServiceStore, myCameraStore, myMicrophoneStore } from "./MyMediaStore";
-import type {} from "../Api/Desktop";
+import type { } from "../Api/Desktop";
 import type { Streamable, WebRtcStreamable } from "./StreamableCollectionStore";
 import { screenShareStreamElementsStore } from "./PeerStore";
 import { muteMediaStreamStore } from "./MuteMediaStreamStore";
@@ -47,13 +48,13 @@ let previousComputedVideoConstraint: boolean | MediaTrackConstraints = false;
 let previousComputedAudioConstraint: boolean | MediaTrackConstraints = false;
 
 function createScreenShareBandwidthStore() {
-    const { subscribe, set } = writable<number | "unlimited">(localUserStore.getScreenShareBandwidth());
+    const { subscribe, set } = writable<number | "unlimited">(localUserStoreAdapter.getScreenShareBandwidth());
 
     return {
         subscribe,
         setBandwidth: (bandwidth: number | "unlimited") => {
             set(bandwidth);
-            localUserStore.setScreenShareBandwidth(bandwidth);
+            localUserStoreAdapter.setScreenShareBandwidth(bandwidth);
         },
     };
 }
@@ -296,7 +297,7 @@ export const screenSharingLocalMedia = readable<Streamable | undefined>(undefine
         once: (event: string, callback: (...args: unknown[]) => void) => {
             callback();
         },
-        closeStreamable: () => {},
+        closeStreamable: () => { },
         volume: writable(1),
         videoType: "local_screenSharing",
     } satisfies Streamable;

@@ -1,5 +1,5 @@
 import { writable, derived } from "svelte/store";
-import { localUserStore } from "../Connection/LocalUserStore";
+import { localUserStoreAdapter } from "../Connection/LocalUserStoreAdapter";
 import type { BackgroundConfig, BackgroundMode } from "../WebRtc/BackgroundProcessor/createBackgroundTransformer";
 import { analyticsClient } from "../Administration/AnalyticsClient";
 
@@ -8,10 +8,10 @@ import { analyticsClient } from "../Administration/AnalyticsClient";
  */
 function createBackgroundConfigStore() {
     const initialConfig: BackgroundConfig = {
-        mode: (localUserStore.getBackgroundMode() as BackgroundMode) || "none", // Default to blur for testing
-        blurAmount: localUserStore.getBackgroundBlurAmount() || 15, // Nice blur amount for testing
-        backgroundImage: localUserStore.getBackgroundImage() || undefined,
-        backgroundVideo: localUserStore.getBackgroundVideo() || undefined,
+        mode: (localUserStoreAdapter.getBackgroundMode() as BackgroundMode) || "none", // Default to blur for testing
+        blurAmount: localUserStoreAdapter.getBackgroundBlurAmount() || 15, // Nice blur amount for testing
+        backgroundImage: localUserStoreAdapter.getBackgroundImage() || undefined,
+        backgroundVideo: localUserStoreAdapter.getBackgroundVideo() || undefined,
     };
 
     const { subscribe, set, update } = writable<BackgroundConfig>(initialConfig);
@@ -21,7 +21,7 @@ function createBackgroundConfigStore() {
         setMode: (mode: BackgroundMode) => {
             update((config) => {
                 const newConfig = { ...config, mode };
-                localUserStore.setBackgroundMode(mode);
+                localUserStoreAdapter.setBackgroundMode(mode);
                 analyticsClient.settingBackground(mode);
                 return newConfig;
             });
@@ -29,30 +29,30 @@ function createBackgroundConfigStore() {
         setBlurAmount: (amount: number) => {
             update((config) => {
                 const newConfig = { ...config, blurAmount: amount };
-                localUserStore.setBackgroundBlurAmount(amount);
+                localUserStoreAdapter.setBackgroundBlurAmount(amount);
                 return newConfig;
             });
         },
         setBackgroundImage: (imageUrl: string) => {
             update((config) => {
                 const newConfig = { ...config, backgroundImage: imageUrl, mode: "image" as BackgroundMode };
-                localUserStore.setBackgroundImage(imageUrl);
-                localUserStore.setBackgroundMode("image");
+                localUserStoreAdapter.setBackgroundImage(imageUrl);
+                localUserStoreAdapter.setBackgroundMode("image");
                 return newConfig;
             });
         },
         setBackgroundVideo: (videoUrl: string) => {
             update((config) => {
                 const newConfig = { ...config, backgroundVideo: videoUrl, mode: "video" as BackgroundMode };
-                localUserStore.setBackgroundVideo(videoUrl);
-                localUserStore.setBackgroundMode("video");
+                localUserStoreAdapter.setBackgroundVideo(videoUrl);
+                localUserStoreAdapter.setBackgroundMode("video");
                 return newConfig;
             });
         },
         reset: () => {
             const resetConfig = { ...initialConfig, mode: "none" as BackgroundMode };
             set(resetConfig);
-            localUserStore.setBackgroundMode("none");
+            localUserStoreAdapter.setBackgroundMode("none");
         },
     };
 }

@@ -1,6 +1,6 @@
 import { get, writable } from "svelte/store";
 import { analyticsClient } from "../Administration/AnalyticsClient";
-import { localUserStore } from "../Connection/LocalUserStore";
+import { localUserStoreAdapter } from "../Connection/LocalUserStoreAdapter";
 import type { Emoji } from "./Utils/emojiSchema";
 
 function createEmoteMenuStore() {
@@ -21,7 +21,7 @@ function createEmoteDataStore() {
     const { subscribe, set, update } = writable(new Map<number, Emoji>());
 
     //check if favorite emoji already define
-    const mapStored = localUserStore.getEmojiFavorite();
+    const mapStored = localUserStoreAdapter.getEmojiFavorite();
     if (mapStored != undefined) {
         set(mapStored);
     } else {
@@ -66,7 +66,7 @@ export const emoteDataStore = createEmoteDataStore();
 // This is a singleton, so we don't need to unsubscribe.
 // eslint-disable-next-line svelte/no-ignored-unsubscribe
 emoteDataStore.subscribe((map: Map<number, Emoji>) => {
-    localUserStore.setEmojiFavorite(map);
+    localUserStoreAdapter.setEmojiFavorite(map);
 });
 
 export type EmoteIndex = 1 | 2 | 3 | 4 | 5 | 6;

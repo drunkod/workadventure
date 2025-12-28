@@ -4,6 +4,7 @@ import deepEqual from "fast-deep-equal";
 import { AvailabilityStatus } from "@workadventure/messages";
 import * as Sentry from "@sentry/svelte";
 import { localUserStore } from "../Connection/LocalUserStore";
+import { localUserStoreAdapter } from "../Connection/LocalUserStoreAdapter";
 import { isIOS, isSafari } from "../WebRtc/DeviceUtils";
 import type { ObtainedMediaStreamConstraints } from "../WebRtc/P2PMessages/ConstraintMessage";
 import { SoundMeter } from "../Phaser/Components/SoundMeter";
@@ -33,17 +34,17 @@ import { backgroundConfigStore, backgroundProcessingEnabledStore } from "./Backg
  * A store that contains the camera state requested by the user (on or off).
  */
 function createRequestedCameraState() {
-    const { subscribe, set } = writable(localUserStore.getRequestedCameraState());
+    const { subscribe, set } = writable(localUserStoreAdapter.getRequestedCameraState());
 
     return {
         subscribe,
         enableWebcam: () => {
             set(true);
-            localUserStore.setRequestedCameraState(true);
+            localUserStoreAdapter.setRequestedCameraState(true);
         },
         disableWebcam: () => {
             set(false);
-            localUserStore.setRequestedCameraState(false);
+            localUserStoreAdapter.setRequestedCameraState(false);
         },
     };
 }
@@ -52,17 +53,17 @@ function createRequestedCameraState() {
  * A store that contains the microphone state requested by the user (on or off).
  */
 function createRequestedMicrophoneState() {
-    const { subscribe, set } = writable(localUserStore.getRequestedMicrophoneState());
+    const { subscribe, set } = writable(localUserStoreAdapter.getRequestedMicrophoneState());
 
     return {
         subscribe,
         enableMicrophone: () => {
             set(true);
-            localUserStore.setRequestedMicrophoneState(true);
+            localUserStoreAdapter.setRequestedMicrophoneState(true);
         },
         disableMicrophone: () => {
             set(false);
-            localUserStore.setRequestedMicrophoneState(false);
+            localUserStoreAdapter.setRequestedMicrophoneState(false);
         },
     };
 }

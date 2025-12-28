@@ -2,22 +2,22 @@
  * Jazz Store Adapter for WorkAdventure
  * 
  * This module provides a Svelte store-compatible interface to Jazz CoValues.
- * Uses dynamic imports for browser context to work with Svelte 4 and older moduleResolution.
+ * Uses direct imports from jazz-tools dist to work with older moduleResolution.
  */
 
-import { writable, derived, get, type Readable, type Writable } from 'svelte/store';
+import { writable, get, type Writable } from 'svelte/store';
 import { WaAccount, type UserPreferencesType } from './schema';
 import { getJazzSyncConfig } from './jazz-config';
 
-// Jazz context manager singleton (typed as any due to dynamic import)
+// Jazz context state
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-let contextManager: any = null;
-let contextPromise: Promise<void> | null = null;
+let jazzContext: any = null;
+let initPromise: Promise<void> | null = null;
 
 // Reactive store for Jazz initialization state
 export const jazzInitialized: Writable<boolean> = writable(false);
 
-// Reactive store for current account (typed as any for flexibility)
+// Reactive store for current account
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const jazzAccount: Writable<any> = writable(null);
 
@@ -25,20 +25,21 @@ export const jazzAccount: Writable<any> = writable(null);
  * Initialize Jazz context (call once at app startup)
  */
 export async function initializeJazz(): Promise<void> {
-    if (contextPromise) return contextPromise;
+    if (initPromise) return initPromise;
 
-    contextPromise = (async () => {
+    initPromise = (async () => {
         try {
             // Dynamic import to avoid TypeScript module resolution issues
+            // Import from the actual dist path that exists
+            // @ts-ignore - TypeScript can't resolve jazz-tools/browser with moduleResolution: node
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const browserModule = await import('jazz-tools/browser') as any;
-            const { JazzBrowserContextManager } = browserModule;
-
-            contextManager = new JazzBrowserContextManager();
+            const { createBrowserContext } = browserModule;
 
             const syncConfig = getJazzSyncConfig();
 
-            await contextManager.createContext({
+            // Create browser context with local storage
+            jazzContext = await createBrowserContext({
                 AccountSchema: WaAccount,
                 sync: syncConfig ? {
                     peer: syncConfig.peer,
@@ -46,90 +47,78 @@ export async function initializeJazz(): Promise<void> {
                 } : undefined,
             });
 
-            // Get account and update store
-            const me = contextManager.getCurrentAccount?.();
-            if (me) {
-                jazzAccount.set(me);
+            // Update stores
+            if (jazzContext?.me) {
+                jazzAccount.set(jazzContext.me);
             }
-
             jazzInitialized.set(true);
+
             console.log('[Jazz] Initialized successfully');
         } catch (error) {
-            console.error('[Jazz] Initialization failed:', error);
-            throw error;
+            console.warn('[Jazz] Failed to initialize, using localStorage fallback:', error);
+            jazzInitialized.set(false);
         }
     })();
 
-    return contextPromise;
+    return initPromise;
 }
 
 /**
- * Get current Jazz account (synchronous, may be null before init)
+ * Cleanup Jazz context
  */
-export function getJazzAccount(): typeof WaAccount | null {
+export function cleanupJazz(): void {
+    if (jazzContext?.done) {
+        jazzContext.done();
+    }
+    jazzContext = null;
+    jazzAccount.set(null);
+    jazzInitialized.set(false);
+}
+
+/**
+ * Get current Jazz account (synchronous)
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getJazzAccount(): any {
     return get(jazzAccount);
 }
 
 /**
- * Get user preferences CoValue
- * Returns a derived store that updates when preferences change
+ * Create a reactive store for user preferences
  */
-export function createUserPreferencesStore(): Readable<UserPreferencesType | null> {
-    return derived(jazzAccount, ($account) => {
-        if (!$account) return null;
-        const root = $account.root;
-        if (!root) return null;
-        return root.preferences as UserPreferencesType;
-    });
-}
-
-// Singleton preferences store
-let _userPreferencesStore: Readable<UserPreferencesType | null> | null = null;
-
-export function getUserPreferencesStore(): Readable<UserPreferencesType | null> {
-    if (!_userPreferencesStore) {
-        _userPreferencesStore = createUserPreferencesStore();
-    }
-    return _userPreferencesStore;
+export function getUserPreferencesStore() {
+    return {
+        subscribe: (callback: (prefs: UserPreferencesType | null) => void) => {
+            return jazzAccount.subscribe(account => {
+                if (account?.root?.preferences) {
+                    callback(account.root.preferences);
+                } else {
+                    callback(null);
+                }
+            });
+        }
+    };
 }
 
 /**
- * Helper to get a preference value (with fallback)
+ * Get a single preference value (synchronous)
  */
 export function getPreference<K extends keyof UserPreferencesType>(
-    key: K,
-    fallback: UserPreferencesType[K]
-): UserPreferencesType[K] {
-    const prefs = get(getUserPreferencesStore());
-    if (!prefs) return fallback;
-    return prefs[key] ?? fallback;
+    key: K
+): UserPreferencesType[K] | undefined {
+    const account = get(jazzAccount);
+    return account?.root?.preferences?.[key];
 }
 
 /**
- * Helper to set a preference value
+ * Set a single preference value
  */
 export function setPreference<K extends keyof UserPreferencesType>(
     key: K,
     value: UserPreferencesType[K]
 ): void {
-    const prefs = get(getUserPreferencesStore());
-    if (!prefs) {
-        console.warn('[Jazz] Cannot set preference - not initialized');
-        return;
-    }
-    // @ts-expect-error - Jazz $jazz API access
-    prefs.$jazz.set(key, value);
-}
-
-/**
- * Cleanup Jazz context (call on app unmount if needed)
- */
-export function cleanupJazz(): void {
-    if (contextManager) {
-        // Jazz handles cleanup internally
-        contextManager = null;
-        contextPromise = null;
-        jazzInitialized.set(false);
-        jazzAccount.set(null);
+    const account = get(jazzAccount);
+    if (account?.root?.preferences) {
+        account.root.preferences[key] = value;
     }
 }

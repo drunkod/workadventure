@@ -13,4 +13,6 @@ export {
     getUserPreferencesStore,
     getPreference,
     setPreference,
+    getJazzAccount,
 } from './jazzStore';
+

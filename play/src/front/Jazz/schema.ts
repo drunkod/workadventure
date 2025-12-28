@@ -57,6 +57,18 @@ export const UserPreferences = co.map({
     // Sound preference: 'ding' or 'wobble'
     bubbleSound: z.optional(z.string()),
 
+    // Background transformation settings
+    backgroundMode: z.optional(z.string()), // 'none' | 'blur' | 'image' | 'video'
+    backgroundBlurAmount: z.optional(z.number()),
+    backgroundImage: z.optional(z.string()),
+    backgroundVideo: z.optional(z.string()),
+
+    // Proximity discussion volume (0-1)
+    volumeProximityDiscussion: z.optional(z.number()),
+
+    // Emoji favorites stored as JSON: '{"1":{"emoji":"👍","name":"thumbs up"},...}'
+    emojiFavoriteJson: z.optional(z.string()),
+
     // Help shown flags
     helpCameraSettingsShown: z.boolean(),
 });
