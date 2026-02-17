@@ -87,6 +87,10 @@ jobs:
         run: npm test
         working-directory: "play"
 
+      - name: "Frontend-only mock smoke"
+        run: npm run test:front-mock-smoke
+        working-directory: "play"
+
   continuous-integration-back:
     name: "Continuous Integration Back"
 

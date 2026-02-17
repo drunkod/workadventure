@@ -140,12 +140,19 @@ Phase 3 tests:
 
 ## Phase 4: Add automated verification
 
-- [ ] Add a small test script (or vitest integration) asserting:
+- [x] Add a small test script (or vitest integration) asserting:
   - Mock endpoints return expected status + schema.
   - `/mock-maps/*` resolves assets from `maps/`.
   - Frontend boot works with `alone=true`.
 
-- [ ] Add a CI smoke check for `dev-front-mock` startup and endpoint contract.
+- [x] Add a CI smoke check for `dev-front-mock` startup and endpoint contract.
+
+Implemented:
+- Smoke script: `play/tests/mock-mode/smoke-dev-front-mock.sh`
+- NPM command: `play/package.json` -> `npm run test:front-mock-smoke`
+- CI step: `.github/workflows/continuous_integration.yml` ("Frontend-only mock smoke")
+
+Verified on February 17, 2026.
 
 ---
 
