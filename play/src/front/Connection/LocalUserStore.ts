@@ -271,9 +271,16 @@ class LocalUserStore {
     setAuthToken(value: string | null) {
         if (value !== null) {
             localStorage.setItem(authToken, value);
-            this.jwt = JwtAuthToken.parse(LocalUserStore.parseJwt(value));
+            try {
+                this.jwt = JwtAuthToken.parse(LocalUserStore.parseJwt(value));
+            } catch (error) {
+                // Frontend-only/dev modes can use opaque tokens that are not JWTs.
+                console.warn("Invalid auth token format. JWT claims are unavailable in this session.", error);
+                this.jwt = undefined;
+            }
         } else {
             localStorage.removeItem(authToken);
+            this.jwt = undefined;
         }
     }
 
@@ -287,6 +294,9 @@ class LocalUserStore {
 
     private static parseJwt(token: string) {
         const base64Url = token.split(".")[1];
+        if (!base64Url) {
+            throw new Error("Invalid JWT token: missing payload");
+        }
         const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
         const jsonPayload = decodeURIComponent(
             window

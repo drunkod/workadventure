@@ -1,4 +1,4 @@
-import { basename } from "path";
+import { basename, extname, normalize, resolve } from "path";
 import fs from "fs";
 import { defineConfig, loadEnv } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
             port: 8080,
             hmr: {
                 // workaround for development in docker
-                clientPort: 80,
+                clientPort: env.FRONTEND_ONLY === "true" ? 8080 : 80,
             },
             watch: {
                 ignored: ["./src/pusher"],
@@ -73,6 +73,7 @@ export default defineConfig(({ mode }) => {
                       }),
                   ]),
             tsconfigPaths(),
+            ...(env.FRONTEND_ONLY === "true" ? [frontendOnlyMockPlugin(env)] : []),
         ],
         resolve: {
             alias: {
@@ -129,6 +130,328 @@ export default defineConfig(({ mode }) => {
     }
     return config;
 });
+
+function frontendOnlyMockPlugin(env: Record<string, string>) {
+    const mapsRoot = resolve(process.cwd(), "../maps");
+    const mockCompanionData = getMockCompanionData(resolve(process.cwd(), "src/pusher/data/companions.json"));
+    const mockMapUrl = env.MOCK_MAP_URL || "/mock-maps/starter/map.json";
+    const mockRoomName = env.MOCK_ROOM_NAME || "Frontend Mock Room";
+    const mockAuthToken = ensureJwtAuthToken(env.MOCK_AUTH_TOKEN || "frontend-only-mock-token");
+    const mockUserUuid = env.MOCK_USER_UUID || "frontend-only-user";
+    const mockRegisterRoomUrl = env.MOCK_REGISTER_ROOM_URL || "/_/global/mock-maps/starter/map.json";
+    const mockRegisterMapUrlStart = env.MOCK_REGISTER_MAP_URL_START || "/mock-maps/starter/map.json";
+
+    const defaultMapResponse = {
+        mapUrl: mockMapUrl,
+        group: null,
+        authenticationMandatory: false,
+        roomName: mockRoomName,
+        provideDefaultWokaName: "fix-plus-random-numbers" as const,
+        defaultWokaName: "Guest",
+        provideDefaultWokaTexture: "fix" as const,
+        defaultWokaTexture: "color_22",
+        skipCameraPage: true,
+        enableChat: false,
+        enableChatUpload: false,
+        enableChatOnlineList: false,
+        enableChatDisconnectedList: false,
+        enableSay: false,
+        enableIssueReport: false,
+        enableMatrixChat: false,
+    };
+
+    const sendJson = (res: any, body: unknown) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json; charset=utf-8");
+        res.setHeader("Cache-Control", "no-store");
+        res.end(JSON.stringify(body));
+    };
+
+    const sendNoContent = (res: any) => {
+        res.statusCode = 204;
+        res.setHeader("Cache-Control", "no-store");
+        res.end("");
+    };
+
+    const sendText = (res: any, body: string) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/plain; charset=utf-8");
+        res.setHeader("Cache-Control", "no-store");
+        res.end(body);
+    };
+
+    return {
+        name: "frontend-only-mock-plugin",
+        transformIndexHtml(html: string) {
+            return stripMustacheTemplates(html);
+        },
+        configureServer(server: any) {
+            server.middlewares.use((req: any, res: any, next: any) => {
+                if (!req.url) {
+                    next();
+                    return;
+                }
+
+                const requestUrl = new URL(req.url, "http://localhost");
+                const pathname = requestUrl.pathname;
+                const method = req.method || "GET";
+
+                if (pathname === "/map" && method === "GET") {
+                    sendJson(res, defaultMapResponse);
+                    return;
+                }
+
+                if (pathname === "/anonymLogin" && method === "POST") {
+                    sendJson(res, {
+                        authToken: mockAuthToken,
+                        userUuid: mockUserUuid,
+                    });
+                    return;
+                }
+
+                if (pathname === "/me" && method === "GET") {
+                    sendJson(res, {
+                        status: "ok",
+                        authToken: ensureJwtAuthToken(requestUrl.searchParams.get("token") || mockAuthToken),
+                        userUuid: mockUserUuid,
+                        email: null,
+                        username: "Guest",
+                        locale: "en",
+                        visitCardUrl: null,
+                        isCharacterTexturesValid: true,
+                        isCompanionTextureValid: true,
+                        matrixUserId: null,
+                        matrixServerUrl: null,
+                    });
+                    return;
+                }
+
+                if (pathname === "/woka/list" && method === "GET") {
+                    sendJson(res, getMockWokaData());
+                    return;
+                }
+
+                if (pathname === "/companion/list" && method === "GET") {
+                    sendJson(res, mockCompanionData);
+                    return;
+                }
+
+                if (
+                    (pathname === "/save-name" ||
+                        pathname === "/save-textures" ||
+                        pathname === "/save-companion-texture") &&
+                    method === "POST"
+                ) {
+                    sendNoContent(res);
+                    return;
+                }
+
+                if (pathname === "/register" && method === "POST") {
+                    sendJson(res, {
+                        roomUrl: mockRegisterRoomUrl,
+                        email: null,
+                        organizationMemberToken: null,
+                        mapUrlStart: mockRegisterMapUrlStart,
+                        userUuid: mockUserUuid,
+                        authToken: mockAuthToken,
+                        messages: [],
+                    });
+                    return;
+                }
+
+                if (pathname === "/ping" && method === "GET") {
+                    sendText(res, "pong");
+                    return;
+                }
+
+                if (!pathname.startsWith("/mock-maps/")) {
+                    next();
+                    return;
+                }
+
+                const relativePath = decodeURIComponent(pathname.slice("/mock-maps/".length));
+                const normalizedPath = normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, "");
+                const filePath = resolve(mapsRoot, normalizedPath);
+                const isInsideMapsRoot =
+                    filePath === mapsRoot || filePath.startsWith(mapsRoot + "/") || filePath.startsWith(mapsRoot + "\\");
+
+                if (!isInsideMapsRoot) {
+                    res.statusCode = 403;
+                    res.end("Forbidden");
+                    return;
+                }
+
+                if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+                    res.statusCode = 404;
+                    res.end("Not found");
+                    return;
+                }
+
+                res.statusCode = 200;
+                res.setHeader("Content-Type", getContentType(filePath));
+                res.setHeader("Cache-Control", "no-cache");
+                fs.createReadStream(filePath).pipe(res);
+            });
+        },
+    };
+}
+
+function ensureJwtAuthToken(token: string): string {
+    const tokenParts = token.split(".");
+    if (tokenParts.length === 3 && tokenParts[1]) {
+        return token;
+    }
+
+    const header = toBase64Url(JSON.stringify({ alg: "none", typ: "JWT" }));
+    const payload = toBase64Url(JSON.stringify({ accessToken: token }));
+    return `${header}.${payload}.mock-signature`;
+}
+
+function toBase64Url(value: string): string {
+    return Buffer.from(value, "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function stripMustacheTemplates(html: string): string {
+    let transformed = html;
+
+    // Remove full Mustache sections (e.g. {{#foo}}...{{/foo}}).
+    transformed = transformed.replace(/\{\{#([^}]+)\}\}[\s\S]*?\{\{\/\1\}\}/g, "");
+
+    // Remove remaining variables (e.g. {{ title }} or {{{ script }}}).
+    transformed = transformed.replace(/\{\{\{[^}]+\}\}\}/g, "");
+    transformed = transformed.replace(/\{\{[^}]+\}\}/g, "");
+
+    return transformed;
+}
+
+function getMockWokaData() {
+    return {
+        woka: {
+            collections: [
+                {
+                    name: "default",
+                    textures: [{ id: "color_22", url: "/resources/customisation/character_color/character_color21.png" }],
+                },
+            ],
+        },
+        body: {
+            collections: [
+                {
+                    name: "default",
+                    textures: [{ id: "color_22", url: "/resources/customisation/character_color/character_color21.png" }],
+                },
+            ],
+        },
+        eyes: {
+            collections: [
+                {
+                    name: "default",
+                    textures: [{ id: "eyes_23", url: "/resources/customisation/character_eyes/character_eyes23.png" }],
+                },
+            ],
+        },
+        hair: {
+            collections: [
+                {
+                    name: "default",
+                    textures: [{ id: "hair_1", url: "/resources/customisation/character_hairs/character_hairs1.png" }],
+                },
+            ],
+        },
+        clothes: {
+            collections: [
+                {
+                    name: "default",
+                    textures: [{ id: "clothes_1", url: "/resources/customisation/character_clothes/character_clothes1.png" }],
+                },
+            ],
+        },
+        hat: {
+            collections: [
+                {
+                    name: "default",
+                    textures: [{ id: "hat_1", url: "/resources/customisation/character_hats/character_hats1.png" }],
+                },
+            ],
+        },
+        accessory: {
+            collections: [
+                {
+                    name: "default",
+                    textures: [
+                        { id: "accessory_1", url: "/resources/customisation/character_accessories/character_accessories1.png" },
+                    ],
+                },
+            ],
+        },
+    };
+}
+
+function getMockCompanionData(companionJsonPath: string) {
+    try {
+        const companionData = JSON.parse(fs.readFileSync(companionJsonPath, "utf8"));
+        if (Array.isArray(companionData)) {
+            return companionData;
+        }
+    } catch (error) {
+        console.warn(`Unable to load companions from "${companionJsonPath}". Falling back to inline mock data.`, error);
+    }
+
+    return [
+        {
+            name: "default",
+            textures: [
+                {
+                    id: "dog1",
+                    name: "dog1",
+                    behavior: "dog",
+                    url: "resources/characters/pipoya/Dog 01-1.png",
+                },
+                {
+                    id: "cat1",
+                    name: "cat1",
+                    behavior: "cat",
+                    url: "resources/characters/pipoya/Cat 01-1.png",
+                },
+            ],
+        },
+    ];
+}
+
+function getContentType(filePath: string): string {
+    switch (extname(filePath).toLowerCase()) {
+        case ".json":
+        case ".tmj":
+            return "application/json; charset=utf-8";
+        case ".js":
+            return "text/javascript; charset=utf-8";
+        case ".ts":
+            return "text/plain; charset=utf-8";
+        case ".png":
+            return "image/png";
+        case ".jpg":
+        case ".jpeg":
+            return "image/jpeg";
+        case ".gif":
+            return "image/gif";
+        case ".svg":
+            return "image/svg+xml";
+        case ".webp":
+            return "image/webp";
+        case ".mp3":
+            return "audio/mpeg";
+        case ".ogg":
+            return "audio/ogg";
+        case ".wav":
+            return "audio/wav";
+        case ".css":
+            return "text/css; charset=utf-8";
+        case ".html":
+            return "text/html; charset=utf-8";
+        default:
+            return "application/octet-stream";
+    }
+}
 
 // use to fix the build issue with mediapipe ==> https://github.com/tensorflow/tfjs/issues/7165
 // TODO: remove this when we migrate to mediapipe/tasks-vision

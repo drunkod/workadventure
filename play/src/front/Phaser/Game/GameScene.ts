@@ -393,9 +393,9 @@ export class GameScene extends DirtyScene {
 
         // TODO: How to get mapUrl from WAM here?
         if (_room.mapUrl) {
-            this.mapUrlFile = _room.mapUrl;
+            this.mapUrlFile = new URL(_room.mapUrl, window.location.href).toString();
         } else if (_room.wamUrl) {
-            this.wamUrlFile = _room.wamUrl;
+            this.wamUrlFile = new URL(_room.wamUrl, window.location.href).toString();
         }
         this.roomUrl = _room.key;
 
@@ -771,6 +771,21 @@ export class GameScene extends DirtyScene {
         this.subscribeToGameMapChanged();
         this.subscribeToEntitiesManagerObservables();
 
+        if (this._room.isDisconnected()) {
+            // "alone=true" mode intentionally skips websocket connection.
+            // Rejecting here triggers the existing local fallback textures in Character.
+            this.currentPlayerTexturesReject(new Error("Disconnected mode: websocket is disabled"));
+            if (gameManager.getCompanionTextureId() != undefined) {
+                this.currentCompanionTextureReject(new Error("Disconnected mode: websocket is disabled"));
+            }
+            this.connectionAnswerPromiseDeferred.resolve({
+                items: {},
+                variables: new Map<string, unknown>(),
+                playerVariables: new Map<string, unknown>(),
+                characterTextures: [],
+            });
+        }
+
         //notify game manager can to create currentUser in map
         this.createCurrentPlayer();
         this.removeAllRemotePlayers(); //cleanup the list  of remote players in case the scene was rebooted
@@ -908,9 +923,11 @@ export class GameScene extends DirtyScene {
         });*/
 
         Promise.all([
-            this.connectionAnswerPromiseDeferred.promise.then(() =>
-                debug("Loading process: Websocket connection ready")
-            ),
+            this._room.isDisconnected()
+                ? Promise.resolve().then(() => debug("Loading process: Disconnected mode enabled, websocket skipped"))
+                : this.connectionAnswerPromiseDeferred.promise.then(() =>
+                      debug("Loading process: Websocket connection ready")
+                  ),
             Promise.allSettled(scriptPromises).then((results) => {
                 debug("Loading process: Scripts loaded");
                 return results;
@@ -960,11 +977,13 @@ export class GameScene extends DirtyScene {
                             }
                         }
 
-                        this.initUserPermissionsOnEntity();
+                        if (this.connection) {
+                            this.initUserPermissionsOnEntity();
+                            this.initializeAreaManager();
+                        }
                         this.hide(false);
                         gameSceneIsLoadedStore.set(true);
                         this.sceneReadyToStartDeferred.resolve();
-                        this.initializeAreaManager();
                     })
                     .catch((e) => {
                         console.error("Promise.allSettled should never error", e);
@@ -3436,7 +3455,20 @@ ${escapedMessage}
             return [];
         }
 
-        return script.split("\n").map((scriptSplit) => new URL(scriptSplit, this.mapUrlFile).toString());
+        const absoluteMapUrl = new URL(this.mapUrlFile, window.location.href).toString();
+
+        return script
+            .split("\n")
+            .map((scriptSplit) => scriptSplit.trim())
+            .filter((scriptSplit) => scriptSplit.length > 0)
+            .flatMap((scriptSplit) => {
+                try {
+                    return [new URL(scriptSplit, absoluteMapUrl).toString()];
+                } catch (error) {
+                    console.warn(`Skipping invalid map script URL "${scriptSplit}"`, error);
+                    return [];
+                }
+            });
     }
 
     private loadNextGameFromExitUrl(exitUrl: string): Promise<void> {

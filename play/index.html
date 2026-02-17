@@ -103,9 +103,27 @@
                 };
             }
         </script>
-        <script>
+        <script type="application/json" id="wa-runtime-script">
             {{{ script }}}
         </script>
+        <script>
+            (() => {
+                const runtimeScriptTag = document.getElementById("wa-runtime-script");
+                if (!runtimeScriptTag) {
+                    return;
+                }
+                const runtimeScript = runtimeScriptTag.textContent?.trim() ?? "";
+                if (!runtimeScript || runtimeScript === "{{{ script }}}") {
+                    return;
+                }
+                try {
+                    new Function(runtimeScript)();
+                } catch (error) {
+                    console.error("Unable to execute injected runtime script", error);
+                }
+            })();
+        </script>
+        <script src="/frontend-only-env.js"></script>
 
         {{#logRocketId}}
             <!-- LogRocket -->

@@ -136,6 +136,17 @@ export class GameSceneUserInputHandler implements UserInputHandlerInterface {
         }
         const camera = this.gameScene.getCameraManager().getCamera();
         const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
+        const phaserMap = this.gameScene.getGameMapFrontWrapper().phaserMap;
+
+        if (
+            worldPoint.x < 0 ||
+            worldPoint.y < 0 ||
+            worldPoint.x >= phaserMap.widthInPixels ||
+            worldPoint.y >= phaserMap.heightInPixels
+        ) {
+            return;
+        }
+
         this.gameScene
             .moveTo(
                 {
