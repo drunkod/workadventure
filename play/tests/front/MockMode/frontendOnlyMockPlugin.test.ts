@@ -75,7 +75,7 @@ async function runMiddleware(middleware: Middleware, url: string, method = "GET"
         res.emit("finish");
     });
 
-    if (!ended && url.startsWith("/mock-maps/")) {
+    if (!ended) {
         await once(res, "finish");
     }
 
@@ -172,5 +172,97 @@ describe("frontendOnlyMockPlugin", () => {
         expect(response.statusCode).toBe(200);
         expect(response.headers.get("content-type")).toContain("text/plain");
         expect(response.body).toBe("pong");
+    });
+
+    it("supports /map response variants from environment toggles", async () => {
+        const middleware = getMockMiddleware({
+            MOCK_AUTH_MANDATORY: "true",
+            MOCK_ENABLE_CHAT: "true",
+            MOCK_ENABLE_CHAT_UPLOAD: "true",
+            MOCK_ENABLE_CHAT_ONLINE_LIST: "true",
+            MOCK_ENABLE_CHAT_DISCONNECTED_LIST: "true",
+            MOCK_ENABLE_SAY: "true",
+            MOCK_ENABLE_ISSUE_REPORT: "true",
+            MOCK_ENABLE_MATRIX_CHAT: "true",
+            MOCK_SKIP_CAMERA_PAGE: "false",
+        });
+
+        const response = await runMiddleware(middleware, "/map", "GET");
+        const payload = JSON.parse(response.body) as Record<string, unknown>;
+
+        expect(response.statusCode).toBe(200);
+        expect(payload.authenticationMandatory).toBe(true);
+        expect(payload.enableChat).toBe(true);
+        expect(payload.enableChatUpload).toBe(true);
+        expect(payload.enableChatOnlineList).toBe(true);
+        expect(payload.enableChatDisconnectedList).toBe(true);
+        expect(payload.enableSay).toBe(true);
+        expect(payload.enableIssueReport).toBe(true);
+        expect(payload.enableMatrixChat).toBe(true);
+        expect(payload.skipCameraPage).toBe(false);
+    });
+
+    it("supports /me response variants from environment toggles", async () => {
+        const middleware = getMockMiddleware({
+            MOCK_IS_CHARACTER_TEXTURES_VALID: "false",
+            MOCK_IS_COMPANION_TEXTURES_VALID: "false",
+            MOCK_USERNAME: "MockUser",
+            MOCK_LOCALE: "fr",
+        });
+
+        const response = await runMiddleware(middleware, "/me", "GET");
+        const payload = JSON.parse(response.body) as Record<string, unknown>;
+
+        expect(response.statusCode).toBe(200);
+        expect(payload.username).toBe("MockUser");
+        expect(payload.locale).toBe("fr");
+        expect(payload.isCharacterTexturesValid).toBe(false);
+        expect(payload.isCompanionTextureValid).toBe(false);
+    });
+
+    it("injects /map error response when configured", async () => {
+        const middleware = getMockMiddleware({
+            MOCK_FAIL_MAP: "true",
+            MOCK_FAIL_MAP_STATUS: "503",
+            MOCK_FAIL_MAP_CODE: "MOCK_MAP_DOWN",
+        });
+
+        const response = await runMiddleware(middleware, "/map", "GET");
+        const payload = JSON.parse(response.body) as Record<string, unknown>;
+
+        expect(response.statusCode).toBe(503);
+        expect(payload.status).toBe("error");
+        expect(payload.code).toBe("MOCK_MAP_DOWN");
+    });
+
+    it("injects /me error response when configured", async () => {
+        const middleware = getMockMiddleware({
+            MOCK_FAIL_ME: "1",
+            MOCK_FAIL_ME_STATUS: "401",
+            MOCK_FAIL_ME_CODE: "MOCK_ME_DENIED",
+        });
+
+        const response = await runMiddleware(middleware, "/me", "GET");
+        const payload = JSON.parse(response.body) as Record<string, unknown>;
+
+        expect(response.statusCode).toBe(401);
+        expect(payload.status).toBe("error");
+        expect(payload.code).toBe("MOCK_ME_DENIED");
+    });
+
+    it("applies latency toggles for /map and /me responses", async () => {
+        const mapMiddleware = getMockMiddleware({ MOCK_MAP_DELAY_MS: "40" });
+        const meMiddleware = getMockMiddleware({ MOCK_DELAY_MS: "30" });
+
+        const mapStart = Date.now();
+        await runMiddleware(mapMiddleware, "/map", "GET");
+        const mapElapsedMs = Date.now() - mapStart;
+
+        const meStart = Date.now();
+        await runMiddleware(meMiddleware, "/me", "GET");
+        const meElapsedMs = Date.now() - meStart;
+
+        expect(mapElapsedMs).toBeGreaterThanOrEqual(30);
+        expect(meElapsedMs).toBeGreaterThanOrEqual(20);
     });
 });

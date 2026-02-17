@@ -61,12 +61,12 @@ Verified on February 17, 2026.
 
 ## Phase 1: Stabilize existing mock mode
 
-- [x] Keep JWT-safe auth behavior in mock responses (`/anonymLogin`, `/me`).
-- [x] Keep map/script URL resolution absolute-safe for relative map script URLs.
-- [x] Keep map-bound click guard to avoid noisy out-of-grid pathfinding errors.
-- [x] Keep root `favicon.ico` available to remove unnecessary 404 noise.
+- [ ] Keep JWT-safe auth behavior in mock responses (`/anonymLogin`, `/me`).
+- [ ] Keep map/script URL resolution absolute-safe for relative map script URLs.
+- [ ] Keep map-bound click guard to avoid noisy out-of-grid pathfinding errors.
+- [ ] Keep root `favicon.ico` available to remove unnecessary 404 noise.
 
-Verified on February 17, 2026.
+Status now: implemented in this branch.
 
 ---
 
@@ -94,21 +94,42 @@ Goal: let more frontend flows run without pusher/back.
 
 Verified on February 17, 2026.
 
-Tests added for Phase 1 and Phase 2:
-- `play/tests/front/Phaser/Game/MapScriptUrlUtils.test.ts`
-- `play/tests/front/Phaser/UserInput/MapBoundsUtils.test.ts`
-- `play/tests/front/MockMode/frontendOnlyMockPlugin.test.ts`
-
 ---
 
 ## Phase 3: Make mock mode configurable for UI testing
 
-- [ ] Add env toggles for mock error injection:
+- [x] Add env toggles for mock error injection:
   - Example: fail `/map` or `/me` to test error scenes.
-- [ ] Add env toggles for response variants:
+- [x] Add env toggles for response variants:
   - `MOCK_AUTH_MANDATORY`, `MOCK_ENABLE_CHAT`, `MOCK_IS_CHARACTER_TEXTURES_VALID`, etc.
-- [ ] Add mock latency toggle to test loading/retry UX.
+- [x] Add mock latency toggle to test loading/retry UX.
+Implemented toggles:
 
+- Error injection:
+
+  - `MOCK_FAIL_MAP`, `MOCK_FAIL_MAP_STATUS`, `MOCK_FAIL_MAP_CODE`, `MOCK_FAIL_MAP_TITLE`, `MOCK_FAIL_MAP_SUBTITLE`, `MOCK_FAIL_MAP_DETAILS`
+
+  - `MOCK_FAIL_ME`, `MOCK_FAIL_ME_STATUS`, `MOCK_FAIL_ME_CODE`, `MOCK_FAIL_ME_TITLE`, `MOCK_FAIL_ME_SUBTITLE`, `MOCK_FAIL_ME_DETAILS`
+
+- Response variants:
+
+  - `MOCK_AUTH_MANDATORY`, `MOCK_SKIP_CAMERA_PAGE`
+
+  - `MOCK_ENABLE_CHAT`, `MOCK_ENABLE_CHAT_UPLOAD`, `MOCK_ENABLE_CHAT_ONLINE_LIST`, `MOCK_ENABLE_CHAT_DISCONNECTED_LIST`
+
+  - `MOCK_ENABLE_SAY`, `MOCK_ENABLE_ISSUE_REPORT`, `MOCK_ENABLE_MATRIX_CHAT`
+
+  - `MOCK_IS_CHARACTER_TEXTURES_VALID`, `MOCK_IS_COMPANION_TEXTURES_VALID` (and backward alias `MOCK_IS_COMPANION_TEXTURE_VALID`)
+
+  - `MOCK_USERNAME`, `MOCK_LOCALE`
+
+- Latency:
+
+  - `MOCK_DELAY_MS` (global default)
+
+  - `MOCK_MAP_DELAY_MS`, `MOCK_ME_DELAY_MS` (endpoint-specific overrides)
+
+Verified on February 17, 2026.
 ---
 
 ## Phase 4: Add automated verification

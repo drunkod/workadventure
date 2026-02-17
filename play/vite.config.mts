@@ -140,28 +140,54 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
     const mockUserUuid = env.MOCK_USER_UUID || "frontend-only-user";
     const mockRegisterRoomUrl = env.MOCK_REGISTER_ROOM_URL || "/_/global/mock-maps/starter/map.json";
     const mockRegisterMapUrlStart = env.MOCK_REGISTER_MAP_URL_START || "/mock-maps/starter/map.json";
+    const defaultDelayMs = parseNonNegativeInteger(env.MOCK_DELAY_MS, 0);
+    const mapDelayMs = parseNonNegativeInteger(env.MOCK_MAP_DELAY_MS, defaultDelayMs);
+    const meDelayMs = parseNonNegativeInteger(env.MOCK_ME_DELAY_MS, defaultDelayMs);
+
+    const shouldFailMap = parseBooleanWithDefault(env.MOCK_FAIL_MAP, false);
+    const shouldFailMe = parseBooleanWithDefault(env.MOCK_FAIL_ME, false);
+    const mapErrorStatus = parseHttpStatusCode(env.MOCK_FAIL_MAP_STATUS, 500);
+    const meErrorStatus = parseHttpStatusCode(env.MOCK_FAIL_ME_STATUS, 500);
 
     const defaultMapResponse = {
         mapUrl: mockMapUrl,
         group: null,
-        authenticationMandatory: false,
+        authenticationMandatory: parseBooleanWithDefault(env.MOCK_AUTH_MANDATORY, false),
         roomName: mockRoomName,
         provideDefaultWokaName: "fix-plus-random-numbers" as const,
         defaultWokaName: "Guest",
         provideDefaultWokaTexture: "fix" as const,
         defaultWokaTexture: "color_22",
-        skipCameraPage: true,
-        enableChat: false,
-        enableChatUpload: false,
-        enableChatOnlineList: false,
-        enableChatDisconnectedList: false,
-        enableSay: false,
-        enableIssueReport: false,
-        enableMatrixChat: false,
+        skipCameraPage: parseBooleanWithDefault(env.MOCK_SKIP_CAMERA_PAGE, true),
+        enableChat: parseBooleanWithDefault(env.MOCK_ENABLE_CHAT, false),
+        enableChatUpload: parseBooleanWithDefault(env.MOCK_ENABLE_CHAT_UPLOAD, false),
+        enableChatOnlineList: parseBooleanWithDefault(env.MOCK_ENABLE_CHAT_ONLINE_LIST, false),
+        enableChatDisconnectedList: parseBooleanWithDefault(env.MOCK_ENABLE_CHAT_DISCONNECTED_LIST, false),
+        enableSay: parseBooleanWithDefault(env.MOCK_ENABLE_SAY, false),
+        enableIssueReport: parseBooleanWithDefault(env.MOCK_ENABLE_ISSUE_REPORT, false),
+        enableMatrixChat: parseBooleanWithDefault(env.MOCK_ENABLE_MATRIX_CHAT, false),
     };
 
-    const sendJson = (res: any, body: unknown) => {
-        res.statusCode = 200;
+    const mapErrorResponse = {
+        status: "error" as const,
+        type: "error" as const,
+        code: env.MOCK_FAIL_MAP_CODE || "MOCK_MAP_ERROR",
+        title: env.MOCK_FAIL_MAP_TITLE || "Mock map failure",
+        subtitle: env.MOCK_FAIL_MAP_SUBTITLE || "Forced failure of /map endpoint in mock mode",
+        details: env.MOCK_FAIL_MAP_DETAILS || "Set MOCK_FAIL_MAP=false to disable this injected failure.",
+    };
+
+    const meErrorResponse = {
+        status: "error" as const,
+        type: "error" as const,
+        code: env.MOCK_FAIL_ME_CODE || "MOCK_ME_ERROR",
+        title: env.MOCK_FAIL_ME_TITLE || "Mock me failure",
+        subtitle: env.MOCK_FAIL_ME_SUBTITLE || "Forced failure of /me endpoint in mock mode",
+        details: env.MOCK_FAIL_ME_DETAILS || "Set MOCK_FAIL_ME=false to disable this injected failure.",
+    };
+
+    const sendJson = (res: any, body: unknown, statusCode = 200) => {
+        res.statusCode = statusCode;
         res.setHeader("Content-Type", "application/json; charset=utf-8");
         res.setHeader("Cache-Control", "no-store");
         res.end(JSON.stringify(body));
@@ -178,6 +204,14 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
         res.setHeader("Content-Type", "text/plain; charset=utf-8");
         res.setHeader("Cache-Control", "no-store");
         res.end(body);
+    };
+
+    const sendWithDelay = (delayMs: number, send: () => void) => {
+        if (delayMs <= 0) {
+            send();
+            return;
+        }
+        setTimeout(send, delayMs);
     };
 
     return {
@@ -197,7 +231,13 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
                 const method = req.method || "GET";
 
                 if (pathname === "/map" && method === "GET") {
-                    sendJson(res, defaultMapResponse);
+                    sendWithDelay(mapDelayMs, () => {
+                        if (shouldFailMap) {
+                            sendJson(res, mapErrorResponse, mapErrorStatus);
+                            return;
+                        }
+                        sendJson(res, defaultMapResponse);
+                    });
                     return;
                 }
 
@@ -210,18 +250,27 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
                 }
 
                 if (pathname === "/me" && method === "GET") {
-                    sendJson(res, {
-                        status: "ok",
-                        authToken: ensureJwtAuthToken(requestUrl.searchParams.get("token") || mockAuthToken),
-                        userUuid: mockUserUuid,
-                        email: null,
-                        username: "Guest",
-                        locale: "en",
-                        visitCardUrl: null,
-                        isCharacterTexturesValid: true,
-                        isCompanionTextureValid: true,
-                        matrixUserId: null,
-                        matrixServerUrl: null,
+                    sendWithDelay(meDelayMs, () => {
+                        if (shouldFailMe) {
+                            sendJson(res, meErrorResponse, meErrorStatus);
+                            return;
+                        }
+                        sendJson(res, {
+                            status: "ok",
+                            authToken: ensureJwtAuthToken(requestUrl.searchParams.get("token") || mockAuthToken),
+                            userUuid: mockUserUuid,
+                            email: null,
+                            username: env.MOCK_USERNAME || "Guest",
+                            locale: env.MOCK_LOCALE || "en",
+                            visitCardUrl: null,
+                            isCharacterTexturesValid: parseBooleanWithDefault(env.MOCK_IS_CHARACTER_TEXTURES_VALID, true),
+                            isCompanionTextureValid: parseBooleanWithDefault(
+                                env.MOCK_IS_COMPANION_TEXTURES_VALID ?? env.MOCK_IS_COMPANION_TEXTURE_VALID,
+                                true
+                            ),
+                            matrixUserId: null,
+                            matrixServerUrl: null,
+                        });
                     });
                     return;
                 }
@@ -294,6 +343,47 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
             });
         },
     };
+}
+
+function parseBooleanWithDefault(value: string | undefined, defaultValue: boolean): boolean {
+    if (value === undefined || value.trim() === "") {
+        return defaultValue;
+    }
+
+    switch (value.trim().toLowerCase()) {
+        case "true":
+        case "1":
+        case "yes":
+        case "on":
+            return true;
+        case "false":
+        case "0":
+        case "no":
+        case "off":
+            return false;
+        default:
+            return defaultValue;
+    }
+}
+
+function parseNonNegativeInteger(value: string | undefined, defaultValue: number): number {
+    if (value === undefined || value.trim() === "") {
+        return defaultValue;
+    }
+
+    const parsedValue = Number.parseInt(value, 10);
+    if (Number.isNaN(parsedValue) || parsedValue < 0) {
+        return defaultValue;
+    }
+    return parsedValue;
+}
+
+function parseHttpStatusCode(value: string | undefined, defaultValue: number): number {
+    const parsedValue = parseNonNegativeInteger(value, defaultValue);
+    if (parsedValue < 100 || parsedValue > 599) {
+        return defaultValue;
+    }
+    return parsedValue;
 }
 
 function ensureJwtAuthToken(token: string): string {
