@@ -108,7 +108,9 @@ const createStubContext = () => {
     } as unknown as CanvasRenderingContext2D;
 };
 
-// @ts-ignore Override getContext to return our stub instead of throwing "not implemented".
-HTMLCanvasElement.prototype.getContext = function getContext() {
-    return createStubContext();
-};
+if (typeof HTMLCanvasElement !== "undefined") {
+    // @ts-ignore Override getContext to return our stub instead of throwing "not implemented".
+    HTMLCanvasElement.prototype.getContext = function getContext() {
+        return createStubContext();
+    };
+}

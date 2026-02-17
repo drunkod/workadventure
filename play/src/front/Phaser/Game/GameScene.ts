@@ -128,6 +128,7 @@ import { chatVisibilityStore, forceRefreshChatStore } from "../../Stores/ChatSto
 import type { HasPlayerMovedInterface } from "../../Api/Events/HasPlayerMovedInterface";
 import { extensionModuleStore, gameSceneIsLoadedStore, gameSceneStore } from "../../Stores/GameSceneStore";
 import { myCameraBlockedStore, myMicrophoneBlockedStore } from "../../Stores/MyMediaStore";
+import { resolveMapScriptUrls } from "./MapScriptUrlUtils";
 import type { GameStateEvent } from "../../Api/Events/GameStateEvent";
 import { currentPlayerWokaStore } from "../../Stores/CurrentPlayerWokaStore";
 import {
@@ -3450,25 +3451,7 @@ ${escapedMessage}
 
     private getScriptUrls(map: ITiledMap): string[] {
         const script = PropertyUtils.findStringProperty(GameMapProperties.SCRIPT, map.properties);
-
-        if (!script) {
-            return [];
-        }
-
-        const absoluteMapUrl = new URL(this.mapUrlFile, window.location.href).toString();
-
-        return script
-            .split("\n")
-            .map((scriptSplit) => scriptSplit.trim())
-            .filter((scriptSplit) => scriptSplit.length > 0)
-            .flatMap((scriptSplit) => {
-                try {
-                    return [new URL(scriptSplit, absoluteMapUrl).toString()];
-                } catch (error) {
-                    console.warn(`Skipping invalid map script URL "${scriptSplit}"`, error);
-                    return [];
-                }
-            });
+        return resolveMapScriptUrls(script, this.mapUrlFile);
     }
 
     private loadNextGameFromExitUrl(exitUrl: string): Promise<void> {

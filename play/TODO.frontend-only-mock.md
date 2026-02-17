@@ -61,12 +61,12 @@ Verified on February 17, 2026.
 
 ## Phase 1: Stabilize existing mock mode
 
-- [ ] Keep JWT-safe auth behavior in mock responses (`/anonymLogin`, `/me`).
-- [ ] Keep map/script URL resolution absolute-safe for relative map script URLs.
-- [ ] Keep map-bound click guard to avoid noisy out-of-grid pathfinding errors.
-- [ ] Keep root `favicon.ico` available to remove unnecessary 404 noise.
+- [x] Keep JWT-safe auth behavior in mock responses (`/anonymLogin`, `/me`).
+- [x] Keep map/script URL resolution absolute-safe for relative map script URLs.
+- [x] Keep map-bound click guard to avoid noisy out-of-grid pathfinding errors.
+- [x] Keep root `favicon.ico` available to remove unnecessary 404 noise.
 
-Status now: implemented in this branch.
+Verified on February 17, 2026.
 
 ---
 
@@ -93,6 +93,11 @@ Goal: let more frontend flows run without pusher/back.
   - Reason: health checks/dev scripts consistency.
 
 Verified on February 17, 2026.
+
+Tests added for Phase 1 and Phase 2:
+- `play/tests/front/Phaser/Game/MapScriptUrlUtils.test.ts`
+- `play/tests/front/Phaser/UserInput/MapBoundsUtils.test.ts`
+- `play/tests/front/MockMode/frontendOnlyMockPlugin.test.ts`
 
 ---
 

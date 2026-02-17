@@ -17,6 +17,7 @@ import { isPopupJustClosed } from "../Game/Say/SayManager";
 import LL from "../../../i18n/i18n-svelte";
 import { followRoleStore, followStateStore, followUsersStore } from "../../Stores/FollowStore";
 import type { Shortcut } from "./UserInputManager";
+import { isPointInsideMapBounds } from "./MapBoundsUtils";
 
 export class GameSceneUserInputHandler implements UserInputHandlerInterface {
     private gameScene: GameScene;
@@ -138,12 +139,7 @@ export class GameSceneUserInputHandler implements UserInputHandlerInterface {
         const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
         const phaserMap = this.gameScene.getGameMapFrontWrapper().phaserMap;
 
-        if (
-            worldPoint.x < 0 ||
-            worldPoint.y < 0 ||
-            worldPoint.x >= phaserMap.widthInPixels ||
-            worldPoint.y >= phaserMap.heightInPixels
-        ) {
+        if (!isPointInsideMapBounds(worldPoint, phaserMap)) {
             return;
         }
 

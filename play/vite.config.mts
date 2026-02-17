@@ -131,7 +131,7 @@ export default defineConfig(({ mode }) => {
     return config;
 });
 
-function frontendOnlyMockPlugin(env: Record<string, string>) {
+export function frontendOnlyMockPlugin(env: Record<string, string>) {
     const mapsRoot = resolve(process.cwd(), "../maps");
     const mockCompanionData = getMockCompanionData(resolve(process.cwd(), "src/pusher/data/companions.json"));
     const mockMapUrl = env.MOCK_MAP_URL || "/mock-maps/starter/map.json";
