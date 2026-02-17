@@ -1,6 +1,6 @@
 // @vitest-environment node
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { once } from "events";
 import { Writable } from "stream";
 import fs from "fs";
@@ -250,19 +250,64 @@ describe("frontendOnlyMockPlugin", () => {
         expect(payload.code).toBe("MOCK_ME_DENIED");
     });
 
-    it("applies latency toggles for /map and /me responses", async () => {
-        const mapMiddleware = getMockMiddleware({ MOCK_MAP_DELAY_MS: "40" });
-        const meMiddleware = getMockMiddleware({ MOCK_DELAY_MS: "30" });
+    it("falls back to default error status when fail status env is invalid", async () => {
+        const mapMiddleware = getMockMiddleware({
+            MOCK_FAIL_MAP: "true",
+            MOCK_FAIL_MAP_STATUS: "999",
+        });
+        const meMiddleware = getMockMiddleware({
+            MOCK_FAIL_ME: "true",
+            MOCK_FAIL_ME_STATUS: "bad-status",
+        });
 
-        const mapStart = Date.now();
-        await runMiddleware(mapMiddleware, "/map", "GET");
-        const mapElapsedMs = Date.now() - mapStart;
+        const mapResponse = await runMiddleware(mapMiddleware, "/map", "GET");
+        const meResponse = await runMiddleware(meMiddleware, "/me", "GET");
 
-        const meStart = Date.now();
-        await runMiddleware(meMiddleware, "/me", "GET");
-        const meElapsedMs = Date.now() - meStart;
+        expect(mapResponse.statusCode).toBe(500);
+        expect(meResponse.statusCode).toBe(500);
+    });
 
-        expect(mapElapsedMs).toBeGreaterThanOrEqual(30);
-        expect(meElapsedMs).toBeGreaterThanOrEqual(20);
+    it("supports companion texture validity alias env key", async () => {
+        const middleware = getMockMiddleware({
+            MOCK_IS_COMPANION_TEXTURE_VALID: "false",
+        });
+
+        const response = await runMiddleware(middleware, "/me", "GET");
+        const payload = JSON.parse(response.body) as Record<string, unknown>;
+
+        expect(response.statusCode).toBe(200);
+        expect(payload.isCompanionTextureValid).toBe(false);
+    });
+
+    it("applies latency toggles with endpoint override precedence", async () => {
+        vi.useFakeTimers();
+        try {
+            const middleware = getMockMiddleware({
+                MOCK_DELAY_MS: "25",
+                MOCK_MAP_DELAY_MS: "60",
+            });
+
+            let mapResolved = false;
+            const mapRequest = runMiddleware(middleware, "/map", "GET").then(() => {
+                mapResolved = true;
+            });
+            await vi.advanceTimersByTimeAsync(30);
+            expect(mapResolved).toBe(false);
+            await vi.advanceTimersByTimeAsync(35);
+            await mapRequest;
+            expect(mapResolved).toBe(true);
+
+            let meResolved = false;
+            const meRequest = runMiddleware(middleware, "/me", "GET").then(() => {
+                meResolved = true;
+            });
+            await vi.advanceTimersByTimeAsync(10);
+            expect(meResolved).toBe(false);
+            await vi.advanceTimersByTimeAsync(20);
+            await meRequest;
+            expect(meResolved).toBe(true);
+        } finally {
+            vi.useRealTimers();
+        }
     });
 });

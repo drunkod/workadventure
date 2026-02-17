@@ -130,6 +130,12 @@ Implemented toggles:
   - `MOCK_MAP_DELAY_MS`, `MOCK_ME_DELAY_MS` (endpoint-specific overrides)
 
 Verified on February 17, 2026.
+
+Phase 3 tests:
+- `play/tests/front/MockMode/frontendOnlyMockPlugin.test.ts`
+  - env response variants (`/map`, `/me`)
+  - error injection (`MOCK_FAIL_MAP*`, `MOCK_FAIL_ME*`)
+  - latency toggles and override precedence (`MOCK_DELAY_MS`, `MOCK_MAP_DELAY_MS`, `MOCK_ME_DELAY_MS`)
 ---
 
 ## Phase 4: Add automated verification
