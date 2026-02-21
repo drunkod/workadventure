@@ -1,0 +1,54 @@
+# Smoke test for frontend-only mock mode (no pusher / backend required).
+# Starts `npm run dev-front-mock`, waits for the server to be ready,
+# then runs the full HTTP contract checks defined in
+# play/tests/mock-mode/smoke-dev-front-mock.sh.
+
+name: "Frontend Mock Smoke"
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - "play/**"
+      - "maps/**"
+      - ".github/workflows/frontend-mock-smoke.yml"
+  pull_request:
+    paths:
+      - "play/**"
+      - "maps/**"
+      - ".github/workflows/frontend-mock-smoke.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend-mock-smoke:
+    name: "Frontend Mock Smoke Test"
+
+    runs-on: "ubuntu-latest"
+
+    defaults:
+      run:
+        working-directory: "play"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v5"
+
+      - name: "Setup Node.js"
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: "Install play dependencies"
+        run: npm ci --workspace=workadventure-play
+
+      - name: "Run frontend mock smoke test"
+        run: npm run test:front-mock-smoke
+        env:
+          # Extend wait time for slower CI runners
+          FRONTEND_MOCK_WAIT_SECONDS: "120"
