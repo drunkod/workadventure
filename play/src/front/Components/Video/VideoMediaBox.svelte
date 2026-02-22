@@ -24,56 +24,60 @@
     import WebRtcStats from "./WebRtcStatsBox.svelte";
     import { IconArrowsMinimize, IconArrowsMaximize, IconMicrophoneOff } from "@wa-icons";
 
-    export let fullScreen = false;
-    export let videoBox: VideoBox; // If true, and if there is no video, the height of the video box will be 11rem
-    export let miniMode = false;
-    $: streamableStore = videoBox.streamable;
-    $: streamable = $streamableStore;
+    interface Props {
+        fullScreen?: boolean;
+        videoBox: VideoBox; // If true, and if there is no video, the height of the video box will be 11rem
+        miniMode?: boolean;
+    }
+
+    let { fullScreen = false, videoBox, miniMode = false }: Props = $props();
+    let streamableStore = $derived(videoBox.streamable);
+    let streamable = $derived($streamableStore);
 
     // The inCameraContainer is used to know if the VideoMediaBox is part of a series of video or if it is the highlighted video.
     let inCameraContainer: boolean = getContext("inCameraContainer");
 
-    $: extendedSpaceUser = videoBox.spaceUser;
-    $: megaphoneState = extendedSpaceUser?.reactiveUser.megaphoneState;
+    let extendedSpaceUser = $derived(videoBox.spaceUser);
+    let megaphoneState = $derived(extendedSpaceUser?.reactiveUser.megaphoneState);
 
-    $: pictureStore = extendedSpaceUser?.pictureStore;
+    let pictureStore = $derived(extendedSpaceUser?.pictureStore);
 
-    $: name = extendedSpaceUser?.name;
+    let name = $derived(extendedSpaceUser?.name);
 
-    let showUserSubMenu = false;
+    let showUserSubMenu = $state(false);
 
-    $: hasVideoStore = streamable?.hasVideo;
-    $: hasAudioStore = streamable?.hasAudio;
-    $: isMutedStore = streamable?.isMuted;
-    $: muteAudioStore = streamable?.muteAudio;
-    $: statusStore = streamable?.statusStore;
-    $: volumeMeterStore = streamable?.volumeStore;
-    $: showVoiceIndicatorStore = streamable?.showVoiceIndicator;
-    $: isBlockedStore = streamable?.media?.isBlocked;
-    $: volumeStore = streamable?.volume;
-    $: volumeMeter = $volumeMeterStore;
-    $: muteAudio = muteAudioStore ? $muteAudioStore : false;
-    $: webRtcStatsStore = $displayVideoQualityStore ? streamable?.webrtcStats : undefined;
-    $: webRtcStats = $webRtcStatsStore;
+    let hasVideoStore = $derived(streamable?.hasVideo);
+    let hasAudioStore = $derived(streamable?.hasAudio);
+    let isMutedStore = $derived(streamable?.isMuted);
+    let muteAudioStore = $derived(streamable?.muteAudio);
+    let statusStore = $derived(streamable?.statusStore);
+    let volumeMeterStore = $derived(streamable?.volumeStore);
+    let showVoiceIndicatorStore = $derived(streamable?.showVoiceIndicator);
+    let isBlockedStore = $derived(streamable?.media?.isBlocked);
+    let volumeStore = $derived(streamable?.volume);
+    let volumeMeter = $derived($volumeMeterStore);
+    let muteAudio = $derived(muteAudioStore ? $muteAudioStore : false);
+    let webRtcStatsStore = $derived($displayVideoQualityStore ? streamable?.webrtcStats : undefined);
+    let webRtcStats = $derived($webRtcStatsStore);
 
-    $: showVoiceIndicator = showVoiceIndicatorStore ? $showVoiceIndicatorStore : false;
+    let showVoiceIndicator = $derived(showVoiceIndicatorStore ? $showVoiceIndicatorStore : false);
 
     // If there is no constraintStore, we are in a screen sharing (so video is enabled)
 
-    $: videoEnabled = $hasVideoStore;
+    let videoEnabled = $derived($hasVideoStore);
 
-    $: isMegaphoneSpace = videoBox.isMegaphoneSpace ?? false;
+    let isMegaphoneSpace = $derived(videoBox.isMegaphoneSpace ?? false);
 
     // Check if this is the local user's video box
-    $: isLocalUser = videoBox.uniqueId === "-1" || extendedSpaceUser?.spaceUserId === "local";
+    let isLocalUser = $derived(videoBox.uniqueId === "-1" || extendedSpaceUser?.spaceUserId === "local");
 
     // Check if the local user is streaming with megaphone
     // requestedMegaphoneStore is true when user has requested megaphone
     // We also need to check if they are actually streaming (camera, mic, or screen)
-    $: isLocalUserStreamingMegaphone =
-        isLocalUser &&
+    let isLocalUserStreamingMegaphone =
+        $derived(isLocalUser &&
         $requestedMegaphoneStore &&
-        ($requestedCameraState || $requestedMicrophoneState || $requestedScreenSharingState);
+        ($requestedCameraState || $requestedMicrophoneState || $requestedScreenSharingState));
 
     function toggleFullScreen() {
         highlightFullScreen.update((current) => !current);
@@ -83,7 +87,7 @@
         highlightedEmbedScreen.removeHighlight();
     }
 
-    let userMenuButton: HTMLDivElement;
+    let userMenuButton: HTMLDivElement = $state();
 
     let closeFloatingUi: (() => void) | undefined;
 
@@ -118,7 +122,7 @@
         }
     }
 
-    let showAfterDelay = true;
+    let showAfterDelay = $state(true);
     let connectingTimer: ReturnType<typeof setTimeout> | null = null;
 
     // When the status is "connecting", do not show the video for 1 second. This is to avoid a visual glitch.
@@ -180,7 +184,7 @@
                     class="flex w-8 h-8 justify-center items-center absolute right-2 top-2 @[22rem]/videomediabox:w-full @[22rem]/videomediabox:right-auto @[22rem]/videomediabox:top-auto @[22rem]/videomediabox:h-full @[22rem]/videomediabox:justify-center @[22rem]/videomediabox:items-center @[22rem]/videomediabox:right-none @[22rem]/videomediabox:top-none"
                 >
                     <!--                <div class="w-8 h-8 flex justify-center items-center absolute right-2 top-2">-->
-                    <div class="connecting-spinner" />
+                    <div class="connecting-spinner"></div>
                 </div>
             </div>
         {:else if $statusStore === "error"}
@@ -236,14 +240,14 @@
                             {#if !fullScreen}
                                 <button
                                     class="svg p-4 h-full w-full hover:bg-white/10 flex justify-start items-center z-25 rounded-lg text-base"
-                                    on:click={exitFullScreen}
+                                    onclick={exitFullScreen}
                                 >
                                     <IconArrowsMinimize font-size="20" class="text-white" />
                                 </button>
                             {/if}
                             <button
                                 class="muted-video p-4 h-full w-full hover:bg-white/10 flex justify-start cursor-pointer items-center z-25 rounded-lg text-base"
-                                on:click={toggleFullScreen}
+                                onclick={toggleFullScreen}
                             >
                                 {#if fullScreen}
                                     <IconArrowsMinimize font-size="20" class="text-white" />
@@ -284,7 +288,7 @@
         {:then}
             <button
                 class="full-screen-button absolute top-0 bottom-0 right-0 left-0 m-auto h-14 w-14 z-20 p-4 rounded-lg bg-contrast/50 backdrop-blur transition-all opacity-0 group-hover/screenshare:opacity-100 hover:bg-white/10 cursor-pointer"
-                on:click={() => highlightPeer(videoBox)}
+                onclick={() => highlightPeer(videoBox)}
             >
                 <IconArrowsMaximize font-size="20" class="text-white" />
             </button>
@@ -292,11 +296,11 @@
     {/if}
     {#if !muteAudio}
         {#await userActivationManager.waitForUserActivation()}
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class="absolute w-full h-full aspect-video mx-auto flex justify-center items-center bg-contrast/50 rounded-lg z-20 cursor-pointer"
-                on:click={() => {
+                onclick={() => {
                     userActivationManager.notifyUserActivation();
                 }}
             >

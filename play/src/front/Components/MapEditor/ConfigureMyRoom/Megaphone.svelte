@@ -19,14 +19,14 @@
 
     const currentMegaphoneSettings = gameManager.getCurrentGameScene().wamFile?.settings?.megaphone;
 
-    let enabled: boolean = currentMegaphoneSettings?.enabled ?? false;
+    let enabled: boolean = $state(currentMegaphoneSettings?.enabled ?? false);
     const oldRights: string[] = currentMegaphoneSettings?.rights ?? [];
-    let rights: InputTagOption[] = [];
-    let title: string = currentMegaphoneSettings?.title ?? "MyMegaphone";
-    let scope: string = currentMegaphoneSettings?.scope ?? "WORLD";
-    let enableSoundNotifications: boolean = currentMegaphoneSettings?.enableSoundNotifications ?? true;
+    let rights: InputTagOption[] = $state([]);
+    let title: string = $state(currentMegaphoneSettings?.title ?? "MyMegaphone");
+    let scope: string = $state(currentMegaphoneSettings?.scope ?? "WORLD");
+    let enableSoundNotifications: boolean = $state(currentMegaphoneSettings?.enableSoundNotifications ?? true);
     let notificationSoundUrl: string =
-        currentMegaphoneSettings?.notificationSoundUrl ?? DEFAULT_MEGAPHONE_NOTIFICATION_SOUND_URL;
+        $state(currentMegaphoneSettings?.notificationSoundUrl ?? DEFAULT_MEGAPHONE_NOTIFICATION_SOUND_URL);
     let scopes = [
         { value: "ROOM", label: $LL.mapEditor.settings.megaphone.inputs.room() },
         { value: "WORLD", label: $LL.mapEditor.settings.megaphone.inputs.world() },
@@ -51,15 +51,15 @@
         : baseNotificationSoundOptions;
 
     let audienceVideoFeedbackActivated: boolean =
-        gameManager.getCurrentGameScene().wamFile?.settings?.megaphone?.audienceVideoFeedbackActivated ?? false;
+        $state(gameManager.getCurrentGameScene().wamFile?.settings?.megaphone?.audienceVideoFeedbackActivated ?? false);
 
-    let loading = false;
+    let loading = $state(false);
 
-    let dynamicStrings = {
+    let dynamicStrings = $state({
         error: {
             title: "",
         },
-    };
+    });
 
     async function save(): Promise<string> {
         if (loading) {

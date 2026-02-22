@@ -8,15 +8,24 @@
     import InteractiveAuthSSO from "./InteractiveAuthSSO.svelte";
     import { INTERACTIVE_AUTH_PHASE } from "./InteractiveAuthPhase";
 
-    export let isOpen: boolean;
-    export let matrixClient: MatrixClient;
-    export let onFinished: (finished: boolean) => void;
-    export let makeRequest: (auth: AuthDict | null) => Promise<UIAResponse<void>>;
+    interface Props {
+        isOpen: boolean;
+        matrixClient: MatrixClient;
+        onFinished: (finished: boolean) => void;
+        makeRequest: (auth: AuthDict | null) => Promise<UIAResponse<void>>;
+    }
+
+    let {
+        isOpen,
+        matrixClient,
+        onFinished,
+        makeRequest
+    }: Props = $props();
 
     let isInteractiveAuthFinished = false;
 
-    let uiAuthStage: AuthType | string;
-    let uiAuthPhase: INTERACTIVE_AUTH_PHASE;
+    let uiAuthStage: AuthType | string = $state();
+    let uiAuthPhase: INTERACTIVE_AUTH_PHASE = $state();
 
     const interactiveAuth = new InteractiveAuth({
         matrixClient,
@@ -69,21 +78,27 @@
 
 {#if uiAuthStage === "m.login.sso"}
     <Popup {isOpen}>
-        <h1 slot="title">{$LL.chat.e2ee.interactiveAuth.title()}</h1>
-        <div slot="content">
-            <p>{$LL.chat.e2ee.interactiveAuth.description()}</p>
-            {#if uiAuthPhase === INTERACTIVE_AUTH_PHASE.PRE_AUTH}
-                <p>{$LL.chat.e2ee.interactiveAuth.instruction()}</p>
-            {/if}
-        </div>
-        <svelte:fragment slot="action">
-            <InteractiveAuthSSO
-                authSessionId={interactiveAuth.getSessionId()}
-                {matrixClient}
-                onPhaseChange={onUpdatePhaseChange}
-                onCancel={onCancelInteractiveAuth}
-                submitAuthDict={() => interactiveAuth.submitAuthDict({})}
-            />
-        </svelte:fragment>
+        {#snippet title()}
+                <h1 >{$LL.chat.e2ee.interactiveAuth.title()}</h1>
+            {/snippet}
+        {#snippet content()}
+                <div >
+                <p>{$LL.chat.e2ee.interactiveAuth.description()}</p>
+                {#if uiAuthPhase === INTERACTIVE_AUTH_PHASE.PRE_AUTH}
+                    <p>{$LL.chat.e2ee.interactiveAuth.instruction()}</p>
+                {/if}
+            </div>
+            {/snippet}
+        {#snippet action()}
+            
+                <InteractiveAuthSSO
+                    authSessionId={interactiveAuth.getSessionId()}
+                    {matrixClient}
+                    onPhaseChange={onUpdatePhaseChange}
+                    onCancel={onCancelInteractiveAuth}
+                    submitAuthDict={() => interactiveAuth.submitAuthDict({})}
+                />
+            
+            {/snippet}
     </Popup>
 {/if}

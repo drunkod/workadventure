@@ -4,19 +4,31 @@
     import Loader from "../../Chat/Components/Loader.svelte";
     import { LL } from "../../../i18n/i18n-svelte";
 
-    // Minimums and maximums for safety
-    export let minHeight = 160; // px
-    export let maxHeight: number | null = null; // if null, uses viewport height
-    export let minIframeWidth = 240; // px
-    export let maxIframeWidth: number | null = null; // if null, uses viewport width
+    
 
     // Initial sizing: match your previous intent
     // You had md:w-[calc(100vw/4)], which gives a width of one quarter of viewport
+    
+  interface Props {
+    // Minimums and maximums for safety
+    minHeight?: number; // px
+    maxHeight?: number | null; // if null, uses viewport height
+    minIframeWidth?: number; // px
+    maxIframeWidth?: number | null; // if null, uses viewport width
     // We compute the starting height from that width with a 16:9 ratio
-    export let initialWidthFraction = 1 / 4;
+    initialWidthFraction?: any;
+  }
 
-    let lineHeight = 0; // px, height of the outer line
-    let iframeWidth = 0; // px, computed from lineHeight
+  let {
+    minHeight = 160,
+    maxHeight = null,
+    minIframeWidth = 240,
+    maxIframeWidth = null,
+    initialWidthFraction = 1 / 4
+  }: Props = $props();
+
+    let lineHeight = $state(0); // px, height of the outer line
+    let iframeWidth = $state(0); // px, computed from lineHeight
     let dragging = false;
     let startY = 0;
     let startH = 0;
@@ -106,7 +118,7 @@
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen
-            />
+></iframe>
         {:else}
             <Loader text={$LL.mapEditor.properties.listenerMegaphone.waitingSpeaker()} className="m-4" />
         {/if}
@@ -117,11 +129,11 @@
         role="separator"
         aria-label="Resize line height"
         class="absolute flex justify-center items-center left-0 right-0 -bottom-8 h-fit cursor-n-resize z-20"
-        on:pointerdown={beginDrag}
+        onpointerdown={beginDrag}
     >
         <!-- Visual grip -->
         <div
             class="mx-auto mt-3 mb-3 w-20 h-2 outline outline-4 outline-contrast bg-white cursor-ns-resize transition-colors rounded-lg"
-        />
+></div>
     </div>
 </div>

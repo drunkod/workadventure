@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run, preventDefault, stopPropagation } from 'svelte/legacy';
+
     import type { UploadEntityMessage } from "@workadventure/messages";
     import { CustomEntityDirection } from "@workadventure/messages";
     import { onDestroy } from "svelte";
@@ -10,34 +12,14 @@
     import CustomEntityEditionForm from "../CustomEntityEditionForm/CustomEntityEditionForm.svelte";
     import { IconCloudUpload } from "@wa-icons";
 
-    let files: FileList | undefined = undefined;
-    let dropZoneRef: HTMLDivElement;
-    let customEntityToUpload: EntityPrefab | undefined = undefined;
-    let errorOnFile: string | undefined;
+    let files: FileList | undefined = $state(undefined);
+    let dropZoneRef: HTMLDivElement = $state();
+    let customEntityToUpload: EntityPrefab | undefined = $state(undefined);
+    let errorOnFile: string | undefined = $state();
     let tagUploadInProcess: string | undefined;
 
     const BASIC_TYPE = "Custom";
 
-    $: {
-        if (files) {
-            const file = files.item(0);
-            if (file && isASupportedFormat(file.type)) {
-                customEntityToUpload = {
-                    collectionName: "custom entities",
-                    name: file.name,
-                    imagePath: URL.createObjectURL(file),
-                    id: uuidv4(),
-                    direction: Direction.Down,
-                    tags: [],
-                    color: "",
-                    type: BASIC_TYPE,
-                };
-            } else {
-                console.error("File format not supported");
-                errorOnFile = $LL.mapEditor.entityEditor.uploadEntity.errorOnFileFormat();
-            }
-        }
-    }
 
     const mapEditorEntityUploadEventStoreUnsubscriber = mapEditorEntityUploadEventStore.subscribe(
         (uploadEntityMessage) => {
@@ -108,6 +90,26 @@
     onDestroy(() => {
         mapEditorEntityUploadEventStoreUnsubscriber();
     });
+    run(() => {
+        if (files) {
+            const file = files.item(0);
+            if (file && isASupportedFormat(file.type)) {
+                customEntityToUpload = {
+                    collectionName: "custom entities",
+                    name: file.name,
+                    imagePath: URL.createObjectURL(file),
+                    id: uuidv4(),
+                    direction: Direction.Down,
+                    tags: [],
+                    color: "",
+                    type: BASIC_TYPE,
+                };
+            } else {
+                console.error("File format not supported");
+                errorOnFile = $LL.mapEditor.entityEditor.uploadEntity.errorOnFileFormat();
+            }
+        }
+    });
 </script>
 
 {#if customEntityToUpload}
@@ -124,11 +126,11 @@
     <div class="no-padding">
         <p class="m-0">{$LL.mapEditor.entityEditor.uploadEntity.title()}</p>
         <p class="opacity-50">{$LL.mapEditor.entityEditor.uploadEntity.description()}</p>
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
-            on:drop|preventDefault|stopPropagation={dropHandler}
-            on:dragover|preventDefault={() => dropZoneRef.classList.add("border-cyan-400")}
-            on:dragleave|preventDefault={() => dropZoneRef.classList.remove("border-cyan-400")}
+            ondrop={stopPropagation(preventDefault(dropHandler))}
+            ondragover={preventDefault(() => dropZoneRef.classList.add("border-cyan-400"))}
+            ondragleave={preventDefault(() => dropZoneRef.classList.remove("border-cyan-400"))}
             bind:this={dropZoneRef}
             class="hover:cursor-pointer h-32 flex flex-col border border-dashed rounded-md items-center justify-center bg-white bg-opacity-10"
         >

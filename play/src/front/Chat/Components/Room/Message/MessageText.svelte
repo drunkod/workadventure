@@ -4,8 +4,12 @@
     import { onDestroy, onMount, createEventDispatcher } from "svelte";
     import type { ChatMessageContent } from "../../../Connection/ChatConnection";
     import { sanitizeHTML } from "./WA-HTML-Sanitizer";
-    export let content: Readable<ChatMessageContent>;
-    export let hasDepth: false;
+    interface Props {
+        content: Readable<ChatMessageContent>;
+        hasDepth: false;
+    }
+
+    let { content, hasDepth }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         updateMessageBody: void;
@@ -49,7 +53,7 @@
         return marked;
     }
 
-    let html = "";
+    let html = $state("");
 
     let unsubscriber: Unsubscriber | undefined;
     onMount(() => {

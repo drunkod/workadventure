@@ -3,7 +3,7 @@
     import { profileAvailable, getProfileUrl } from "../../Stores/MenuStore";
     import { iframeListener } from "../../Api/IframeListener";
 
-    let profileIframe: HTMLIFrameElement;
+    let profileIframe: HTMLIFrameElement = $state();
 
     onMount(() => {
         if ($profileAvailable && profileIframe) iframeListener.registerIframe(profileIframe);
@@ -18,7 +18,7 @@
     <div class="content">
         <section class="centered-column w-full m-auto resizing-text">
             {#if $profileAvailable}
-                <iframe bind:this={profileIframe} title="profile" src={getProfileUrl()} class="w-full h-dvh border-0" />
+                <iframe bind:this={profileIframe} title="profile" src={getProfileUrl()} class="w-full h-dvh border-0"></iframe>
             {/if}
         </section>
     </div>

@@ -1,13 +1,25 @@
 <script lang="ts">
-    export let height = "h-6";
-    export let width = "w-6";
-    export let strokeColor = "stroke-white";
     // Ignoring fillColor for this icon as it is not used
     // Still putting the prop here for consistency with other icons and to avoid a warning
-    // svelte-ignore unused-export-let
-    export let fillColor = "fill-white";
-    export let hover = "group-hover/btn-emoji:fill-white";
-    export let classList = "aspect-ratio transition-all";
+    
+    interface Props {
+        height?: string;
+        width?: string;
+        strokeColor?: string;
+        // svelte-ignore unused-export-let
+        fillColor?: string;
+        hover?: string;
+        classList?: string;
+    }
+
+    let {
+        height = "h-6",
+        width = "w-6",
+        strokeColor = "stroke-white",
+        fillColor = "fill-white",
+        hover = "group-hover/btn-emoji:fill-white",
+        classList = "aspect-ratio transition-all"
+    }: Props = $props();
 </script>
 
 <svg

@@ -1,12 +1,25 @@
 <script lang="ts">
-    export let label: string;
-    export let placeHolder = "";
-    export let value: string;
-    export let onFocus = () => {};
-    export let onBlur = () => {};
-    export let onKeyPress: () => void;
-    export let errorHelperText: string | undefined = undefined;
-    export let error = false;
+    interface Props {
+        label: string;
+        placeHolder?: string;
+        value: string;
+        onFocus?: any;
+        onBlur?: any;
+        onKeyPress: () => void;
+        errorHelperText?: string | undefined;
+        error?: boolean;
+    }
+
+    let {
+        label,
+        placeHolder = "",
+        value = $bindable(),
+        onFocus = () => {},
+        onBlur = () => {},
+        onKeyPress,
+        errorHelperText = undefined,
+        error = false
+    }: Props = $props();
 </script>
 
 <div class="flex flex-col">
@@ -18,9 +31,9 @@
         type="text"
         placeholder={placeHolder}
         bind:value
-        on:focus={onFocus}
-        on:blur={onBlur}
-        on:keypress={onKeyPress}
+        onfocus={onFocus}
+        onblur={onBlur}
+        onkeypress={onKeyPress}
         class:error={errorHelperText || error}
         class:!border-red-500={errorHelperText || error}
     />

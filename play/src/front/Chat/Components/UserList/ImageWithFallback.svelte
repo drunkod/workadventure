@@ -1,10 +1,14 @@
-<script>
-    export let src;
-    export let alt;
-    export let fallback;
-    export let classes;
+<script lang="ts">
+    import { run } from 'svelte/legacy';
 
-    let currentSrc;
+    let {
+        src,
+        alt,
+        fallback,
+        classes
+    } = $props();
+
+    let currentSrc = $state();
 
     function handleError() {
         if (currentSrc !== fallback) {
@@ -12,7 +16,9 @@
         }
     }
 
-    $: currentSrc = src ?? fallback;
+    run(() => {
+        currentSrc = src ?? fallback;
+    });
 </script>
 
-<img class={classes} src={currentSrc} {alt} on:error={handleError} draggable="false" />
+<img class={classes} src={currentSrc} {alt} onerror={handleError} draggable="false" />

@@ -1,14 +1,27 @@
 <script lang="ts">
     import { fly } from "svelte/transition";
     import tooltipArrow from "../images/arrow-top.svg";
-    export let helpMedia: string | null = null;
-    export let hasImage = true;
-    export let hasDesc = true;
-    export let title = "Find people and navigate to them";
-    export let desc =
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-    export let delayBeforeAppear = 500;
-    export let shortcuts: string[] = [];
+    interface Props {
+        helpMedia?: string | null;
+        hasImage?: boolean;
+        hasDesc?: boolean;
+        title?: string;
+        desc?: string;
+        delayBeforeAppear?: number;
+        shortcuts?: string[];
+        children?: import('svelte').Snippet;
+    }
+
+    let {
+        helpMedia = null,
+        hasImage = true,
+        hasDesc = true,
+        title = "Find people and navigate to them",
+        desc = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        delayBeforeAppear = 500,
+        shortcuts = [],
+        children
+    }: Props = $props();
 </script>
 
 <link rel="preload" as="image" href={tooltipArrow} />
@@ -66,5 +79,5 @@
             {/if}
         </div>
     </div>
-    <slot />
+    {@render children?.()}
 </div>

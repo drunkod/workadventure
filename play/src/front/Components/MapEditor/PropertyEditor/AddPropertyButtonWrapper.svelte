@@ -36,10 +36,19 @@
         IconZoomInArea,
     } from "@wa-icons";
 
-    export let property: AreaDataPropertiesKeys | EntityDataPropertiesKeys;
-    export let subProperty: string | undefined = undefined;
-    export let isActive = false;
-    export let disabled = false;
+    interface Props {
+        property: AreaDataPropertiesKeys | EntityDataPropertiesKeys;
+        subProperty?: string | undefined;
+        isActive?: boolean;
+        disabled?: boolean;
+    }
+
+    let {
+        property,
+        subProperty = undefined,
+        isActive = false,
+        disabled = false
+    }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         change: undefined;
@@ -414,8 +423,8 @@
 {#if property === "extensionModule" && modulesExtensionMapEditor.length > 0 && subProperty !== undefined}
     {#each modulesExtensionMapEditor as moduleExtension, index (`modulesExtensionMapEditor-${index}`)}
         {#if moduleExtension[subProperty] != undefined}
-            <svelte:component
-                this={moduleExtension[subProperty].AddAreaPropertyButton}
+            {@const SvelteComponent = moduleExtension[subProperty].AddAreaPropertyButton}
+            <SvelteComponent
                 on:click={(event) => {
                     dispatch("click", event);
                 }}

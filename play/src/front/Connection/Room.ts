@@ -9,6 +9,7 @@ import {
     ENABLE_CHAT_ONLINE_LIST,
     ENABLE_CHAT_UPLOAD,
     ENABLE_ISSUE_REPORT,
+    JAZZ_CHAT_ENABLED,
     ENABLE_OPENID,
     ENABLE_SAY,
     OPID_WOKA_NAME_POLICY,
@@ -192,7 +193,7 @@ export class Room {
                 this._legals = data.legals ?? undefined;
 
                 this._enableChat = (data.enableChat ?? true) && ENABLE_CHAT;
-                this._isMatrixChatEnabled = (data.enableMatrixChat ?? true) && ENABLE_OPENID;
+                this._isMatrixChatEnabled = (data.enableMatrixChat ?? true) && (ENABLE_OPENID || JAZZ_CHAT_ENABLED);
                 this._enableChatUpload = (data.enableChatUpload ?? true) && ENABLE_CHAT_UPLOAD;
                 this._enableChatOnlineList = (data.enableChatOnlineList ?? true) && ENABLE_CHAT_ONLINE_LIST;
                 this._enableChatDisconnectedList =

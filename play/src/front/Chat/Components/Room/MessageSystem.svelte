@@ -1,7 +1,11 @@
 <script lang="ts">
     import type { ChatMessage } from "../../Connection/ChatConnection";
 
-    export let message: Pick<ChatMessage, "date" | "content">;
+    interface Props {
+        message: Pick<ChatMessage, "date" | "content">;
+    }
+
+    let { message }: Props = $props();
 
     const { date, content } = message;
 </script>

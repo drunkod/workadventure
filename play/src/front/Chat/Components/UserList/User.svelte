@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { stopPropagation } from 'svelte/legacy';
+
     import { AskPositionMessage_AskType, AvailabilityStatus } from "@workadventure/messages";
     import * as Sentry from "@sentry/svelte";
     import highlightWords from "highlight-words";
@@ -16,22 +18,26 @@
     import ImageWithFallback from "./ImageWithFallback.svelte";
     import { IconLoader, IconSend } from "@wa-icons";
 
-    export let user: ChatUser;
 
-    export let isMatrixChatEnabled = true;
+    interface Props {
+        user: ChatUser;
+        isMatrixChatEnabled?: boolean;
+    }
+
+    let { user, isMatrixChatEnabled = true }: Props = $props();
 
     let showRoomCreationInProgress = false;
 
-    $: ({ chatId, availabilityStatus, username = "", color, isAdmin, pictureStore } = user);
+    let { chatId, availabilityStatus, username = "", color, isAdmin, pictureStore } = $derived(user);
 
-    $: isMe = user.chatId === localUserStore.getChatId() || user.uuid === localUserStore.getLocalUser()?.uuid;
+    let isMe = $derived(user.chatId === localUserStore.getChatId() || user.uuid === localUserStore.getLocalUser()?.uuid);
 
-    $: userStatus = isMe ? availabilityStatusStore : availabilityStatus;
+    let userStatus = $derived(isMe ? availabilityStatusStore : availabilityStatus);
 
-    $: chunks = highlightWords({
+    let chunks = $derived(highlightWords({
         text: username.match(/\[\d*]/) ? username.substring(0, username.search(/\[\d*]/)) : username,
         query: $chatSearchBarValue,
-    });
+    }));
 
     const roomCreationInProgress = gameManager.chatConnection.roomCreationInProgress;
 
@@ -99,12 +105,12 @@
                 ? 'admin'
                 : 'user'} group/chatItem relative mb-[1px] text-md flex gap-2 flex-row items-center hover:bg-white transition-all hover:bg-opacity-10 hover:rounded hover:!cursor-pointer px-2 py-2 cursor-pointer"
         >
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class="relative wa-avatar {!$userStatus ? 'opacity-50' : ''} cursor-pointer w-7 h-7 rounded-md"
                 style={`background-color: ${color ?? defaultColor}`}
-                on:click|stopPropagation={openWokaMenu}
+                onclick={stopPropagation(openWokaMenu)}
             >
                 <div class="w-7 h-7 rounded-md overflow-hidden">
                     <div
@@ -114,11 +120,11 @@
                     </div>
                 </div>
             </div>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class={`flex-auto ms-1 ${!$userStatus && "opacity-50"} cursor-pointer`}
-                on:click|stopPropagation={openWokaMenu}
+                onclick={stopPropagation(openWokaMenu)}
             >
                 <div class="flex items-center h-4">
                     <div class="text-sm font-bold mb-0 flex items-center text-nowrap">
@@ -155,7 +161,7 @@
                                 <div
                                     class="rounded-full me-1 h-1.5 w-1.5"
                                     style="background:{getColorHexOfStatus($userStatus)}"
-                                />
+></div>
                             {/if}
                             {getNameOfAvailabilityStatus($userStatus ?? 0)}
                         </div>
@@ -187,7 +193,7 @@
                             class:text-gray-400={user.chatId === undefined}
                             data-testId={`send-message-${user.username}`}
                             disabled={user.chatId === undefined}
-                            on:click|stopPropagation={() => {
+                            onclick={stopPropagation(() => {
                                 openDirectChatRoom(chatId).catch((error) => {
                                     console.error("Error opening direct chat room:", error);
                                     Sentry.captureException(error, {
@@ -200,7 +206,7 @@
                                     });
                                 });
                                 analyticsClient.sendMessageFromUserList();
-                            }}
+                            })}
                         >
                             <IconSend font-size="16" />
                         </button>

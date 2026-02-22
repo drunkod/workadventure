@@ -5,12 +5,21 @@
     import type { VerificationEmojiDialogProps } from "./MatrixSecurity";
     import { IconVerify } from "@wa-icons";
 
-    export let isOpen: boolean;
-    export let props: VerificationEmojiDialogProps;
-    let waitingOtherDeviceResponse = false;
-    let deviceIsVerified = false;
+    interface Props {
+        isOpen: boolean;
+        props: VerificationEmojiDialogProps;
+    }
 
-    const { confirmationCallback, mismatchCallback, emojis, donePromise, isThisDeviceVerification } = props;
+    let { isOpen, props: dialogProps }: Props = $props();
+
+    let waitingOtherDeviceResponse = $state(false);
+    let deviceIsVerified = $state(false);
+
+    let confirmationCallback = $derived(dialogProps.confirmationCallback);
+    let mismatchCallback = $derived(dialogProps.mismatchCallback);
+    let emojis = $derived(dialogProps.emojis);
+    let donePromise = $derived(dialogProps.donePromise);
+    let isThisDeviceVerification = $derived(dialogProps.isThisDeviceVerification);
 
     let closeTimeout: ReturnType<typeof setTimeout> | undefined;
 

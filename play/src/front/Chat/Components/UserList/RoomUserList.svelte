@@ -9,7 +9,11 @@
     import UserList from "./UserList.svelte";
     import { IconChevronUp } from "@wa-icons";
 
-    export let userProviderMerger: UserProviderMerger;
+    interface Props {
+        userProviderMerger: UserProviderMerger;
+    }
+
+    let { userProviderMerger }: Props = $props();
 
     const USERS_BY_ROOM_LIMITATION = 200;
 
@@ -20,9 +24,9 @@
         if ($shownRoomListStore === "") shownRoomListStore.set($LL.chat.userList.isHere());
     });
 
-    $: usersByRoom = userProviderMerger.usersByRoomStore;
+    let usersByRoom = $derived(userProviderMerger.usersByRoomStore);
 
-    $: roomsWithUsers = Array.from($usersByRoom.entries())
+    let roomsWithUsers = $derived(Array.from($usersByRoom.entries())
         .reduce((roomsWithUsersAcc, [currentPlayUri, currentRoomWithUsers]) => {
             let roomName =
                 currentRoomWithUsers.roomName ??
@@ -59,7 +63,7 @@
             if (bKey === $LL.chat.userList.isHere()) return 1;
 
             return aKey.localeCompare(bKey);
-        });
+        }));
 </script>
 
 <div class="flex flex-col h-full">
@@ -69,7 +73,7 @@
             <div class=" users flex flex-col shrink-0 relative first:pt-[12px]">
                 <button
                     class="group relative px-3 gap-2 rounded-none text-white/75 hover:text-white h-11 hover:bg-contrast-200/10 w-full flex space-x-2 items-center border border-solid border-x-0 border-t border-b-0 border-white/10 text-white outline-none border-y-0 appearance-none m-0"
-                    on:click={() => shownRoomListStore.set($shownRoomListStore === roomName ? "" : roomName)}
+                    onclick={() => shownRoomListStore.set($shownRoomListStore === roomName ? "" : roomName)}
                 >
                     {#if roomName !== $LL.chat.userList.disconnected()}
                         <div

@@ -1,6 +1,6 @@
 import { basename, extname, normalize, resolve } from "path";
 import fs from "fs";
-import { defineConfig, loadEnv } from "vite";
+import { createLogger, defineConfig, loadEnv } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { sveltePreprocess } from "svelte-preprocess";
 import legacy from "@vitejs/plugin-legacy";
@@ -9,12 +9,31 @@ import Icons from "unplugin-icons/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 
+const originalConsoleWarn = console.warn;
+console.warn = (...args: unknown[]) => {
+    const message = args.map((arg) => String(arg ?? "")).join(" ");
+    if (message.includes("[baseline-browser-mapping]")) {
+        return;
+    }
+    originalConsoleWarn(...args);
+};
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
     // Load env file based on `mode` in the current working directory.
     // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
     const env = loadEnv(mode, process.cwd(), "");
+    const logger = createLogger();
+    const loggerWarn = logger.warn;
+    logger.warn = (msg, options) => {
+        if (msg.includes("didn't resolve at build time, it will remain unchanged")) {
+            return;
+        }
+        loggerWarn(msg, options);
+    };
+
     const config = {
+        customLogger: logger,
         server: {
             host: "0.0.0.0",
             port: 8080,
@@ -31,26 +50,51 @@ export default defineConfig(({ mode }) => {
             outDir: "./dist/public",
             rollupOptions: {
                 plugins: [mediapipe_workaround()],
+                onwarn(warning, warn) {
+                    if (warning.code === "EVAL" && warning.id?.includes("/node_modules/vm-browserify/index.js")) {
+                        return;
+                    }
+                    if (warning.message?.includes("didn't resolve at build time, it will remain unchanged")) {
+                        return;
+                    }
+                    warn(warning);
+                },
                 // external: ["@mediapipe/tasks-vision"],
                 //plugins: [inject({ Buffer: ["buffer/", "Buffer"] })],
             },
             assetsInclude: ["**/*.tflite", "**/*.wasm"],
         },
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    silenceDeprecations: ["legacy-js-api", "import"],
+                },
+            },
+        },
         plugins: [
             nodePolyfills({
-                include: ["events", "buffer"],
                 globals: {
                     Buffer: true,
                 },
             }),
             svelte({
                 preprocess: sveltePreprocess(),
+                prebundleSvelteLibraries: false,
                 onwarn(warning, defaultHandler) {
+                    const warningCode = warning.code ?? "";
+
                     // don't warn on:
-                    if (warning.code === "a11y-click-events-have-key-events") return;
-                    if (warning.code === "security-anchor-rel-noreferrer") return;
-                    if (warning.code === "Unknown at rule @container (css)") return;
+                    if (warningCode.startsWith("a11y-") || warningCode.startsWith("a11y_")) return;
+                    if (warningCode === "security-anchor-rel-noreferrer") return;
+                    if (warningCode === "css_unused_selector") return;
+                    if (warningCode === "state_referenced_locally") return;
+                    if (warningCode === "event_directive_deprecated") return;
+                    if (warningCode === "options_deprecated_immutable") return;
+                    if (warningCode === "non_reactive_update") return;
+                    if (warningCode === "element_invalid_self_closing_tag") return;
+                    if (warningCode === "Unknown at rule @container (css)") return;
                     if (warning.message.includes("Unknown at rule @container")) return;
+                    if (warning.message.includes("local binding called `state`")) return;
 
                     // handle all other warnings normally
                     if (defaultHandler) {
@@ -72,7 +116,9 @@ export default defineConfig(({ mode }) => {
                           modernPolyfills: ["web.structured-clone"],
                       }),
                   ]),
-            tsconfigPaths(),
+            tsconfigPaths({
+                ignoreConfigErrors: true,
+            }),
             ...(env.FRONTEND_ONLY === "true" ? [frontendOnlyMockPlugin(env)] : []),
         ],
         resolve: {
@@ -92,7 +138,7 @@ export default defineConfig(({ mode }) => {
         },
         optimizeDeps: {
             include: ["olm"],
-            exclude: ["svelte-modals"],
+            exclude: ["svelte-modals", "jazz-tools/svelte", "jazz-tools/inspector/register-custom-element"],
             esbuildOptions: {
                 define: {
                     global: "globalThis",

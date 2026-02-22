@@ -1,4 +1,4 @@
-<script context="module" lang="ts">
+<script module lang="ts">
     // Create interface for the property
     export interface ApplicationProperty {
         name: string;
@@ -44,21 +44,25 @@
     import MessageInput from "./MessageInput.svelte";
     import { IconMoodSmile, IconPaperclip, IconSend, IconX } from "@wa-icons";
 
-    export let room: ChatRoom;
-    export let disabled = false;
+    interface Props {
+        room: ChatRoom;
+        disabled?: boolean;
+    }
 
-    let message = "";
-    let messageInput: HTMLDivElement;
-    let messageBarRef: HTMLDivElement;
+    let { room, disabled = false }: Props = $props();
+
+    let message = $state("");
+    let messageInput: HTMLDivElement = $state();
+    let messageBarRef: HTMLDivElement = $state();
     let stopTypingTimeOutID: undefined | ReturnType<typeof setTimeout>;
-    let files: { id: string; file: File }[] = [];
-    let filesPreview: { id: string; size: number; name: string; type: string; url: FileReader["result"] }[] = [];
+    let files: { id: string; file: File }[] = $state([]);
+    let filesPreview: { id: string; size: number; name: string; type: string; url: FileReader["result"] }[] = $state([]);
     const TYPINT_TIMEOUT = 10000;
 
-    let applicationComponentOpened = false;
-    let fileAttachmentComponentOpened = false;
-    let fileAttachementEnabled = false;
-    let applicationProperty: ApplicationProperty | undefined = undefined;
+    let applicationComponentOpened = $state(false);
+    let fileAttachmentComponentOpened = $state(false);
+    let fileAttachementEnabled = $state(false);
+    let applicationProperty: ApplicationProperty | undefined = $state(undefined);
     const isProximityChatRoom = room instanceof ProximityChatRoom;
     let replyMessageId: string | null = null;
     const draftId = `${room.id}-${localUserStore.getChatId() ?? "0"}`;
@@ -398,7 +402,7 @@
         applicationProperty = applicationPropertyEvent.detail;
     }
 
-    let applicationPropertyInProcessing = false;
+    let applicationPropertyInProcessing = $state(false);
     function onProcessingApplicationProperty() {
         applicationPropertyInProcessing = true;
     }
@@ -407,7 +411,7 @@
         applicationPropertyInProcessing = false;
     }
 
-    $: quotedMessageContent = $selectedChatMessageToReply?.content;
+    let quotedMessageContent = $derived($selectedChatMessageToReply?.content);
 </script>
 
 {#if files.length > 0 && !(room instanceof ProximityChatRoom)}
@@ -421,7 +425,7 @@
                 >
                     <button
                         class="border-2 border-white border-solid absolute flex items-center justify-center rounded-full bg-secondary hover:bg-secondary-600 p-0.5 -start-2 -top-2"
-                        on:click={() => deleteFile(preview.id)}
+                        onclick={() => deleteFile(preview.id)}
                     >
                         <IconX font-size="12" />
                     </button>
@@ -456,7 +460,7 @@
             <button
                 data-testid="fileAttachmentButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openFileAttachmentComponent()}
+                onclick={() => openFileAttachmentComponent()}
                 class:bg-secondary-800={fileAttachmentComponentOpened}
                 disabled={!fileAttachementEnabled || isProximityChatRoom}
             >
@@ -474,7 +478,7 @@
             <button
                 data-testid="youtubeApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("youtube")}
+                onclick={() => openLinkForm("youtube")}
                 class:bg-secondary-800={applicationProperty?.name === "youtube"}
                 disabled={!connectionManager.youtubeToolActivated}
             >
@@ -490,7 +494,7 @@
             <button
                 data-testid="klaxoonApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("klaxoon")}
+                onclick={() => openLinkForm("klaxoon")}
                 class:bg-secondary-800={applicationProperty?.name === "klaxoon"}
                 disabled={!connectionManager.klaxoonToolActivated}
             >
@@ -506,7 +510,7 @@
             <button
                 data-testid="googleSheetsApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("googleSheets")}
+                onclick={() => openLinkForm("googleSheets")}
                 class:bg-secondary-800={applicationProperty?.name === "googleSheets"}
                 disabled={!connectionManager.googleSheetsToolActivated}
             >
@@ -522,7 +526,7 @@
             <button
                 data-testid="googleDocsApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("googleDocs")}
+                onclick={() => openLinkForm("googleDocs")}
                 class:bg-secondary-800={applicationProperty?.name === "googleDocs"}
                 disabled={!connectionManager.googleDocsToolActivated}
             >
@@ -538,7 +542,7 @@
             <button
                 data-testid="googleSlidesApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("googleSlides")}
+                onclick={() => openLinkForm("googleSlides")}
                 class:bg-secondary-800={applicationProperty?.name === "googleSlides"}
                 disabled={!connectionManager.googleSlidesToolActivated}
             >
@@ -554,7 +558,7 @@
             <button
                 data-testid="googleDriveApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("googleDrive")}
+                onclick={() => openLinkForm("googleDrive")}
                 class:bg-secondary-800={applicationProperty?.name === "googleDrive"}
                 disabled={!connectionManager.googleSheetsToolActivated}
             >
@@ -570,7 +574,7 @@
             <button
                 data-testid="eraserApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("eraser")}
+                onclick={() => openLinkForm("eraser")}
                 class:bg-secondary-800={applicationProperty?.name === "eraser"}
                 disabled={!connectionManager.eraserToolActivated}
             >
@@ -586,7 +590,7 @@
             <button
                 data-testid="excalidrawApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("excalidraw")}
+                onclick={() => openLinkForm("excalidraw")}
                 class:bg-secondary-800={applicationProperty?.name === "excalidraw"}
                 disabled={!connectionManager.excalidrawToolActivated}
             >
@@ -602,7 +606,7 @@
             <button
                 data-testid="cardsApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("cards")}
+                onclick={() => openLinkForm("cards")}
                 class:bg-secondary-800={applicationProperty?.name === "cards"}
                 disabled={!connectionManager.cardsToolActivated}
             >
@@ -618,7 +622,7 @@
             <button
                 data-testid="tldrawApplicationButton"
                 class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
-                on:click={() => openLinkForm("tldraw")}
+                onclick={() => openLinkForm("tldraw")}
                 class:bg-secondary-800={applicationProperty?.name === "tldraw"}
                 disabled={!connectionManager.tldrawToolActivated}
             >
@@ -638,7 +642,7 @@
                     data-testid="{app.name}ApplicationButton"
                     class="p-2 m-0 flex flex-col w-36 items-center justify-center hover:bg-white/10 rounded-2xl gap-2 disabled:opacity-50"
                     class:bg-secondary-800={applicationProperty?.name === app.name}
-                    on:click={() => openLinkForm(app.name)}
+                    onclick={() => openLinkForm(app.name)}
                 >
                     <img draggable="false" class="w-8" src={app.image} alt="info icon" />
                     <h2 class="text-sm p-0 m-0">{app.name}</h2>
@@ -678,7 +682,7 @@
                         <span class="text-sm text-gray-400">
                             {$LL.chat.replyTo()}
                         </span>
-                        <button class="p-2 m-0" on:click={unselectChatMessageToReply}>
+                        <button class="p-2 m-0" onclick={unselectChatMessageToReply}>
                             <!--<IconCircleX />-->
                             <IconX font-size={18} />
                         </button>
@@ -712,7 +716,7 @@
         data-testid="addApplicationButton"
         class="p-0 m-0 h-11 w-11 flex items-center justify-center hover:bg-white/10 rounded-none"
         class:bg-secondary-800={applicationComponentOpened}
-        on:click={toggleApplicationComponent}
+        onclick={toggleApplicationComponent}
     >
         <IconX
             font-size={18}
@@ -722,7 +726,7 @@
     </button>
     <button
         class="p-0 m-0 h-11 w-11 flex items-center justify-center hover:bg-white/10 rounded-none"
-        on:click={openCloseEmojiPicker}
+        onclick={openCloseEmojiPicker}
     >
         <IconMoodSmile font-size={18} />
     </button>
@@ -731,7 +735,7 @@
             data-testid="sendMessageButton"
             class="disabled:opacity-30 disabled:!cursor-none disabled:text-white py-0 px-3 m-0 bg-secondary h-full rounded-none"
             disabled={applicationPropertyInProcessing}
-            on:click={() => sendMessage(message)}
+            onclick={() => sendMessage(message)}
         >
             <IconSend />
         </button>

@@ -1,14 +1,16 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { LL } from "../../../i18n/i18n-svelte";
     import TextGlobalMessage from "./TextGlobalMessage.svelte";
     import AudioGlobalMessage from "./AudioGlobalMessage.svelte";
 
-    let handleSendText: { sendTextMessage(broadcast: boolean): void };
-    let handleSendAudio: { sendAudioMessage(broadcast: boolean): Promise<void> };
+    let handleSendText: { sendTextMessage(broadcast: boolean): void } = $state();
+    let handleSendAudio: { sendAudioMessage(broadcast: boolean): Promise<void> } = $state();
 
-    let inputSendTextActive = true;
-    let uploadAudioActive = !inputSendTextActive;
-    let broadcastToWorld = false;
+    let inputSendTextActive = $state(true);
+    let uploadAudioActive = $state(!inputSendTextActive);
+    let broadcastToWorld = $state(false);
 
     function activateInputText() {
         inputSendTextActive = true;
@@ -38,14 +40,14 @@
                 class="py-6 px-12 text-lg bold relative {inputSendTextActive
                     ? "after:content-[''] after:absolute after:w-full after:h-2 after:bg-secondary after:-bottom-[4px] after:left-0 after:rounded-lg"
                     : 'opacity-50'}"
-                on:click|preventDefault={activateInputText}>{$LL.menu.globalMessage.text()}</button
+                onclick={preventDefault(activateInputText)}>{$LL.menu.globalMessage.text()}</button
             >
             <button
                 type="button"
                 class="py-6 px-12 text-lg bold relative {uploadAudioActive
                     ? "after:content-[''] after:absolute after:w-full after:h-2 after:bg-secondary after:-bottom-[4px] after:left-0 after:rounded-lg"
                     : 'opacity-50'}"
-                on:click|preventDefault={activateUploadAudio}>{$LL.menu.globalMessage.audio()}</button
+                onclick={preventDefault(activateUploadAudio)}>{$LL.menu.globalMessage.audio()}</button
             >
         </section>
     </div>
@@ -63,7 +65,7 @@
             <span>{$LL.menu.globalMessage.warning()}</span>
         </label>
         <section class="centered-column">
-            <button class="light" on:click|preventDefault={send}>{$LL.menu.globalMessage.send()}</button>
+            <button class="light" onclick={preventDefault(send)}>{$LL.menu.globalMessage.send()}</button>
         </section>
     </div>
 </div>

@@ -8,9 +8,13 @@
     import LivekitRoomConfigEditor from "./LivekitRoomConfigEditor.svelte";
     import { IconUsersGroup } from "@wa-icons";
 
-    export let property: LivekitRoomPropertyData;
-    export let hasHighlightProperty: boolean;
-    export let shouldDisableDisableChatButton: boolean;
+    interface Props {
+        property: LivekitRoomPropertyData;
+        hasHighlightProperty: boolean;
+        shouldDisableDisableChatButton: boolean;
+    }
+
+    let { property = $bindable(), hasHighlightProperty, shouldDisableDisableChatButton }: Props = $props();
     let livekitConfigModalOpened = false;
 
     const dispatch = createEventDispatcher<{
@@ -44,39 +48,43 @@
         dispatch("close");
     }}
 >
-    <span slot="header" class="flex justify-center items-center">
-        <IconUsersGroup font-size="18" class="mr-2" />
-        {$LL.mapEditor.properties.livekitRoomProperty.label()}
-    </span>
-    <span slot="content">
-        <div class="value-input">
-            <Input
-                id="roomName"
-                type="text"
-                label={$LL.mapEditor.properties.livekitRoomProperty.roomNameLabel()}
-                placeholder={$LL.mapEditor.properties.livekitRoomProperty.roomNamePlaceholder()}
-                bind:value={property.roomName}
-                onChange={onValueChange}
-            />
-        </div>
-        <button
-            class=" w-full mt-4 btn bg-transparent rounded-md hover:!bg-white/10 transition-all border !border-white py-2"
-            on:click={OpenPopup}
-            data-testid="livekitRoomMoreOptionsButton"
-        >
-            {$LL.mapEditor.properties.livekitRoomProperty.moreOptionsLabel()}
-        </button>
-        {#if !hasHighlightProperty}
+    {#snippet header()}
+        <span  class="flex justify-center items-center">
+            <IconUsersGroup font-size="18" class="mr-2" />
+            {$LL.mapEditor.properties.livekitRoomProperty.label()}
+        </span>
+    {/snippet}
+    {#snippet content()}
+        <span >
+            <div class="value-input">
+                <Input
+                    id="roomName"
+                    type="text"
+                    label={$LL.mapEditor.properties.livekitRoomProperty.roomNameLabel()}
+                    placeholder={$LL.mapEditor.properties.livekitRoomProperty.roomNamePlaceholder()}
+                    bind:value={property.roomName}
+                    onChange={onValueChange}
+                />
+            </div>
             <button
-                class=" btn btn-sm btn-light btn-ghost w-full"
-                on:click={() => {
+                class=" w-full mt-4 btn bg-transparent rounded-md hover:!bg-white/10 transition-all border !border-white py-2"
+                onclick={OpenPopup}
+                data-testid="livekitRoomMoreOptionsButton"
+            >
+                {$LL.mapEditor.properties.livekitRoomProperty.moreOptionsLabel()}
+            </button>
+            {#if !hasHighlightProperty}
+                <button
+                    class=" btn btn-sm btn-light btn-ghost w-full"
+                    onclick={() => {
                     dispatch("highlightAreaOnEnter");
                 }}
-            >
-                {$LL.mapEditor.properties.livekitRoomProperty.highlightAreaOnEnter()}
-            </button>
-        {/if}
-    </span>
+                >
+                    {$LL.mapEditor.properties.livekitRoomProperty.highlightAreaOnEnter()}
+                </button>
+            {/if}
+        </span>
+    {/snippet}
 </PropertyEditorBase>
 
 <style lang="scss">

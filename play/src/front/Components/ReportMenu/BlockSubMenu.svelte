@@ -1,12 +1,18 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { onMount } from "svelte";
     import { blackListManager } from "../../WebRtc/BlackListManager";
     import { showReportScreenStore, userReportEmpty } from "../../Stores/ShowReportScreenStore";
     import { LL } from "../../../i18n/i18n-svelte";
 
-    export let userUUID: string | undefined;
-    export let userName: string;
-    let userIsBlocked = false;
+    interface Props {
+        userUUID: string | undefined;
+        userName: string;
+    }
+
+    let { userUUID, userName }: Props = $props();
+    let userIsBlocked = $state(false);
 
     onMount(() => {
         if (userUUID === undefined) {
@@ -39,7 +45,7 @@
             type="button"
             data-testid="blockmenu-block-user-button"
             class="btn btn-danger w-full"
-            on:click|preventDefault={blockUser}
+            onclick={preventDefault(blockUser)}
         >
             {userIsBlocked ? $LL.report.block.unblock() : $LL.report.block.block()}
         </button>

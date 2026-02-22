@@ -1,8 +1,15 @@
 <script lang="ts">
-    const SLOTS = $$props.$$slots;
-    export let extraClasses = "";
-    export let fullContent = false;
-    export let reduceOnSmallScreen = false;
+    import type { Snippet } from "svelte";
+
+    interface Props {
+        extraClasses?: string;
+        fullContent?: boolean;
+        reduceOnSmallScreen?: boolean;
+        children?: Snippet;
+        buttons?: Snippet;
+    }
+
+    let { extraClasses = "", fullContent = false, reduceOnSmallScreen = false, children, buttons }: Props = $props();
 </script>
 
 <div
@@ -11,12 +18,12 @@
 >
     <div class="flex items-center p-4 px-10 pointer-events-auto justify-center grow">
         <div class="text-center leading-6 responsive-message {fullContent ? 'w-full' : ''}">
-            <slot />
+            {@render children?.()}
         </div>
     </div>
-    {#if SLOTS.buttons}
+    {#if buttons}
         <div class="buttons-wrapper flex items-center justify-center p-2 space-x-2 bg-contrast pointer-events-auto">
-            <slot name="buttons" />
+            {@render buttons()}
         </div>
     {/if}
 </div>

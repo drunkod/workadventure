@@ -1,26 +1,37 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { activePictureInPictureStore } from "../../../Stores/PeerStore";
     import { NoVideoOutputDetector } from "./NoVideoOutputDetector";
 
-    export let style: string;
-    export let className: string;
-    export let videoWidth: number;
-    export let videoHeight: number;
-    export let onLoadVideoElement: (event: Event) => void;
-    export let loop = false;
 
-    export let stream: MediaStream;
-    export let setDimensions: (width: number, height: number) => void;
+    interface Props {
+        style: string;
+        className: string;
+        videoWidth: number;
+        videoHeight: number;
+        onLoadVideoElement: (event: Event) => void;
+        loop?: boolean;
+        stream: MediaStream;
+        setDimensions: (width: number, height: number) => void;
+    }
+
+    let {
+        style,
+        className,
+        videoWidth = $bindable(),
+        videoHeight = $bindable(),
+        onLoadVideoElement,
+        loop = false,
+        stream,
+        setDimensions
+    }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         video: undefined;
         noVideo: undefined;
     }>();
 
-    let videoElement: HTMLVideoElement;
+    let videoElement: HTMLVideoElement = $state();
     let resizeObserver: ResizeObserver | undefined;
     let noVideoOutputDetector: NoVideoOutputDetector | undefined;
     let lastWidth: number | undefined;
@@ -124,11 +135,11 @@
     bind:videoWidth
     bind:videoHeight
     bind:this={videoElement}
-    on:loadedmetadata={onLoadVideoElement}
+    onloadedmetadata={onLoadVideoElement}
     class={`bg-contrast/80 backdrop-blur ${className}`}
     autoplay
     playsinline
     muted={true}
     {loop}
     data-testid="webrtc-video"
-/>
+></video>

@@ -1,7 +1,11 @@
 <script lang="ts">
-    export let colors: string[];
-    export let selectedColor: string;
-    export let onColorChange: (color: string) => void;
+    interface Props {
+        colors: string[];
+        selectedColor: string;
+        onColorChange: (color: string) => void;
+    }
+
+    let { colors, selectedColor, onColorChange }: Props = $props();
 </script>
 
 {#if colors.length > 1}
@@ -14,8 +18,8 @@
                         selectedColor === color ? "border-solid border-yellow-400 rounded-full" : ""
                     }`}
                     style="background-color: {color};"
-                    on:click={() => onColorChange(color)}
-                />
+                    onclick={() => onColorChange(color)}
+></button>
             </div>
         {/each}
     </div>

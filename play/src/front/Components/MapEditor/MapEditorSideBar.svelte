@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run, preventDefault } from 'svelte/legacy';
+
     import { onDestroy, onMount } from "svelte";
     import type { ComponentType } from "svelte";
     // import { createPopperActions } from "svelte-popperjs";
@@ -32,25 +34,7 @@
         tooltiptext: $LL.mapEditor.sideBar.trashEditor(),
     };
 
-    $: if ($mapEditorActivatedForThematics && !$mapEditorActivated) {
-        availableTools.push(entityEditorTool);
-        availableTools.push(trashEditorTool);
-    }
 
-    $: if ($mapEditorActivated && !isMobile) {
-        availableTools.push({
-            toolName: EditorToolName.AreaEditor,
-            iconComponent: IconTexture,
-            tooltiptext: $LL.mapEditor.sideBar.areaEditor(),
-        });
-        availableTools.push(entityEditorTool);
-        availableTools.push({
-            toolName: EditorToolName.WAMSettingsEditor,
-            iconComponent: IconSettings,
-            tooltiptext: $LL.mapEditor.sideBar.configureMyRoom(),
-        });
-        availableTools.push(trashEditorTool);
-    }
 
     function switchTool(newTool: EditorToolName) {
         // The map sidebar is opened when the user clicks on the explorer for the first time.
@@ -64,8 +48,8 @@
         gameManager.getCurrentGameScene().getMapEditorModeManager().equipTool(newTool);
     }
 
-    let sectionSideBarContainer: HTMLElement;
-    let isMobile = isMediaBreakpointUp("md");
+    let sectionSideBarContainer: HTMLElement = $state();
+    let isMobile = $state(isMediaBreakpointUp("md"));
     const resizeObserver = new ResizeObserver(() => {
         isMobile = isMediaBreakpointUp("md");
     });
@@ -76,6 +60,28 @@
 
     onDestroy(() => {
         resizeObserver.unobserve(sectionSideBarContainer);
+    });
+    run(() => {
+        if ($mapEditorActivatedForThematics && !$mapEditorActivated) {
+            availableTools.push(entityEditorTool);
+            availableTools.push(trashEditorTool);
+        }
+    });
+    run(() => {
+        if ($mapEditorActivated && !isMobile) {
+            availableTools.push({
+                toolName: EditorToolName.AreaEditor,
+                iconComponent: IconTexture,
+                tooltiptext: $LL.mapEditor.sideBar.areaEditor(),
+            });
+            availableTools.push(entityEditorTool);
+            availableTools.push({
+                toolName: EditorToolName.WAMSettingsEditor,
+                iconComponent: IconSettings,
+                tooltiptext: $LL.mapEditor.sideBar.configureMyRoom(),
+            });
+            availableTools.push(trashEditorTool);
+        }
     });
 </script>
 
@@ -90,7 +96,7 @@
             <button
                 class="p-3 hover:bg-white/10 rounded aspect-square w-12 m-0"
                 data-testid="closeMapEditorButton"
-                on:click|preventDefault={() => switchTool(EditorToolName.CloseMapEditor)}
+                onclick={preventDefault(() => switchTool(EditorToolName.CloseMapEditor))}
             >
                 <IconX font-size="20" />
             </button>
@@ -104,10 +110,10 @@
                             : 'hover:bg-white/10'}"
                         id={tool.toolName}
                         class:active={$mapEditorSelectedToolStore === tool.toolName}
-                        on:click|preventDefault={() => switchTool(tool.toolName)}
+                        onclick={preventDefault(() => switchTool(tool.toolName))}
                         type="button"
                     >
-                        <svelte:component this={tool.iconComponent} font-size="22" />
+                        <tool.iconComponent font-size="22" />
                     </button>
                     <div
                         class=" bg-contrast/90 backdrop-blur-xl text-white tooltip absolute text-nowrap p-2 invisible opacity-0 transition-all peer-hover:visible peer-hover:opacity-100 rounded top-1/2 -translate-y-1/2 right-[130%]"

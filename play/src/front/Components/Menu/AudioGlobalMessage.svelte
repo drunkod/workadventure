@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { HtmlUtils } from "../../WebRtc/HtmlUtils";
     import { gameManager } from "../../Phaser/Game/GameManager";
     import { AdminMessageEventTypes } from "../../Connection/AdminMessagesService";
@@ -12,12 +14,12 @@
     }
 
     let gameScene = gameManager.getCurrentGameScene();
-    let fileInput: HTMLInputElement;
-    let fileName: string | undefined;
-    let fileSize: string;
-    let errorFile: boolean;
-    let errorUpload: boolean;
-    let dropHover = false;
+    let fileInput: HTMLInputElement = $state();
+    let fileName: string | undefined = $state();
+    let fileSize: string = $state();
+    let errorFile: boolean = $state();
+    let errorUpload: boolean = $state();
+    let dropHover = $state(false);
 
     const AUDIO_TYPE = AdminMessageEventTypes.audio;
 
@@ -100,21 +102,21 @@
     }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <section
     class="section-input-send-audio centered-column cursor-pointer"
-    on:dragover|preventDefault={() => {
+    ondragover={preventDefault(() => {
         dropHover = true;
-    }}
-    on:dragleave|preventDefault={() => {
+    })}
+    ondragleave={preventDefault(() => {
         dropHover = false;
-    }}
-    on:drop|preventDefault={(e) => {
+    })}
+    ondrop={preventDefault((e) => {
         dropAudioFile(e);
         dropHover = false;
-    }}
-    on:click={() => {
+    })}
+    onclick={() => {
         fileInput.click();
     }}
 >
@@ -157,7 +159,7 @@
         type="file"
         id="input-send-audio"
         bind:this={fileInput}
-        on:change={(e) => {
+        onchange={(e) => {
             inputAudioFile(e);
         }}
     />

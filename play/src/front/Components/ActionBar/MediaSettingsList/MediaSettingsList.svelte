@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { fly } from "svelte/transition";
     import { clickOutside } from "svelte-outside";
     import { createEventDispatcher, onDestroy } from "svelte";
@@ -7,11 +9,17 @@
     import MediaSettingsPanel from "./MediaSettingsPanel.svelte";
     import BackgroundSettingsPanel from "./BackgroundSettingsPanel.svelte";
 
-    export let mediaSettingsDisplayed = false;
+    interface Props {
+        mediaSettingsDisplayed?: boolean;
+    }
 
-    let mode: "settings" | "background" = "settings";
+    let { mediaSettingsDisplayed = $bindable(false) }: Props = $props();
 
-    $: inBackgroundSettingsStore.set(mode === "background");
+    let mode: "settings" | "background" = $state("settings");
+
+    run(() => {
+        inBackgroundSettingsStore.set(mode === "background");
+    });
 
     onDestroy(() => {
         inBackgroundSettingsStore.set(false);

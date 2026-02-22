@@ -54,6 +54,10 @@ export interface FrontConfigurationInterface {
     MATRIX_PUBLIC_URI: string | undefined;
     MATRIX_ADMIN_USER: string | undefined;
     MATRIX_DOMAIN: string | undefined;
+    JAZZ_CHAT_ENABLED: boolean;
+    JAZZ_SYNC_PEER: string | undefined;
+    JAZZ_API_KEY: string | undefined;
+    JAZZ_GLOBAL_ROOM_ID: string | undefined;
     ENABLE_CHAT: boolean | undefined;
     ENABLE_CHAT_ONLINE_LIST: boolean | undefined;
     ENABLE_CHAT_DISCONNECTED_LIST: boolean | undefined;

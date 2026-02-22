@@ -156,6 +156,10 @@ export const MATRIX_API_URI: string | undefined = env.MATRIX_API_URI;
 export const MATRIX_ADMIN_USER: string | undefined = env.MATRIX_ADMIN_USER;
 export const MATRIX_ADMIN_PASSWORD: string | undefined = env.MATRIX_ADMIN_PASSWORD;
 export const MATRIX_DOMAIN: string | undefined = env.MATRIX_DOMAIN;
+export const JAZZ_CHAT_ENABLED: boolean = env.JAZZ_CHAT_ENABLED;
+export const JAZZ_SYNC_PEER: string | undefined = env.JAZZ_SYNC_PEER;
+export const JAZZ_API_KEY: string | undefined = env.JAZZ_API_KEY;
+export const JAZZ_GLOBAL_ROOM_ID: string | undefined = env.JAZZ_GLOBAL_ROOM_ID;
 
 export const ENABLE_SAY: boolean = env.ENABLE_SAY || true;
 
@@ -219,6 +223,10 @@ export const FRONT_ENVIRONMENT_VARIABLES: FrontConfigurationInterface = {
     GOOGLE_DRIVE_PICKER_APP_ID: env.GOOGLE_DRIVE_PICKER_APP_ID,
     EMBEDLY_KEY: env.EMBEDLY_KEY,
     MATRIX_PUBLIC_URI,
+    JAZZ_CHAT_ENABLED,
+    JAZZ_SYNC_PEER,
+    JAZZ_API_KEY,
+    JAZZ_GLOBAL_ROOM_ID,
     ENABLE_CHAT,
     ENABLE_CHAT_ONLINE_LIST,
     ENABLE_CHAT_DISCONNECTED_LIST,

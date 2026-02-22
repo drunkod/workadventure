@@ -6,9 +6,13 @@
     import { LL } from "../../../../i18n/i18n-svelte";
     import { IconLoader } from "@wa-icons";
 
-    export let room: ChatRoom & ChatRoomMembershipManagement;
+    interface Props {
+        room: ChatRoom & ChatRoomMembershipManagement;
+    }
+
+    let { room }: Props = $props();
     let roomName = room.name;
-    let loadingInvitation = false;
+    let loadingInvitation = $state(false);
 
     function joinRoom() {
         loadingInvitation = true;
@@ -55,14 +59,14 @@
         <div class="flex gap-1">
             <button
                 class="border border-solid border-danger text-danger hover:bg-danger-400/10 rounded text-xs py-1 px-2 m-0"
-                on:click={() => leaveRoom()}
+                onclick={() => leaveRoom()}
             >
                 {$LL.chat.decline()}
             </button>
             <button
                 class="border border-solid border-success text-success hover:bg-success-400/10 rounded text-xs py-1 px-2 m-0"
                 data-testid="acceptInvitationButton"
-                on:click={() => joinRoom()}
+                onclick={() => joinRoom()}
             >
                 {$LL.chat.accept()}
             </button>

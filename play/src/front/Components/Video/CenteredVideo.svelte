@@ -1,6 +1,8 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import LL from "../../../i18n/i18n-svelte";
     import type { Streamable } from "../../Stores/StreamableCollectionStore";
     import MegaphoneIcon from "../Icons/MegaphoneIcon.svelte";
@@ -9,7 +11,17 @@
     import ScriptingVideo from "./VideoTags/ScriptingVideo.svelte";
     import { IconCameraExclamation } from "@wa-icons";
 
-    /**
+    
+
+
+    // This impacts the video position in the container when the video uses the full width of the container.
+    
+    
+    
+
+    
+    interface Props {
+        /**
      * This component is in charge of displaying a <video> element in the center of the
      * container it is part of. It will rescale the video to fit the container both in
      * width and height, keeping the aspect ratio of the video.
@@ -18,37 +30,48 @@
      *
      * @slot - The content to display on top of the video.
      */
+        videoEnabled?: boolean;
+        media: Streamable["media"];
+        // If set to "top", the video will be at the top of the container. If set to "center", the video will be centered.
+        verticalAlign?: "center" | "top";
+        isTalking?: boolean;
+        flipX?: boolean;
+        // If cover is true, the video will be stretched to cover the whole container (and some part of the video might be cropped).
+        cover?: boolean;
+        // If true, the video will be displayed with a background is it does not cover the whole box
+        withBackground?: boolean;
+        isBlocked?: boolean;
+        // If true, the video box is a megaphone space
+        isMegaphoneSpace?: boolean;
+        children?: import('svelte').Snippet;
+    }
 
-    export let videoEnabled = false;
-    export let media: Streamable["media"];
-
-    // This impacts the video position in the container when the video uses the full width of the container.
-    // If set to "top", the video will be at the top of the container. If set to "center", the video will be centered.
-    export let verticalAlign: "center" | "top" = "center";
-    export let isTalking = false;
-    export let flipX = false;
-    // If cover is true, the video will be stretched to cover the whole container (and some part of the video might be cropped).
-    export let cover = true;
-    // If true, the video will be displayed with a background is it does not cover the whole box
-    export let withBackground = false;
-    export let isBlocked = false;
-
-    // If true, the video box is a megaphone space
-    export let isMegaphoneSpace = false;
+    let {
+        videoEnabled = false,
+        media,
+        verticalAlign = "center",
+        isTalking = false,
+        flipX = false,
+        cover = true,
+        withBackground = false,
+        isBlocked = false,
+        isMegaphoneSpace = false,
+        children
+    }: Props = $props();
 
     function onLoadVideoElement() {}
 
-    let containerWidth: number;
-    let containerHeight: number;
-    let videoWidth: number;
-    let videoHeight: number;
-    let videoStreamWidth: number;
-    let videoStreamHeight: number;
-    let overlayWidth: number;
-    let overlayHeight: number;
-    let videoRatio: number;
+    let containerWidth: number = $state();
+    let containerHeight: number = $state();
+    let videoWidth: number = $state();
+    let videoHeight: number = $state();
+    let videoStreamWidth: number = $state();
+    let videoStreamHeight: number = $state();
+    let overlayWidth: number = $state();
+    let overlayHeight: number = $state();
+    let videoRatio: number = $state();
 
-    $: {
+    run(() => {
         if (videoEnabled && containerWidth && containerHeight) {
             const containerRatio = containerWidth / containerHeight;
             // In case there is no video, we put an arbitrary ratio of 16/9 to avoid division by 0.
@@ -98,9 +121,9 @@
                 //debug("containerRatio <= videoRatio: videoWidth: " + videoWidth + "; videoHeight: " + videoHeight);
             }
         }
-    }
+    });
 
-    let displayNoVideoWarning = false;
+    let displayNoVideoWarning = $state(false);
 </script>
 
 <div
@@ -243,6 +266,6 @@
               (verticalAlign === "center" ? " top: " + (containerHeight - overlayHeight) / 2 + "px;" : "")
             : ""}
     >
-        <slot />
+        {@render children?.()}
     </div>
 </div>

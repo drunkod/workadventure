@@ -10,10 +10,16 @@
     import type { AskStartVerificationModalProps } from "./MatrixSecurity";
     import { matrixSecurity } from "./MatrixSecurity";
 
-    export let isOpen: boolean;
-    export let props: AskStartVerificationModalProps;
-    const { request, otherDeviceInformation } = props;
-    let errorLabel: string | undefined = "";
+    interface Props {
+        isOpen: boolean;
+        props: AskStartVerificationModalProps;
+    }
+
+    let { isOpen, props: modalProps }: Props = $props();
+
+    let request = $derived(modalProps.request);
+    let otherDeviceInformation = $derived(modalProps.otherDeviceInformation);
+    let errorLabel = $state<string | undefined>("");
     const doneDeferred = new Deferred<void>();
     let verifier: Verifier | undefined;
 

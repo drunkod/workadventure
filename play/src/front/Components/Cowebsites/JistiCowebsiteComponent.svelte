@@ -16,12 +16,16 @@
 
     const debug = Debug("jitsiCowebsite");
 
-    export let actualCowebsite: JitsiCoWebsite;
-    export let visible: boolean;
-    let domain = actualCowebsite.getJitsiDomain();
-    let jitsiContainer: HTMLDivElement;
+    interface Props {
+        actualCowebsite: JitsiCoWebsite;
+        visible: boolean;
+    }
+
+    let { actualCowebsite, visible }: Props = $props();
+    let domain = $derived(actualCowebsite.getJitsiDomain());
+    let jitsiContainer: HTMLDivElement = $state();
     let playerName = gameManager.getPlayerName();
-    let jwt: string | undefined = actualCowebsite.jwt;
+    let jwt: string | undefined = $derived(actualCowebsite.jwt);
     let jitsiApi: JitsiApi;
     let screenWakeRelease: (() => Promise<void>) | undefined;
     let jitsiMeetLoadedPromise: CancelablePromise<void> | undefined;
@@ -191,5 +195,5 @@
 </script>
 
 <div class="relative w-full h-full" class:hidden={!visible}>
-    <div bind:this={jitsiContainer} class="absolute w-full h-full z-0" />
+    <div bind:this={jitsiContainer} class="absolute w-full h-full z-0"></div>
 </div>

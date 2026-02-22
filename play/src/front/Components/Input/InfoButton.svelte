@@ -1,5 +1,10 @@
 <script lang="ts">
     import { createFloatingUiActions } from "../../Utils/svelte-floatingui";
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
     const [floatingUiRef, floatingUiContent, arrowAction] = createFloatingUiActions(
         {
@@ -9,11 +14,11 @@
         8
     );
 
-    let showTooltip = false;
+    let showTooltip = $state(false);
 </script>
 
 <div>
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <svg
         use:floatingUiRef
         class="icon icon-tabler icon-tabler-info-square-rounded-filled fill-contrast-200 stroke-contrast-200"
@@ -25,8 +30,8 @@
         viewBox="0 0 24 24"
         width="24"
         xmlns="http://www.w3.org/2000/svg"
-        on:mouseenter={() => (showTooltip = true)}
-        on:mouseleave={() => (showTooltip = false)}
+        onmouseenter={() => (showTooltip = true)}
+        onmouseleave={() => (showTooltip = false)}
     >
         <path d="M0 0h24v24H0z" fill="none" stroke="none" />
         <path
@@ -42,10 +47,10 @@
             : 'hidden'} absolute bg-contrast-900 rounded p-3 text-white z-10 w-80"
         use:floatingUiContent
     >
-        <slot />
+        {@render children?.()}
 
         <!-- Arrow -->
-        <div use:arrowAction />
+        <div use:arrowAction></div>
     </div>
     <!--{/if}-->
 </div>

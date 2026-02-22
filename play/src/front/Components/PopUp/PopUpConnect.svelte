@@ -13,15 +13,17 @@
 
 <PopUpContainer reduceOnSmallScreen={true}>
     {$LL.mapEditor.entityEditor.errors.dragNotConnected()}
-    <svelte:fragment slot="buttons">
-        <button class="btn btn-secondary btn-sm w-full max-w-96 justify-center" on:click={goToLogin}>
-            {$LL.actionbar.login()}
-        </button>
-        <button
-            class="btn btn-outline btn-sm w-full max-w-96 justify-center"
-            on:click={() => popupStore.removePopup("popupConnect")}
-        >
-            {$LL.actionbar.cancel()}
-        </button>
-    </svelte:fragment>
+    {#snippet buttons()}
+    
+            <button class="btn btn-secondary btn-sm w-full max-w-96 justify-center" onclick={goToLogin}>
+                {$LL.actionbar.login()}
+            </button>
+            <button
+                class="btn btn-outline btn-sm w-full max-w-96 justify-center"
+                onclick={() => popupStore.removePopup("popupConnect")}
+            >
+                {$LL.actionbar.cancel()}
+            </button>
+        
+    {/snippet}
 </PopUpContainer>

@@ -9,9 +9,13 @@
         change: string;
     }>();
 
-    export let messageRef: HTMLDivElement | undefined;
+    interface Props {
+        messageRef: HTMLDivElement | undefined;
+    }
 
-    let trigger: HTMLButtonElement;
+    let { messageRef }: Props = $props();
+
+    let trigger: HTMLButtonElement = $state();
 
     let closeEmojiPicker: (() => void) | undefined = undefined;
 
@@ -48,7 +52,7 @@
     data-testid="openEmojiPickerButton"
     class="p-0 m-0 text-white/50 hover:text-white transition-all flex"
     bind:this={trigger}
-    on:click={togglePicker}
+    onclick={togglePicker}
 >
     <IconMoodSmile font-size={16} />
 </button>

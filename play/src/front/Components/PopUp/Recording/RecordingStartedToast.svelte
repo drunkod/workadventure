@@ -3,7 +3,11 @@
     import StartRecordingIcon from "../../Icons/StartRecordingIcon.svelte";
     import ToastContainer from "../../Toasts/ToastContainer.svelte";
 
-    export let toastUuid: string;
+    interface Props {
+        toastUuid: string;
+    }
+
+    let { toastUuid }: Props = $props();
 </script>
 
 <ToastContainer extraClasses="recording-modal" duration={5000} theme="error" {toastUuid}>
@@ -12,7 +16,7 @@
         <div class="flex flex-row items-center justify-start gap-4 px-2 py-3">
             <!-- Recording icon with pulse animation -->
             <div class="recording-icon-wrapper">
-                <div class="recording-pulse" />
+                <div class="recording-pulse"></div>
                 <div class="recording-icon-container">
                     <StartRecordingIcon
                         height="h-10"

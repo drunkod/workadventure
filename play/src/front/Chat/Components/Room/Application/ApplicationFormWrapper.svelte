@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { handlers } from 'svelte/legacy';
+
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import type { KlaxoonEvent } from "@workadventure/shared-utils";
     import {
@@ -24,10 +26,14 @@
         input: string;
     }>();
 
-    export let property: ApplicationProperty;
+    interface Props {
+        property: ApplicationProperty;
+    }
 
-    let errorLink: string | undefined;
-    let htmlElementInput: HTMLInputElement;
+    let { property }: Props = $props();
+
+    let errorLink: string | undefined = $state();
+    let htmlElementInput: HTMLInputElement = $state();
     let timeOutToFocusElement: ReturnType<typeof setTimeout>;
     let timeOutToHtmlInpuElement: ReturnType<typeof setTimeout>;
 
@@ -193,18 +199,17 @@
         class="border rounded w-full !m-0 text-black"
         value={property.link}
         bind:this={htmlElementInput}
-        on:input={() => {
+        oninput={handlers(() => {
             dispatch("input", property.link);
-        }}
-        on:focusout={unFocus}
-        on:keydown={(event) => {
+        }, input)}
+        onfocusout={unFocus}
+        onkeydown={(event) => {
             if (event.key === "Enter") {
                 unFocus().catch((error) => {
                     console.error(error);
                 });
             }
         }}
-        on:input={input}
         placeholder={property.placeholder}
     />
 

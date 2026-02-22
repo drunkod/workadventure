@@ -3,10 +3,14 @@
     import type { VideoCoWebsite } from "../../WebRtc/CoWebsite/VideoCoWebsite";
     import { screenWakeLock } from "../../Utils/ScreenWakeLock";
 
-    export let actualCowebsite: VideoCoWebsite;
-    export let visible: boolean;
+    interface Props {
+        actualCowebsite: VideoCoWebsite;
+        visible: boolean;
+    }
+
+    let { actualCowebsite, visible }: Props = $props();
     let screenWakeRelease: (() => Promise<void>) | undefined;
-    let videoElement: HTMLVideoElement;
+    let videoElement: HTMLVideoElement = $state();
 
     async function requestWakeLock(): Promise<void> {
         try {
@@ -59,7 +63,7 @@
 </script>
 
 <div class="relative w-full h-full flex items-center justify-center bg-black" class:hidden={!visible}>
-    <!-- svelte-ignore a11y-media-has-caption -->
+    <!-- svelte-ignore a11y_media_has_caption -->
     <video
         bind:this={videoElement}
         controls

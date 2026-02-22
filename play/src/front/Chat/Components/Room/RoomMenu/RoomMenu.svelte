@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation } from 'svelte/legacy';
+
     import { onDestroy, onMount } from "svelte";
     import { openModal } from "svelte-modals";
     import { get } from "svelte/store";
@@ -22,13 +24,17 @@
     import RoomOption from "./RoomOption.svelte";
     import { IconDots, IconLogout, IconUserEdit, IconMute, IconUnMute, IconMapPin, IconCamera } from "@wa-icons";
 
-    export let room: ChatRoom & ChatRoomMembershipManagement & ChatRoomNotificationControl & ChatRoomModeration;
+    interface Props {
+        room: ChatRoom & ChatRoomMembershipManagement & ChatRoomNotificationControl & ChatRoomModeration;
+    }
+
+    let { room }: Props = $props();
     const areNotificationsMuted = room.areNotificationsMuted;
-    let optionButtonRef: HTMLButtonElement | undefined = undefined;
-    let hideOptions = true;
+    let optionButtonRef: HTMLButtonElement | undefined = $state(undefined);
+    let hideOptions = $state(true);
     let usersByRoomStore:
         | Readable<Map<string | undefined, { roomName: string | undefined; users: ChatUser[] }>>
-        | undefined = undefined;
+        | undefined = $state(undefined);
 
     const hasPermissionToInvite = room.hasPermissionTo("invite");
     const hasPermissionToKick = room.hasPermissionTo("kick");
@@ -36,7 +42,6 @@
 
     const { connection } = gameManager.getCurrentGameScene();
 
-    $: shouldDisplayManageParticipantButton = $hasPermissionToInvite || $hasPermissionToKick || $hasPermissionToBan;
 
     onMount(() => {
         document.addEventListener("click", closeRoomOptionsOnClickOutside);
@@ -97,37 +102,9 @@
         });
     }
 
-    $: members = get(room.members);
-    $: usersByRoomMap = usersByRoomStore && $usersByRoomStore ? $usersByRoomStore : new Map();
 
-    // Flatten usersByRoomMap into a list of users with playUri from their room
-    $: usersWithRoomPlayUri = (() => {
-        const usersList: (ChatUser & { playUri: string })[] = [];
-        for (const [playUri, roomData] of usersByRoomMap.entries()) {
-            for (const user of roomData.users) {
-                usersList.push({
-                    ...user,
-                    playUri: playUri ?? user.playUri ?? "",
-                });
-            }
-        }
-        return usersList;
-    })();
 
-    // Get the matrix chat user from the room
-    $: matrixChatUser = (() => {
-        if (room.type !== "direct") return undefined;
-        // get the user from the room
-        const users = members;
 
-        // Get user id from local user store
-        const localUserChatId = localUserStore.getChatId();
-        // Find the user that no match with my chat id
-        return users.find((u) => u.id !== localUserChatId);
-    })();
-
-    $: isInTheSameMap = chatUser?.playUri === gameManager.getCurrentGameScene().roomUrl;
-    $: chatUser = usersWithRoomPlayUri.find((u) => u.chatId === matrixChatUser?.id);
 
     function locateUser() {
         if (chatUser == undefined || chatUser.uuid == undefined) return;
@@ -165,19 +142,48 @@
         }
         toggleRoomOptions();
     }
+    let shouldDisplayManageParticipantButton = $derived($hasPermissionToInvite || $hasPermissionToKick || $hasPermissionToBan);
+    let members = $derived(get(room.members));
+    let usersByRoomMap = $derived(usersByRoomStore && $usersByRoomStore ? $usersByRoomStore : new Map());
+    // Flatten usersByRoomMap into a list of users with playUri from their room
+    let usersWithRoomPlayUri = $derived((() => {
+        const usersList: (ChatUser & { playUri: string })[] = [];
+        for (const [playUri, roomData] of usersByRoomMap.entries()) {
+            for (const user of roomData.users) {
+                usersList.push({
+                    ...user,
+                    playUri: playUri ?? user.playUri ?? "",
+                });
+            }
+        }
+        return usersList;
+    })());
+    // Get the matrix chat user from the room
+    let matrixChatUser = $derived((() => {
+        if (room.type !== "direct") return undefined;
+        // get the user from the room
+        const users = members;
+
+        // Get user id from local user store
+        const localUserChatId = localUserStore.getChatId();
+        // Find the user that no match with my chat id
+        return users.find((u) => u.id !== localUserChatId);
+    })());
+    let chatUser = $derived(usersWithRoomPlayUri.find((u) => u.chatId === matrixChatUser?.id));
+    let isInTheSameMap = $derived(chatUser?.playUri === gameManager.getCurrentGameScene().roomUrl);
 </script>
 
 <button
     data-testid="toggleRoomMenu"
     bind:this={optionButtonRef}
-    on:click|preventDefault|stopPropagation={toggleRoomOptions}
+    onclick={stopPropagation(preventDefault(toggleRoomOptions))}
     class="m-0 p-0 flex items-center justify-center h-7 w-7 hover:bg-white/10 rounded"
 >
     <IconDots font-size="16" />
 </button>
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-    on:mouseleave={toggleRoomOptions}
+    onmouseleave={toggleRoomOptions}
     class="bg-contrast/50 backdrop-blur-md rounded-md overflow-hidden z-[99] w-max end-2 top-10 p-1"
     class:absolute={optionButtonRef !== undefined}
     class:hidden={hideOptions}

@@ -2,12 +2,21 @@
     import { getColorByString } from "../../Utils/ColorGenerator";
     import type { PictureStore } from "../../Stores/PictureStore";
 
-    export let pictureStore: PictureStore | undefined;
-    export let fallbackName = "A";
-    export let color: string | null = null;
-    export let isChatAvatar = false;
+    interface Props {
+        pictureStore: PictureStore | undefined;
+        fallbackName?: string;
+        color?: string | null;
+        isChatAvatar?: boolean;
+    }
 
-    let forceFallback = false;
+    let {
+        pictureStore,
+        fallbackName = "A",
+        color = null,
+        isChatAvatar = false
+    }: Props = $props();
+
+    let forceFallback = $state(false);
 </script>
 
 {#if $pictureStore && !forceFallback}
@@ -17,7 +26,7 @@
         class="rounded-sm h-full w-full object-contain bg-white"
         draggable="false"
         style:background-color={`${color ? color : `${getColorByString(fallbackName)}`}`}
-        on:error={(event) => {
+        onerror={(event) => {
             console.warn(`Failed to load avatar image for ${fallbackName}`, event);
             forceFallback = true;
         }}

@@ -1,8 +1,18 @@
 <script lang="ts">
+    import type { Snippet } from "svelte";
     import type { ConfirmationModalPropsInterface } from "../Interfaces/ConfirmationModalPropsInterface";
     import PopUpContainer from "../../../PopUp/PopUpContainer.svelte";
-    export let props: ConfirmationModalPropsInterface;
-    $: ({ handleAccept, handleClose, acceptLabel, closeLabel } = props);
+
+    interface Props {
+        props: ConfirmationModalPropsInterface;
+        children?: Snippet;
+    }
+
+    let { props: modalProps, children }: Props = $props();
+    let handleAccept = $derived(modalProps.handleAccept);
+    let handleClose = $derived(modalProps.handleClose);
+    let acceptLabel = $derived(modalProps.acceptLabel);
+    let closeLabel = $derived(modalProps.closeLabel);
 
     const onKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
@@ -29,11 +39,11 @@
 <!--</div>-->
 
 <PopUpContainer>
-    <slot />
-    <div class="buttons-wrapper flex items-center justify-center p-2 gap-2 pointer-events-auto mt-2">
-        <button class="btn btn-light btn-ghost btn-sm w-1/2 justify-center responsive-message" on:click={handleClose}
+    {@render children?.()}
+    {#snippet buttons()}
+        <button class="btn btn-light btn-ghost btn-sm w-1/2 justify-center responsive-message" onclick={handleClose}
             >{closeLabel}</button
         >
-        <button class="btn btn-secondary btn-sm w-1/2 justify-center" on:click={handleAccept}>{acceptLabel}</button>
-    </div>
+        <button class="btn btn-secondary btn-sm w-1/2 justify-center" onclick={handleAccept}>{acceptLabel}</button>
+    {/snippet}
 </PopUpContainer>

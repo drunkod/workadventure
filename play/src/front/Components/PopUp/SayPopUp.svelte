@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { AvailabilityStatus, SayMessageType } from "@workadventure/messages";
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import { gameManager } from "../../Phaser/Game/GameManager";
@@ -12,9 +14,13 @@
     import PopUpContainer from "./PopUpContainer.svelte";
     import { IconSend } from "@wa-icons";
 
-    export let type: "say" | "think" = "say";
-    let message = "";
-    let messageInput: Input;
+    interface Props {
+        type?: "say" | "think";
+    }
+
+    let { type = $bindable("say") }: Props = $props();
+    let message = $state("");
+    let messageInput: Input = $state();
 
     const dispatch = createEventDispatcher<{ close: void }>();
 
@@ -27,7 +33,7 @@
         console.debug("SayPopUp mounted, focusing input", type);
     });
 
-    $: {
+    run(() => {
         switch ($availabilityStatusStore) {
             case AvailabilityStatus.JITSI:
             case AvailabilityStatus.BBB:
@@ -50,7 +56,7 @@
                 break;
             }
         }
-    }
+    });
 
     onDestroy(() => {
         // Firefox does not trigger the "blur" event when the input is removed from the DOM.
@@ -101,7 +107,7 @@
     }
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 <PopUpContainer reduceOnSmallScreen={true} fullContent={true}>
     <div class="flex flex-row w-full items-center gap-2 min-w-80" data-testid="say-popup">
         <ButtonClose
@@ -147,7 +153,7 @@
                 class="h-10 {message.length > 0
                     ? 'w-10'
                     : 'w-0'} p-0 aspect-square bg-secondary rounded flex items-center justify-center cursor-pointer transition-all"
-                on:click={sendMessageOrEscapeLine}
+                onclick={sendMessageOrEscapeLine}
             >
                 <IconSend />
             </button>

@@ -8,7 +8,7 @@
 
 <button
     class="close-button"
-    on:click={() => {
+    onclick={() => {
         dispatch("click");
     }}
 >

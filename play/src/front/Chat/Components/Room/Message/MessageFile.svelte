@@ -3,7 +3,11 @@
     import type { ChatMessageContent } from "../../../Connection/ChatConnection";
     import { IconInbox } from "@wa-icons";
 
-    export let content: Readable<ChatMessageContent>;
+    interface Props {
+        content: Readable<ChatMessageContent>;
+    }
+
+    let { content }: Props = $props();
 </script>
 
 <a

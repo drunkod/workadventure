@@ -4,9 +4,13 @@
     import { analyticsClient } from "../../../Administration/AnalyticsClient";
     import { IconUserCircle } from "@wa-icons";
 
-    export let first: boolean | undefined = undefined;
-    export let last: boolean | undefined = undefined;
-    export let classList: string | undefined = undefined;
+    interface Props {
+        first?: boolean | undefined;
+        last?: boolean | undefined;
+        classList?: string | undefined;
+    }
+
+    let { first = undefined, last = undefined, classList = undefined }: Props = $props();
 
     function goToLogin() {
         analyticsClient.login();

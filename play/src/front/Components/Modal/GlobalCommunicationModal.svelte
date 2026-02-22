@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation } from 'svelte/legacy';
+
     //import { fly } from "svelte/transition";
     import { onDestroy, onMount } from "svelte";
     import { isMediaBreakpointUp } from "../../Utils/BreakpointsUtils";
@@ -39,18 +41,18 @@
     import InputCheckbox from "../Input/InputCheckbox.svelte";
     import { IconAlertTriangle, IconInfoCircle, IconMessageShare, IconMusicShare, IconSpeakerPhone } from "@wa-icons";
 
-    let mainModal: HTMLDivElement;
+    let mainModal: HTMLDivElement = $state();
 
-    let inputSendTextActive = false;
-    let uploadAudioActive = false;
-    let broadcastToWorld = false;
-    let handleSendText: { sendTextMessage(broadcast: boolean): void };
-    let handleSendAudio: { sendAudioMessage(broadcast: boolean): Promise<void> };
-    let videoElement: HTMLVideoElement;
-    let stream: MediaStream | undefined;
-    let aspectRatio = 1;
+    let inputSendTextActive = $state(false);
+    let uploadAudioActive = $state(false);
+    let broadcastToWorld = $state(false);
+    let handleSendText: { sendTextMessage(broadcast: boolean): void } = $state();
+    let handleSendAudio: { sendAudioMessage(broadcast: boolean): Promise<void> } = $state();
+    let videoElement: HTMLVideoElement = $state();
+    let stream: MediaStream | undefined = $state();
+    let aspectRatio = $state(1);
 
-    let isMobile = isMediaBreakpointUp("md");
+    let isMobile = $state(isMediaBreakpointUp("md"));
     const resizeObserver = new ResizeObserver(() => {
         isMobile = isMediaBreakpointUp("md");
     });
@@ -148,13 +150,13 @@
         event.target.requestFullscreen().catch(() => console.error("error playing video"));
     }
 
-    let cameraDeviceId: string;
+    let cameraDeviceId: string = $state();
     function selectCamera() {
         requestedCameraDeviceIdStore.set(cameraDeviceId);
         localUserStore.setPreferredVideoInputDevice(cameraDeviceId);
     }
 
-    let microphoneDeviceId: string;
+    let microphoneDeviceId: string = $state();
     function selectMicrophone() {
         requestedMicrophoneDeviceIdStore.set(microphoneDeviceId);
         localUserStore.setPreferredAudioInputDevice(microphoneDeviceId);
@@ -177,7 +179,7 @@
     }
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 <div
     class="absolute z-[308] rounded-xxl w-full h-full top-0 left-0 right-0 bottom-0 flex items-center justify-center overflow-hidden"
@@ -199,11 +201,11 @@
                 </h2>
 
                 {#if $displayedMegaphoneScreenStore || inputSendTextActive || uploadAudioActive}
-                    <!-- svelte-ignore a11y-invalid-attribute -->
+                    <!-- svelte-ignore a11y_invalid_attribute -->
                     <a
                         href="#"
                         class="px-4 py-2 text-white no-underline bg-white/10 rounded hover:bg-white/20 flex flex-row items-center text-xs m-0 w-fit"
-                        on:click|preventDefault|stopPropagation={() => back()}
+                        onclick={stopPropagation(preventDefault(() => back()))}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -245,7 +247,7 @@
 
                         <button
                             class="btn-lg btn btn-light btn-border mt-2 mb-4"
-                            on:click={activateLiveMessage}
+                            onclick={activateLiveMessage}
                             disabled={!$megaphoneCanBeUsedStore}
                         >
                             {$LL.megaphone.modal.liveMessage.button()}
@@ -268,10 +270,10 @@
                                 class="w-full cursor-pointer rounded"
                                 controls
                                 muted
-                                on:mouseover={playVideo}
-                                on:mouseout={stopVideo}
-                                on:click={fullScreenVideo}
-                            />
+                                onmouseover={playVideo}
+                                onmouseout={stopVideo}
+                                onclick={fullScreenVideo}
+></video>
                         </div>
                     </div>
 
@@ -290,7 +292,7 @@
 
                         <button
                             class="btn-lg btn btn-light btn-border mb-4"
-                            on:click={activateInputText}
+                            onclick={activateInputText}
                             disabled={!$userIsAdminStore}
                         >
                             {$LL.megaphone.modal.textMessage.button()}
@@ -313,10 +315,10 @@
                                 class="w-full cursor-pointer rounded"
                                 controls
                                 muted
-                                on:mouseover={playVideo}
-                                on:mouseout={stopVideo}
-                                on:click={fullScreenVideo}
-                            />
+                                onmouseover={playVideo}
+                                onmouseout={stopVideo}
+                                onclick={fullScreenVideo}
+></video>
                         </div>
                     </div>
 
@@ -335,7 +337,7 @@
 
                         <button
                             class="btn-lg btn btn-light btn-border mb-4"
-                            on:click={activateUploadAudio}
+                            onclick={activateUploadAudio}
                             disabled={!$userIsAdminStore}
                         >
                             {$LL.megaphone.modal.audioMessage.button()}
@@ -358,10 +360,10 @@
                                 class="w-full cursor-pointer rounded"
                                 controls
                                 muted
-                                on:mouseover={playVideo}
-                                on:mouseout={stopVideo}
-                                on:click={fullScreenVideo}
-                            />
+                                onmouseover={playVideo}
+                                onmouseout={stopVideo}
+                                onclick={fullScreenVideo}
+></video>
                         </div>
                     </div>
                 </div>
@@ -371,7 +373,7 @@
                 <div id="active-globalMessage" class="flex flex-col p-5">
                     {#if inputSendTextActive}
                         <h3 class="text-white mb-2">
-                            <textMessageIcon class="h-8 w-8 mr-1" font-size="22" />
+                            <textMessageIcon class="h-8 w-8 mr-1" font-size="22"></textMessageIcon>
                             {$LL.megaphone.modal.textMessage.title()}
                         </h3>
                         <TextGlobalMessage bind:handleSending={handleSendText} />
@@ -393,7 +395,7 @@
                     </div>
                     <div class="flex justify-center">
                         <section class="centered-column">
-                            <button class="btn btn-light" on:click|preventDefault={send}
+                            <button class="btn btn-light" onclick={preventDefault(send)}
                                 >{$LL.menu.globalMessage.send()}</button
                             >
                         </section>
@@ -426,7 +428,7 @@
                                 autoplay
                                 muted
                                 playsinline
-                            />
+></video>
                             <div class="z-[251] mt-3 w-full p-4 flex items-center justify-center scale-150">
                                 <SoundMeterWidget
                                     volume={$localVolumeStore}
@@ -510,7 +512,7 @@
                         {#if !$requestedMegaphoneStore}
                             <button
                                 class="btn light text-black bg-white mt-4 rounded-md"
-                                on:click={startLive}
+                                onclick={startLive}
                                 disabled={!$requestedCameraState && !$requestedMicrophoneState}
                             >
                                 {#if !$requestedCameraState && !$requestedMicrophoneState && !$requestedScreenSharingState}
@@ -519,7 +521,7 @@
                                 {$LL.megaphone.modal.liveMessage.startMegaphone()}
                             </button>
                         {:else}
-                            <button class="btn btn-danger" on:click={stopLive}>
+                            <button class="btn btn-danger" onclick={stopLive}>
                                 {$LL.megaphone.modal.liveMessage.stopMegaphone()}
                             </button>
                         {/if}

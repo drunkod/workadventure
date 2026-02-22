@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation, handlers } from 'svelte/legacy';
+
     import { type Writable, writable } from "svelte/store";
     import MicrophoneCloseSvg from "../images/microphone-close.svg";
     import banUserSvg from "../images/ban-user.svg";
@@ -13,18 +15,28 @@
     import RangeSlider from "../Input/RangeSlider.svelte";
     import { IconAlertTriangle, IconUser, IconMute, IconUnMute } from "@wa-icons";
 
-    export let spaceUser: SpaceUserExtended;
-    export let videoEnabled: boolean;
-    export let videoType: StreamCategory | undefined;
-    export let onClose: () => void;
-    export let volumeStore: Writable<number> = writable(1);
+    interface Props {
+        spaceUser: SpaceUserExtended;
+        videoEnabled: boolean;
+        videoType: StreamCategory | undefined;
+        onClose: () => void;
+        volumeStore?: Writable<number>;
+    }
+
+    let {
+        spaceUser,
+        videoEnabled,
+        videoType,
+        onClose,
+        volumeStore = writable(1)
+    }: Props = $props();
 
     const isScreenSharing = videoType === "screenSharing";
 
     const isMicrophoneEnabled = spaceUser.reactiveUser.microphoneState;
     const isVideoEnabled = spaceUser.reactiveUser.cameraState;
 
-    let moreActionOpened = false;
+    let moreActionOpened = $state(false);
 
     function muteAudio(spaceUser: SpaceUserExtended) {
         analyticsClient.muteMicrophoneMeetingAction();
@@ -107,12 +119,11 @@
 <div
     class="flex flex-col p-1 w-48 bg-contrast/80 backdrop-blur-md bg-opacity-10 rounded-md max-h-max z-50 cursor-pointer select-none"
     class:mt-[0.2rem]={!videoEnabled}
-    on:click={() => analyticsClient.moreActionMetting()}
-    on:click|preventDefault|stopPropagation={() => toggleActionMenu(!moreActionOpened)}
+    onclick={handlers(() => analyticsClient.moreActionMetting(), stopPropagation(preventDefault(() => toggleActionMenu(!moreActionOpened))))}
     role="button"
     tabindex="0"
-    on:keydown={() => toggleActionMenu(!moreActionOpened)}
-    on:mouseleave={() => close()}
+    onkeydown={() => toggleActionMenu(!moreActionOpened)}
+    onmouseleave={() => close()}
 >
     <!-- Volume control -->
     <div
@@ -121,11 +132,11 @@
         aria-label="Volume control"
     >
         {#if $volumeStore === 0}
-            <button on:click|preventDefault|stopPropagation={() => volumeStore.set(1)}>
+            <button onclick={stopPropagation(preventDefault(() => volumeStore.set(1)))}>
                 <IconMute class="w-4 h-4 text-white flex-shrink-0" />
             </button>
         {:else}
-            <button on:click|preventDefault|stopPropagation={() => volumeStore.set(0)}>
+            <button onclick={stopPropagation(preventDefault(() => volumeStore.set(0)))}>
                 <IconUnMute class="w-4 h-4 text-white flex-shrink-0" />
             </button>
         {/if}
@@ -147,7 +158,7 @@
     {#if ($userIsAdminStore || !$isListenerStore) && !isScreenSharing}
         <button
             class="action-button mute-audio-user flex gap-2 items-center hover:bg-white/10 m-0 p-2 w-full text-sm rounded leading-4 text-left text-white disabled:opacity-50"
-            on:click|preventDefault|stopPropagation={() => muteAudio(spaceUser)}
+            onclick={stopPropagation(preventDefault(() => muteAudio(spaceUser)))}
             disabled={!$isMicrophoneEnabled}
         >
             <img src={MicrophoneCloseSvg} class="w-4 h-4" alt="" draggable="false" />
@@ -163,7 +174,7 @@
     {#if $userIsAdminStore}
         <button
             class="action-button flex gap-2 items-center hover:bg-white/10 m-0 p-2 w-full text-sm rounded leading-4 text-left text-white"
-            on:click|preventDefault|stopPropagation={() => muteAudioEveryBody(spaceUser)}
+            onclick={stopPropagation(preventDefault(() => muteAudioEveryBody(spaceUser)))}
         >
             <img src={MicrophoneCloseSvg} class="w-4 h-4" alt="" draggable="false" />
             {$LL.camera.menu.muteAudioEveryBody()}
@@ -175,7 +186,7 @@
         <button
             id="mute-video-user"
             class="action-button flex gap-2 items-center hover:bg-white/10 m-0 p-2 w-full text-sm rounded leading-4 text-left text-white disabled:opacity-50"
-            on:click|preventDefault|stopPropagation={() => muteVideo(spaceUser)}
+            onclick={stopPropagation(preventDefault(() => muteVideo(spaceUser)))}
             disabled={!$isVideoEnabled}
         >
             <img src={NoVideoSvg} class="w-4 h-4" alt="" draggable="false" />
@@ -191,7 +202,7 @@
     {#if $userIsAdminStore}
         <button
             class="action-button flex gap-2 items-center hover:bg-white/10 m-0 p-2 w-full text-sm rounded leading-4 text-left text-white"
-            on:click|preventDefault|stopPropagation={() => muteVideoEveryBody(spaceUser)}
+            onclick={stopPropagation(preventDefault(() => muteVideoEveryBody(spaceUser)))}
         >
             <img src={NoVideoSvg} class="w-4 h-4" alt="" draggable="false" />
             {$LL.camera.menu.muteVideoEveryBody()}
@@ -203,7 +214,7 @@
         <button
             id="kickoff-user"
             class="action-button flex gap-2 items-center hover:bg-white/10 m-0 p-2 w-full text-sm rounded leading-4 text-left text-white"
-            on:click|preventDefault|stopPropagation={() => kickoff(spaceUser)}
+            onclick={stopPropagation(preventDefault(() => kickoff(spaceUser)))}
         >
             <img src={banUserSvg} class="w-4 h-4" alt="" draggable="false" />
             {$LL.camera.menu.kickoffUser()}
@@ -224,8 +235,7 @@
     {#if spaceUser.visitCardUrl}
         <button
             class="action-button flex gap-2 items-center hover:bg-white/10 m-0 p-2 w-full text-sm rounded leading-4 text-left text-white"
-            on:click={() => analyticsClient.sendPrivateMessageMeetingAction()}
-            on:click|preventDefault|stopPropagation={() => visitCard(spaceUser)}
+            onclick={handlers(() => analyticsClient.sendPrivateMessageMeetingAction(), stopPropagation(preventDefault(() => visitCard(spaceUser))))}
         >
             <IconUser />
             {$LL.chat.menu.visitCard()}
@@ -234,7 +244,7 @@
     <!-- Block or report user -->
     <button
         class="action-button flex gap-2 items-center hover:bg-white/10 m-0 p-2 w-full text-sm rounded leading-4 text-left text-white"
-        on:click|preventDefault|stopPropagation={() => openBlockOrReportPopup(spaceUser)}
+        onclick={stopPropagation(preventDefault(() => openBlockOrReportPopup(spaceUser)))}
     >
         <IconAlertTriangle />
         {$LL.camera.menu.blockOrReportUser()}

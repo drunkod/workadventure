@@ -18,7 +18,7 @@
     import { activeSecondaryZoneActionBarStore } from "../../Stores/MenuStore";
     import { gameManager } from "../../Phaser/Game/GameManager";
 
-    let HTMLAudioPlayer: HTMLAudioElement;
+    let HTMLAudioPlayer: HTMLAudioElement = $state();
     let unsubscriberFileStore: Unsubscriber | null = null;
     let unsubscriberVolumeStore: Unsubscriber | null = null;
     let retryPlayStoreSubscription: Subscription | null = null;
@@ -172,5 +172,5 @@
 </script>
 
 {#if $audioManagerFileStore !== "" && $audioManagerVolumeStore.stopped === false}
-    <audio preload="auto" class="audio-manager-audioplayer" bind:this={HTMLAudioPlayer} />
+    <audio preload="auto" class="audio-manager-audioplayer" bind:this={HTMLAudioPlayer}></audio>
 {/if}

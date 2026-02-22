@@ -46,10 +46,12 @@
             <TextGlobalMessage />
         </div>
     </div>
-    <svelte:fragment slot="buttons">
-        <!-- TODO -->
-        <button class="btn btn-light btn-ghost w-1/2 justify-center"> Send Message </button>
-        <!-- Mettre l'action du send message -->
-        <button class="btn btn-secondary w-1/2 justify-center" on:click={closeBanner}> Close </button>
-    </svelte:fragment>
+    {#snippet buttons()}
+    
+            <!-- TODO -->
+            <button class="btn btn-light btn-ghost w-1/2 justify-center"> Send Message </button>
+            <!-- Mettre l'action du send message -->
+            <button class="btn btn-secondary w-1/2 justify-center" onclick={closeBanner}> Close </button>
+        
+    {/snippet}
 </PopUpContainer>

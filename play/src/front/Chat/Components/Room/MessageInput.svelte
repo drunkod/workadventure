@@ -1,20 +1,35 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
 
-    export let message: string;
-    export let inputClass = "";
-    export let dataText = "";
-    export let dataTestid = "";
-    export let messageInput: HTMLDivElement;
-    export let onKeyDown: ((event: KeyboardEvent) => void) | undefined = undefined;
-    export let onInput = () => {};
-    export let disabled = false;
-    export let focusin = (event: FocusEvent) => {
+    interface Props {
+        message: string;
+        inputClass?: string;
+        dataText?: string;
+        dataTestid?: string;
+        messageInput: HTMLDivElement;
+        onKeyDown?: ((event: KeyboardEvent) => void) | undefined;
+        onInput?: any;
+        disabled?: boolean;
+        focusin?: any;
+        focusout?: any;
+    }
+
+    let {
+        message = $bindable(),
+        inputClass = "",
+        dataText = "",
+        dataTestid = "",
+        messageInput = $bindable(),
+        onKeyDown = undefined,
+        onInput = () => {},
+        disabled = false,
+        focusin = (event: FocusEvent) => {
         console.info("Not used focusin", event);
-    };
-    export let focusout = (event: FocusEvent) => {
+    },
+        focusout = (event: FocusEvent) => {
         console.info("Not used focusout", event);
-    };
+    }
+    }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         pasteFiles: FileList;
@@ -97,20 +112,20 @@
         bind:innerHTML={message}
         contenteditable="true"
         bind:this={messageInput}
-        on:keydown={handleKeyDown}
-        on:compositionstart={onCompositionStart}
-        on:compositionend={onCompositionEnd}
-        on:input={onInput}
-        on:paste={onPasteHandler}
-        on:focusin={focusin}
-        on:focusout={focusout}
+        onkeydown={handleKeyDown}
+        oncompositionstart={onCompositionStart}
+        oncompositionend={onCompositionEnd}
+        oninput={onInput}
+        onpaste={onPasteHandler}
+        onfocusin={focusin}
+        onfocusout={focusout}
         class={inputClass}
         data-text={dataText}
         role="textbox"
         tabindex="0"
         dir="auto"
         lang=""
-    />
+></div>
 {:else}
     <div
         data-testid={dataTestid}
@@ -118,7 +133,7 @@
         contenteditable="false"
         bind:this={messageInput}
         class={`${inputClass} opacity-70/50 cursor-not-allowed`}
-    />
+></div>
 {/if}
 
 <style lang="scss">

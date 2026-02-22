@@ -5,9 +5,14 @@
     import { textMessageStore } from "../../Stores/TypeMessageStore/TextMessageStore";
     import ButtonClose from "../Input/ButtonClose.svelte";
 
-    /* eslint-disable svelte/no-at-html-tags */
+    
 
-    export let message: Message;
+    interface Props {
+        /* eslint-disable svelte/no-at-html-tags */
+        message: Message;
+    }
+
+    let { message }: Props = $props();
 
     const content = JSON.parse(message.text);
     const converter = new QuillDeltaToHtmlConverter(content.ops, { inlineStyles: true });
@@ -23,7 +28,7 @@
     }
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 <div
     class="main-text-message bg-contrast/85 rounded backdrop-blur-md flex gap-3 w-3/5 py-3 pl-5 pr-2 max-h-64 shadow-xl pointer-events-auto animate-bounce-in z-[800]"

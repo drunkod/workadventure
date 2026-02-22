@@ -1,14 +1,13 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import Debug from "debug";
     import * as Sentry from "@sentry/svelte";
     import type { Readable } from "svelte/store";
 
-    export let streamStore: Readable<MediaStream | undefined>;
-    export let outputDeviceId: string | undefined = undefined;
-    export let isBlocked: Readable<boolean>;
 
     const debug = Debug("AudioStream");
 
@@ -16,14 +15,26 @@
         selectOutputAudioDeviceError: void;
     }>();
 
-    export let volume: Readable<number>;
-    let audioElement: HTMLAudioElement;
+    interface Props {
+        streamStore: Readable<MediaStream | undefined>;
+        outputDeviceId?: string | undefined;
+        isBlocked: Readable<boolean>;
+        volume: Readable<number>;
+    }
 
-    $: {
+    let {
+        streamStore,
+        outputDeviceId = undefined,
+        isBlocked,
+        volume
+    }: Props = $props();
+    let audioElement: HTMLAudioElement = $state();
+
+    run(() => {
         if (audioElement) {
             audioElement.volume = $volume;
         }
-    }
+    });
 
     let lastRequestedDeviceId: string | undefined;
 
@@ -68,24 +79,26 @@
         }
     }
 
-    $: {
+    run(() => {
         if (outputDeviceId && audioElement) {
             safeSetSinkId(outputDeviceId, audioElement).catch((e) => {
                 console.error("Error setting the audio output device: ", e);
                 Sentry.captureException(e);
             });
         }
-    }
+    });
 
     let destroyed = false;
 
-    $: stream = $streamStore ? $streamStore : undefined;
+    let stream = $derived($streamStore ? $streamStore : undefined);
 
-    $: if (audioElement && stream) {
-        if (audioElement.srcObject !== stream) {
-            audioElement.srcObject = stream;
+    run(() => {
+        if (audioElement && stream) {
+            if (audioElement.srcObject !== stream) {
+                audioElement.srcObject = stream;
+            }
         }
-    }
+    });
 
     onMount(() => {
         (async () => {
@@ -110,5 +123,5 @@
 </script>
 
 {#if !$isBlocked}
-    <audio bind:this={audioElement} autoplay={true} />
+    <audio bind:this={audioElement} autoplay={true}></audio>
 {/if}

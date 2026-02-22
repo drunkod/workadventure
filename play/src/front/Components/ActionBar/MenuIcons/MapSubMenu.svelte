@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { clickOutside } from "svelte-outside";
     import { getContext, setContext } from "svelte";
     import { mapMenuVisibleStore, openedMenuStore } from "../../../Stores/MenuStore";
@@ -15,10 +17,16 @@
     const inProfileMenu = getContext("profileMenu");
 
     // Useless properties. They are here only to avoid a warning because we set the "first" or "classList" prop on all the right menu items
-    // svelte-ignore unused-export-let
-    export let first: boolean | undefined = undefined;
-    // svelte-ignore unused-export-let
-    export let classList: string | undefined = undefined;
+    
+    
+    interface Props {
+        // svelte-ignore unused-export-let
+        first?: boolean | undefined;
+        // svelte-ignore unused-export-let
+        classList?: string | undefined;
+    }
+
+    let { first = undefined, classList = undefined }: Props = $props();
 
     const [floatingUiRef, floatingUiContent, arrowAction] = createFloatingUiActions(
         {
@@ -35,15 +43,15 @@
 
 {#if $mapMenuVisibleStore}
     {#if !inProfileMenu}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
             data-testid="map-menu"
             class="items-center relative cursor-pointer pointer-events-auto"
             use:floatingUiRef
-            on:click|preventDefault={() => {
+            onclick={preventDefault(() => {
                 openedMenuStore.toggle("mapMenu");
-            }}
+            })}
         >
             <div class="group bg-contrast/80 backdrop-blur rounded-lg h-16 @sm/actions:h-14 @xl/actions:h-16 p-2">
                 <div
@@ -76,7 +84,7 @@
                 use:floatingUiContent
                 use:clickOutside={closeMapMenu}
             >
-                <div use:arrowAction />
+                <div use:arrowAction></div>
                 <div class="p-1 m-0">
                     <MapSubMenuContent />
                 </div>

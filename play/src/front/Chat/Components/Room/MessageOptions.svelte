@@ -4,8 +4,12 @@
     import EmojiButton from "./EmojiButton.svelte";
     import { IconArrowBackUp, IconArrowDown, IconPencil, IconTrash } from "@wa-icons";
 
-    export let message: ChatMessage;
-    export let messageRef: HTMLDivElement | undefined;
+    interface Props {
+        message: ChatMessage;
+        messageRef: HTMLDivElement | undefined;
+    }
+
+    let { message, messageRef }: Props = $props();
 
     function replyToMessage() {
         selectedChatMessageToReply.set(message);
@@ -23,7 +27,10 @@
         message.addReaction(event.detail).catch((error) => console.error(error));
     }
 
-    const { content, isMyMessage, type, canDelete } = message;
+    let content = $derived(message.content);
+    let isMyMessage = $derived(message.isMyMessage);
+    let type = $derived(message.type);
+    let canDelete = $derived(message.canDelete);
 </script>
 
 <div class="flex flex-row gap-1 items-center">
@@ -40,7 +47,7 @@
     <button
         class="p-0 m-0 text-white/50 hover:text-white transition-all hover:cursor-pointer flex"
         data-testid="replyToMessageButton"
-        on:click={replyToMessage}
+        onclick={replyToMessage}
     >
         <IconArrowBackUp font-size={16} />
     </button>
@@ -49,7 +56,7 @@
         <button
             class="p-0 m-0 text-white/50 hover:text-white transition-all hover:cursor-pointer flex"
             data-testid="editMessageButton"
-            on:click={selectMessageToEdit}
+            onclick={selectMessageToEdit}
         >
             <IconPencil font-size={16} />
         </button>
@@ -58,7 +65,7 @@
         <button
             class="p-0 m-0 text-white/50 hover:text-white transition-all hover:cursor-pointer flex"
             data-testid="removeMessageButton"
-            on:click={removeMessage}
+            onclick={removeMessage}
         >
             <IconTrash font-size={16} />
         </button>

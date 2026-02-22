@@ -9,11 +9,15 @@
     import EntityToolImg from "../images/icon-tool-entity.svg";
     import { IconSearch } from "@wa-icons";
 
-    export let entitiesPrefabsVariants: Readable<EntityVariant[]>;
+    interface Props {
+        entitiesPrefabsVariants: Readable<EntityVariant[]>;
+    }
 
-    let searchTerm = "book";
+    let { entitiesPrefabsVariants }: Props = $props();
+
+    let searchTerm = $state("book");
     let pickedEntity: EntityPrefab | undefined = undefined;
-    let currentSelectedEntityId: string | undefined = undefined;
+    let currentSelectedEntityId: string | undefined = $state(undefined);
 
     const dispatch = createEventDispatcher<{
         select: EntityPrefab;
@@ -44,9 +48,11 @@
     </div>
 
     <Input bind:value={searchTerm} placeholder={$LL.mapEditor.entityEditor.itemPicker.searchPlaceholder()}>
-        <span slot="inputAppend">
-            <IconSearch />
-        </span>
+        {#snippet inputAppend()}
+                <span >
+                <IconSearch />
+            </span>
+            {/snippet}
     </Input>
 
     <div class="grid grid-cols-[repeat(auto-fit,minmax(64px,3.6em))] gap-2 justify-center">

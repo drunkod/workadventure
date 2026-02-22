@@ -1,4 +1,17 @@
 const plugin = require("tailwindcss/plugin");
+
+const originalWarn = console.warn;
+console.warn = (...args) => {
+  const message = args.map((arg) => String(arg ?? "")).join(" ");
+  if (message.includes("As of Tailwind CSS v2.2, `lightBlue` has been renamed to `sky`.")) return;
+  if (message.includes("As of Tailwind CSS v3.0, `warmGray` has been renamed to `stone`.")) return;
+  if (message.includes("As of Tailwind CSS v3.0, `trueGray` has been renamed to `neutral`.")) return;
+  if (message.includes("As of Tailwind CSS v3.0, `coolGray` has been renamed to `gray`.")) return;
+  if (message.includes("As of Tailwind CSS v3.0, `blueGray` has been renamed to `slate`.")) return;
+  if (message.includes("Update your configuration file to silence this warning.")) return;
+  originalWarn(...args);
+};
+
 module.exports = {
   content: [
     "./src/**/*.{html,js,svelte,ts}"

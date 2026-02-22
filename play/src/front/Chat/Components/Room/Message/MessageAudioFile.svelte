@@ -2,10 +2,14 @@
     import type { Readable } from "svelte/store";
     import type { ChatMessageContent } from "../../../Connection/ChatConnection";
 
-    export let content: Readable<ChatMessageContent>;
+    interface Props {
+        content: Readable<ChatMessageContent>;
+    }
+
+    let { content }: Props = $props();
 </script>
 
-<audio controls src={$content.url} class="max-w-full min-w-96 block p-2" />
+<audio controls src={$content.url} class="max-w-full min-w-96 block p-2"></audio>
 
 <style>
     audio::-webkit-media-controls-panel {

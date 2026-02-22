@@ -8,9 +8,13 @@
     import type { PictureStore } from "../../../Stores/PictureStore";
     import { IconLoader } from "@wa-icons";
 
-    export let roomInformation: { name: string; id: string; pictureStore: PictureStore };
+    interface Props {
+        roomInformation: { name: string; id: string; pictureStore: PictureStore };
+    }
+
+    let { roomInformation }: Props = $props();
     let roomName = roomInformation.name;
-    let loadingInvitation = false;
+    let loadingInvitation = $state(false);
 
     async function joinRoom() {
         loadingInvitation = true;
@@ -55,7 +59,7 @@
             <button
                 class="border border-solid border-success text-success hover:bg-success-400/10 rounded text-xs py-1 px-2 m-0"
                 data-testid="acceptInvitationButton"
-                on:click={() => joinRoom()}
+                onclick={() => joinRoom()}
             >
                 {$LL.chat.join()}
             </button>

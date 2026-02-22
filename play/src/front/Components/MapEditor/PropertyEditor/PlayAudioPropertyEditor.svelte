@@ -8,9 +8,13 @@
     import { IconFileMusic } from "../../Icons";
     import PropertyEditorBase from "./PropertyEditorBase.svelte";
 
-    export let property: PlayAudioPropertyData;
-    export let isArea = false;
-    let optionAdvancedActivated = false;
+    interface Props {
+        property: PlayAudioPropertyData;
+        isArea?: boolean;
+    }
+
+    let { property = $bindable(), isArea = false }: Props = $props();
+    let optionAdvancedActivated = $state(false);
 
     const dispatch = createEventDispatcher<{
         change: undefined;
@@ -18,9 +22,9 @@
         audioLink: PlayAudioPropertyData;
     }>();
 
-    let HTMLAudioPlayer: HTMLAudioElement;
-    let playing = false;
-    let errorMessage = "";
+    let HTMLAudioPlayer: HTMLAudioElement = $state();
+    let playing = $state(false);
+    let errorMessage = $state("");
 
     function playAudio() {
         if (!property.audioLink) {
@@ -79,78 +83,82 @@
         dispatch("close");
     }}
 >
-    <span slot="header" class="flex justify-center items-center">
-        <IconFileMusic font-size="18" class="mr-2" />
-        {$LL.mapEditor.properties.playAudio.label()}
-    </span>
-    <span slot="content">
-        <div class="value-input">
-            <div class="flex">
-                <Input
-                    id="audioLink"
-                    label={$LL.mapEditor.properties.playAudio.audioLinkLabel()}
-                    type="text"
-                    placeholder={$LL.mapEditor.properties.playAudio.audioLinkPlaceholder()}
-                    bind:value={property.audioLink}
-                    onChange={onValueChange}
-                />
-                {#if !playing}
-                    <button on:click={playAudio} class="mt-7 ps-1 pe-0 text-xl"> ▶️ </button>
-                {:else}
-                    <button on:click={stopAudio} class="mt-7 ps-1 pe-0 text-xl"> ⏹️ </button>
-                {/if}
-            </div>
-            <audio class="audio-manager-audioplayer" bind:this={HTMLAudioPlayer} />
-        </div>
-        <div class="value-input text-danger-800" class:invisible={!errorMessage}>
-            ⚠️ {errorMessage}
-        </div>
-
-        <InputSwitch
-            id="advancedOption"
-            label={$LL.mapEditor.properties.advancedOptions()}
-            bind:value={optionAdvancedActivated}
-        />
-
-        {#if optionAdvancedActivated}
-            <div class:active={optionAdvancedActivated} class="advanced-option">
-                {#if isArea === false}
-                    <div class="value-input flex flex-col">
-                        <Input
-                            label={$LL.mapEditor.properties.openWebsite.triggerMessage()}
-                            id="triggerMessage"
-                            type="text"
-                            placeholder={$LL.trigger.object()}
-                            bind:value={property.triggerMessage}
-                            onChange={onValueChange}
-                        />
-                    </div>
-                {/if}
-                <div class="value-input">
-                    <RangeSlider
-                        label={$LL.mapEditor.properties.playAudio.volumeLabel()}
-                        unit=""
-                        id="volume"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        bind:value={property.volume}
-                        onChange={onRangeChange}
-                        buttonShape="square"
+    {#snippet header()}
+        <span  class="flex justify-center items-center">
+            <IconFileMusic font-size="18" class="mr-2" />
+            {$LL.mapEditor.properties.playAudio.label()}
+        </span>
+    {/snippet}
+    {#snippet content()}
+        <span >
+            <div class="value-input">
+                <div class="flex">
+                    <Input
+                        id="audioLink"
+                        label={$LL.mapEditor.properties.playAudio.audioLinkLabel()}
+                        type="text"
+                        placeholder={$LL.mapEditor.properties.playAudio.audioLinkPlaceholder()}
+                        bind:value={property.audioLink}
+                        onChange={onValueChange}
                     />
+                    {#if !playing}
+                        <button onclick={playAudio} class="mt-7 ps-1 pe-0 text-xl"> ▶️ </button>
+                    {:else}
+                        <button onclick={stopAudio} class="mt-7 ps-1 pe-0 text-xl"> ⏹️ </button>
+                    {/if}
                 </div>
-                {#if !property.hideButtonLabel}
+                <audio class="audio-manager-audioplayer" bind:this={HTMLAudioPlayer}></audio>
+            </div>
+            <div class="value-input text-danger-800" class:invisible={!errorMessage}>
+                ⚠️ {errorMessage}
+            </div>
+
+            <InputSwitch
+                id="advancedOption"
+                label={$LL.mapEditor.properties.advancedOptions()}
+                bind:value={optionAdvancedActivated}
+            />
+
+            {#if optionAdvancedActivated}
+                <div class:active={optionAdvancedActivated} class="advanced-option">
+                    {#if isArea === false}
+                        <div class="value-input flex flex-col">
+                            <Input
+                                label={$LL.mapEditor.properties.openWebsite.triggerMessage()}
+                                id="triggerMessage"
+                                type="text"
+                                placeholder={$LL.trigger.object()}
+                                bind:value={property.triggerMessage}
+                                onChange={onValueChange}
+                            />
+                        </div>
+                    {/if}
                     <div class="value-input">
-                        <Input
-                            label={$LL.mapEditor.entityEditor.buttonLabel()}
-                            id="audioButtonLabel"
-                            type="text"
-                            bind:value={property.buttonLabel}
-                            onChange={onValueChange}
+                        <RangeSlider
+                            label={$LL.mapEditor.properties.playAudio.volumeLabel()}
+                            unit=""
+                            id="volume"
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            bind:value={property.volume}
+                            onChange={onRangeChange}
+                            buttonShape="square"
                         />
                     </div>
-                {/if}
-            </div>
-        {/if}
-    </span>
+                    {#if !property.hideButtonLabel}
+                        <div class="value-input">
+                            <Input
+                                label={$LL.mapEditor.entityEditor.buttonLabel()}
+                                id="audioButtonLabel"
+                                type="text"
+                                bind:value={property.buttonLabel}
+                                onChange={onValueChange}
+                            />
+                        </div>
+                    {/if}
+                </div>
+            {/if}
+        </span>
+    {/snippet}
 </PropertyEditorBase>

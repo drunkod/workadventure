@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { fly } from "svelte/transition";
     import { getNavigatorType } from "../../WebRtc/DeviceUtils";
     import { LL } from "../../../i18n/i18n-svelte";
@@ -18,7 +20,7 @@
 <form
     class="helpCameraSettings z-[600] bg-contrast/80 backdrop-blur rounded-lg text-white self-center pointer-events-auto flex flex-col m-auto w-full md:w-2/3 2xl:w-1/4 text-sm md:text-base"
     style={getBackgroundColor() ? `background-color: ${getBackgroundColor()};` : ""}
-    on:submit|preventDefault={close}
+    onsubmit={preventDefault(close)}
     transition:fly={{ y: -50, duration: 500 }}
 >
     <section class="mb-0 p-4">
@@ -35,7 +37,7 @@
     </section>
 
     <section class="justify-center bottom-0 w-full bg-contrast p-4 flex flex-row space-x-4 mt-4 rounded-b-lg">
-        <button class="btn btn-secondary grow" on:click|preventDefault={close}>{$LL.warning.popupBlocked.done()}</button
+        <button class="btn btn-secondary grow" onclick={preventDefault(close)}>{$LL.warning.popupBlocked.done()}</button
         >
     </section>
 </form>

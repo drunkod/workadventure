@@ -3,10 +3,15 @@
     import type { ExternalComponentZones } from "../../Stores/Utils/externalSvelteComponentService";
     import { externalSvelteComponentService } from "../../Stores/Utils/externalSvelteComponentService";
 
-    export let zone: ExternalComponentZones;
+    interface Props {
+        zone: ExternalComponentZones;
+        [key: string]: any
+    }
+
+    let { zone, ...rest }: Props = $props();
     let direction = 1;
 
-    const components = externalSvelteComponentService.getComponentsByZone(zone);
+    let components = $derived(externalSvelteComponentService.getComponentsByZone(zone));
 </script>
 
 <!-- Stack design for centered popup zone -->
@@ -21,14 +26,14 @@
                     class="absolute w-11/12 md:max-w-3xl transition-all"
                     style={`margin-top: ${-index * 20}px; opacity: ${1 - index * 0.1}; z-index: ${400 - index};`}
                 >
-                    <svelte:component this={value.componentType} {...$$restProps} {...valueProps} />
+                    <value.componentType {...rest} {...valueProps} />
                 </div>
             {/each}
         </div>
     {:else}
         {#each [...$components.entries()] as [key, value] (`${key}`)}
             {@const valueProps = value.props ?? {}}
-            <svelte:component this={value.componentType} {...$$restProps} {...valueProps} />
+            <value.componentType {...rest} {...valueProps} />
         {/each}
     {/if}
 {/if}

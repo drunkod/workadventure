@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import type { EntityPrefab } from "@workadventure/map-editor";
     import { createEventDispatcher } from "svelte";
     import LL from "../../../../../i18n/i18n-svelte";
@@ -11,17 +13,21 @@
     import LogoCollisionGrid from "./LogoCollisionGrid.svg";
     import EntityEditionCollisionGrid from "./EntityEditionCollisionGrid.svelte";
 
-    export let customEntity: EntityPrefab;
-    export let isUploadForm = false;
+    interface Props {
+        customEntity: EntityPrefab;
+        isUploadForm?: boolean;
+    }
 
-    let { name, tags, collisionGrid: customEntityCollisionGrid, depthOffset: depthOffsetCustomEntity } = customEntity;
-    let inputTagOptions: InputTagOption[] | undefined = tags.map((tag) => ({ value: tag, label: tag }));
+    let { customEntity, isUploadForm = false }: Props = $props();
 
-    let collisionGrid = customEntityCollisionGrid ?? [];
-    let floatingObject = isUploadForm ? false : customEntityCollisionGrid === undefined;
-    let depthOffset: number = depthOffsetCustomEntity ? depthOffsetCustomEntity * -1 : 0;
-    let entityImageRef: HTMLImageElement;
-    let displayDepthCustomSelector = false;
+    let { name, tags, collisionGrid: customEntityCollisionGrid, depthOffset: depthOffsetCustomEntity } = $state(customEntity);
+    let inputTagOptions: InputTagOption[] | undefined = $state(tags.map((tag) => ({ value: tag, label: tag })));
+
+    let collisionGrid = $state(customEntityCollisionGrid ?? []);
+    let floatingObject = $state(isUploadForm ? false : customEntityCollisionGrid === undefined);
+    let depthOffset: number = $state(depthOffsetCustomEntity ? depthOffsetCustomEntity * -1 : 0);
+    let entityImageRef: HTMLImageElement = $state();
+    let displayDepthCustomSelector = $state(false);
 
     const dispatch = createEventDispatcher<{
         applyEntityModifications: EntityPrefab;
@@ -35,7 +41,7 @@
         CUSTOM = "Custom",
     }
 
-    let selectedDepthOption: depthOptions = depthOffset === 0 ? depthOptions.STANDING : depthOptions.CUSTOM;
+    let selectedDepthOption: depthOptions = $state(depthOffset === 0 ? depthOptions.STANDING : depthOptions.CUSTOM);
 
     function getModifiedCustomEntity(): EntityPrefab {
         return {
@@ -86,9 +92,11 @@
         return $LL.mapEditor.entityEditor.customEntityEditorForm.groundLevel();
     }
 
-    $: if (selectedDepthOption) {
-        updateDepthOffset(selectedDepthOption);
-    }
+    run(() => {
+        if (selectedDepthOption) {
+            updateDepthOffset(selectedDepthOption);
+        }
+    });
 </script>
 
 <div class="flex flex-col flex-1 gap-2">
@@ -171,20 +179,20 @@
             <button
                 class="btn-lg btn btn-danger w-full"
                 data-testid="removeEntity"
-                on:click={() => dispatch("removeEntity", { entityId: customEntity.id })}
+                onclick={() => dispatch("removeEntity", { entityId: customEntity.id })}
                 >{$LL.mapEditor.entityEditor.buttons.delete()}</button
             >
         {/if}
 
         <div class="flex gap-2 w-full mt-2">
-            <button class="btn-lg btn btn-contrast w-full" on:click={() => dispatch("closeForm")}
+            <button class="btn-lg btn btn-contrast w-full" onclick={() => dispatch("closeForm")}
                 >{$LL.mapEditor.entityEditor.buttons.cancel()}</button
             >
 
             <button
                 class="btn-lg btn btn-secondary w-full"
                 data-testid="applyEntityModifications"
-                on:click={() => dispatch("applyEntityModifications", getModifiedCustomEntity())}
+                onclick={() => dispatch("applyEntityModifications", getModifiedCustomEntity())}
                 >{isUploadForm
                     ? $LL.mapEditor.entityEditor.buttons.upload()
                     : $LL.mapEditor.entityEditor.buttons.save()}</button

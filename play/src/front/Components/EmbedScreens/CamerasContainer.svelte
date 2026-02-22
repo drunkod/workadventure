@@ -33,6 +33,8 @@
 
 -->
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { onDestroy, onMount, setContext } from "svelte";
     import type { Writable } from "svelte/store";
     import { myCameraPeerStore, type MyLocalStreamable } from "../../Stores/StreamableCollectionStore";
@@ -55,7 +57,6 @@
 
     setContext("inCameraContainer", true);
 
-    export let oneLineMaxHeight: number;
     let gap = 16; // Configurable gap between videos in pixels
 
     // The "maximum" number of videos we want to display.
@@ -63,24 +64,28 @@
     // will be maximumVideosPerPage + nbVideos % vpr
     const maximumVideosPerPage = MAX_DISPLAYED_VIDEOS;
 
-    export let isOnOneLine: boolean;
-    export let oneLineMode: "vertical" | "horizontal" = "horizontal";
-    let containerWidth: number;
-    let maxContainerHeight: number;
-    let containerHeight: number;
-    let videoWidth: number;
-    let videoHeight: number | undefined;
-    let camerasContainer: HTMLDivElement | undefined;
+    interface Props {
+        oneLineMaxHeight: number;
+        isOnOneLine: boolean;
+        oneLineMode?: "vertical" | "horizontal";
+    }
+
+    let { oneLineMaxHeight, isOnOneLine, oneLineMode = "horizontal" }: Props = $props();
+    let containerWidth: number = $state();
+    let maxContainerHeight: number = $state();
+    let containerHeight: number = $state();
+    let videoWidth: number = $state();
+    let videoHeight: number | undefined = $state();
+    let camerasContainer: HTMLDivElement | undefined = $state();
 
     // The minimum width of a media box in pixels
     const minMediaBoxWidth = 160;
 
     const gameScene = gameManager.getCurrentGameScene();
 
-    $: myCameraStreamable = $myCameraPeerStore.streamable as Writable<MyLocalStreamable | undefined>;
 
     // Single IntersectionObserver shared across all VideoBox components
-    let intersectionObserver: IntersectionObserver | undefined;
+    let intersectionObserver: IntersectionObserver | undefined = $state();
 
     onMount(() => {
         // Create the IntersectionObserver once camerasContainer is bound
@@ -139,42 +144,8 @@
         gameScene.reposition();
     });
 
-    $: maxMediaBoxWidth = (oneLineMaxHeight * 16) / 9;
 
-    $: {
-        if (!isOnOneLine) {
-            containerHeight = maxContainerHeight * localUserStore.getCameraContainerHeight();
-            if (camerasContainer) {
-                camerasContainer.style.height = `${containerHeight}px`;
-            }
-        } else {
-            if (camerasContainer) {
-                camerasContainer.style.height = "";
-            }
-        }
-    }
 
-    $: {
-        if (isOnOneLine) {
-            if (oneLineMode === "horizontal") {
-                videoWidth = Math.max(
-                    Math.min(maxMediaBoxWidth, containerWidth / $oneLineStreamableCollectionStore.length),
-                    minMediaBoxWidth
-                );
-                videoHeight = undefined;
-                maxVisibleVideosStore.set(Math.ceil(containerWidth / videoWidth));
-            } else {
-                videoWidth = containerWidth;
-                videoHeight = videoWidth * (9 / 16);
-                maxVisibleVideosStore.set(Math.ceil(containerHeight / videoHeight));
-            }
-        } else {
-            const layout = calculateOptimalLayout(containerWidth, containerHeight);
-            videoWidth = layout.videoWidth;
-            videoHeight = layout.videoHeight;
-        }
-        gameScene.reposition();
-    }
 
     function calculateOptimalLayout(containerWidth: number, containerHeight: number) {
         if (!containerWidth || !containerHeight) {
@@ -304,9 +275,60 @@
         );
     }
 
-    let grabPointerEvents = false;
+    let grabPointerEvents = $state(false);
     const isWebkit = "WebkitAppearance" in document.documentElement.style;
-    $: {
+
+    let resizeInProgress = $state(false);
+    function onResizeHandler(height: number) {
+        resizeInProgress = true;
+        containerHeight = height;
+        const coefCameraContainerHeight = containerHeight / maxContainerHeight;
+        localUserStore.setCameraContainerHeight(coefCameraContainerHeight > 0.9 ? 0.9 : coefCameraContainerHeight);
+        if (camerasContainer) {
+            const oldHeight = camerasContainer.scrollHeight;
+            // Move the scroll position to keep the same percentage of position
+            const oldScrollPercent = camerasContainer.scrollTop / oldHeight;
+
+            camerasContainer.style.height = `${containerHeight}px`;
+            camerasContainer.scrollTop = camerasContainer.scrollHeight * oldScrollPercent;
+        }
+    }
+    let myCameraStreamable = $derived($myCameraPeerStore.streamable as Writable<MyLocalStreamable | undefined>);
+    let maxMediaBoxWidth = $derived((oneLineMaxHeight * 16) / 9);
+    run(() => {
+        if (!isOnOneLine) {
+            containerHeight = maxContainerHeight * localUserStore.getCameraContainerHeight();
+            if (camerasContainer) {
+                camerasContainer.style.height = `${containerHeight}px`;
+            }
+        } else {
+            if (camerasContainer) {
+                camerasContainer.style.height = "";
+            }
+        }
+    });
+    run(() => {
+        if (isOnOneLine) {
+            if (oneLineMode === "horizontal") {
+                videoWidth = Math.max(
+                    Math.min(maxMediaBoxWidth, containerWidth / $oneLineStreamableCollectionStore.length),
+                    minMediaBoxWidth
+                );
+                videoHeight = undefined;
+                maxVisibleVideosStore.set(Math.ceil(containerWidth / videoWidth));
+            } else {
+                videoWidth = containerWidth;
+                videoHeight = videoWidth * (9 / 16);
+                maxVisibleVideosStore.set(Math.ceil(containerHeight / videoHeight));
+            }
+        } else {
+            const layout = calculateOptimalLayout(containerWidth, containerHeight);
+            videoWidth = layout.videoWidth;
+            videoHeight = layout.videoHeight;
+        }
+        gameScene.reposition();
+    });
+    run(() => {
         // In Webkit, the scroll event on the cameras-container is not triggered when the user scrolls unless the
         // pointer-events is set to auto. But we want to avoid that unless there is a scroll bar to keep the
         // pointer events to go through to the map.
@@ -330,23 +352,7 @@
         } else {
             grabPointerEvents = false;
         }
-    }
-
-    let resizeInProgress = false;
-    function onResizeHandler(height: number) {
-        resizeInProgress = true;
-        containerHeight = height;
-        const coefCameraContainerHeight = containerHeight / maxContainerHeight;
-        localUserStore.setCameraContainerHeight(coefCameraContainerHeight > 0.9 ? 0.9 : coefCameraContainerHeight);
-        if (camerasContainer) {
-            const oldHeight = camerasContainer.scrollHeight;
-            // Move the scroll position to keep the same percentage of position
-            const oldScrollPercent = camerasContainer.scrollTop / oldHeight;
-
-            camerasContainer.style.height = `${containerHeight}px`;
-            camerasContainer.scrollTop = camerasContainer.scrollHeight * oldScrollPercent;
-        }
-    }
+    });
 </script>
 
 <div

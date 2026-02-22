@@ -2,36 +2,60 @@
     import { LL } from "../../../i18n/i18n-svelte";
     import InfoButton from "./InfoButton.svelte";
 
-    export let label: string | undefined = undefined;
-    export let dataTestId: string | undefined = undefined;
-    export let options: { value: string | undefined; label: string }[] = [];
-    export let id: string | undefined = undefined;
-    export let value: string | boolean | null | undefined;
-    export let onChange: (e: Event) => void = () => {};
-    export let onClick = () => {};
-    export let disabled = false;
-    export let placeholder = "";
-    export let variant: "light" | "" = "";
-    export let optional = false;
-    export let outerClass: string | undefined = undefined;
-    export let extraSelectClass: string | undefined = undefined;
+    interface Props {
+        label?: string | undefined;
+        dataTestId?: string | undefined;
+        options?: { value: string | undefined; label: string }[];
+        id?: string | undefined;
+        value: string | boolean | null | undefined;
+        onChange?: (e: Event) => void;
+        onClick?: any;
+        disabled?: boolean;
+        placeholder?: string;
+        variant?: "light" | "";
+        optional?: boolean;
+        outerClass?: string | undefined;
+        extraSelectClass?: string | undefined;
+        info?: import('svelte').Snippet;
+        children?: import('svelte').Snippet;
+        helper?: import('svelte').Snippet;
+        [key: string]: any
+    }
 
-    const SLOTS = $$slots;
+    let {
+        label = undefined,
+        dataTestId = undefined,
+        options = [],
+        id = undefined,
+        value = $bindable(),
+        onChange = () => {},
+        onClick = () => {},
+        disabled = false,
+        placeholder = "",
+        variant = "",
+        optional = false,
+        outerClass = undefined,
+        extraSelectClass = undefined,
+        info,
+        children,
+        helper,
+        ...rest
+    } = $props<Props>();
 
-    let uniqueId = id || `input-${Math.random().toString(36).substring(2, 9)} `;
+    const fallbackId = `input-${Math.random().toString(36).substring(2, 9)}`;
 </script>
 
 <div class="flex flex-col {outerClass}">
     <div class="relative flex-grow">
         {#if label}
             <div class="input-label">
-                <label for={uniqueId} class="grow font-light">{label}</label>
+                <label for={id ?? fallbackId} class="grow font-light">{label}</label>
             </div>
         {/if}
 
-        {#if SLOTS.info}
+        {#if info}
             <InfoButton>
-                <slot name="info" />
+                {@render info?.()}
             </InfoButton>
         {/if}
 
@@ -41,14 +65,14 @@
             </div>
         {/if}
         <select
-            id={uniqueId}
+            id={id ?? fallbackId}
             class="grow w-full input-select font-light pe-10 text-white {extraSelectClass}"
             class:input-select-light={variant === "light"}
             data-testid={dataTestId}
-            {...$$restProps}
+            {...rest}
             bind:value
-            on:change={onChange}
-            on:click={onClick}
+            onchange={onChange}
+            onclick={onClick}
             {placeholder}
             {disabled}
         >
@@ -56,11 +80,11 @@
                 <option value={optionValue}>{optionLabel}</option>
             {/each}
 
-            <slot />
+            {@render children?.()}
         </select>
     </div>
 </div>
 
-{#if SLOTS.helper}
-    <slot name="helper" />
+{#if helper}
+    {@render helper?.()}
 {/if}

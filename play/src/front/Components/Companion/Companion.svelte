@@ -3,10 +3,19 @@
     import { gameManager } from "../../Phaser/Game/GameManager";
     import type { PictureStore } from "../../Stores/PictureStore";
 
-    export let userId: number;
-    export let placeholderSrc: string;
-    export let width = "62px";
-    export let height = "62px";
+    interface Props {
+        userId: number;
+        placeholderSrc: string;
+        width?: string;
+        height?: string;
+    }
+
+    let {
+        userId,
+        placeholderSrc,
+        width = "62px",
+        height = "62px"
+    }: Props = $props();
 
     const gameScene = gameManager.getCurrentGameScene();
     let companionWokaPictureStore: PictureStore | undefined;
@@ -19,7 +28,7 @@
         );
     }
 
-    let src = placeholderSrc;
+    let src = $state(placeholderSrc);
 
     if (companionWokaPictureStore) {
         const unsubscribe = companionWokaPictureStore.subscribe((source) => {

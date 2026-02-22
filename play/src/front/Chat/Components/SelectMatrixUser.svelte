@@ -7,11 +7,15 @@
     import type { SelectItem } from "./Room/searchChatMembersRule";
     import { searchChatMembersRule } from "./Room/searchChatMembersRule";
     import { IconUsers } from "@wa-icons";
-    export let value: SelectItem[] = [];
-    export let placeholder = "";
-    export let filterText = "";
+    interface Props {
+        value?: SelectItem[];
+        placeholder?: string;
+        filterText?: string;
+    }
 
-    let items: SelectItem[] = [];
+    let { value = $bindable([]), placeholder = "", filterText = $bindable("") }: Props = $props();
+
+    let items: SelectItem[] = $state([]);
     const chat = gameManager.chatConnection;
 
     const dispatch = createEventDispatcher<{
@@ -108,11 +112,15 @@
     bind:filterText
     {items}
 >
-    <div slot="prepend" class="ps-2">
-        <IconUsers font-size="20" class="text-white" />
-    </div>
-    <div slot="item" let:item class="cursor-pointer">
-        {item.created ? $LL.chat.addNew : ""}
-        {`${item.label} (${item.value})`}
-    </div>
+    {#snippet prepend()}
+        <div  class="ps-2">
+            <IconUsers font-size="20" class="text-white" />
+        </div>
+    {/snippet}
+    {#snippet item({ item })}
+        <div   class="cursor-pointer">
+            {item.created ? $LL.chat.addNew : ""}
+            {`${item.label} (${item.value})`}
+        </div>
+    {/snippet}
 </Select>

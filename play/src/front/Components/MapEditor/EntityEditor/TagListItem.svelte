@@ -5,8 +5,12 @@
     import EntityImage from "./EntityItem/EntityImage.svelte";
     import { IconChevronRight, IconChevronLeft } from "@wa-icons";
 
-    export let tag: string;
-    export let entitiesPrefabsVariants: EntityVariant[];
+    interface Props {
+        tag: string;
+        entitiesPrefabsVariants: EntityVariant[];
+    }
+
+    let { tag, entitiesPrefabsVariants }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         onSelectedTag: string;
@@ -16,11 +20,11 @@
 </script>
 
 {#if entitiesPrefabsVariants.length !== 0}
-    <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <li
         class="min-w-full group transition-all bg-white bg-opacity-10 rounded mt-2 hover:bg-opacity-100 hover:text-dark hover:!cursor-pointer"
-        on:click={() => dispatch("onSelectedTag", tag)}
+        onclick={() => dispatch("onSelectedTag", tag)}
     >
         <div class="entities-tag-list-item-grid p-2">
             <div class="asset">

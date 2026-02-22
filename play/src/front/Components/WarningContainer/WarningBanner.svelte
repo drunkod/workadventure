@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { fly } from "svelte/transition";
     import { userIsAdminStore, limitMapStore, bannerStore } from "../../Stores/GameStore";
     import { ADMIN_URL } from "../../Enum/EnvironmentVariable";
@@ -39,12 +41,12 @@
                 <div
                     class="absolute w-full h-full z-0 {$bannerStore.bgColor ? '' : 'bg-contrast/50'}"
                     style={`background-color:${$bannerStore.bgColor};`}
-                />
+></div>
                 {#if $bannerStore.closable}
                     <button
                         class="btn btn-ghost relative z-10 ml-4 !py-1"
                         style={`color: ${$bannerStore.bgColor};background:${$bannerStore.textColor};`}
-                        on:click|preventDefault={closeBanner}
+                        onclick={preventDefault(closeBanner)}
                     >
                         {$LL.actionbar.understand()}
                     </button>

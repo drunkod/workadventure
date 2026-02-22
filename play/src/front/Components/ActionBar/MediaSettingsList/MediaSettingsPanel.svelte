@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { handlers } from 'svelte/legacy';
+
     import { createEventDispatcher } from "svelte";
     import {
         cameraListStore,
@@ -90,8 +92,7 @@
                 <div class="group flex items-center relative z-10 py-1 px-2 overflow-hidden">
                     <button
                         class="btn btn-danger btn-sm w-full justify-center"
-                        on:click={() => analyticsClient.camera()}
-                        on:click={cameraClick}
+                        onclick={handlers(() => analyticsClient.camera(), cameraClick)}
                     >
                         {$LL.actionbar.camera.activate()}
                     </button>
@@ -131,8 +132,7 @@
                 <div class="group flex items-center relative z-10 px-2 overflow-hidden">
                     <button
                         class="btn btn-danger btn-sm w-full justify-center"
-                        on:click={() => analyticsClient.microphone()}
-                        on:click={microphoneClick}
+                        onclick={handlers(() => analyticsClient.microphone(), microphoneClick)}
                     >
                         {$LL.actionbar.microphone.activate()}
                     </button>

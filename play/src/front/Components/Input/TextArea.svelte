@@ -2,22 +2,41 @@
     import { LL } from "../../../i18n/i18n-svelte";
     import InfoButton from "./InfoButton.svelte";
 
-    export let id: string | undefined = undefined;
-    export let label: string;
-    export let placeHolder = "";
-    export let onChange = () => {};
-    export let disabled = false;
-    export let value: string | null | undefined;
-    export let onFocus = () => {};
-    export let onBlur = () => {};
-    export let onKeyPress: () => void;
-    export let onClick = () => {};
-    export let optional = false;
-    export let variant: "light" | "" = "";
-    export let size: "xs" | "sm" | "lg" | "" = "";
-    export let height = "h-[85px]";
+    interface Props {
+        id?: string | undefined;
+        label: string;
+        placeHolder?: string;
+        onChange?: any;
+        disabled?: boolean;
+        value: string | null | undefined;
+        onFocus?: any;
+        onBlur?: any;
+        onKeyPress: () => void;
+        onClick?: any;
+        optional?: boolean;
+        variant?: "light" | "";
+        size?: "xs" | "sm" | "lg" | "";
+        height?: string;
+        info?: import('svelte').Snippet;
+    }
 
-    const SLOTS = $$slots;
+    let {
+        id = undefined,
+        label,
+        placeHolder = "",
+        onChange = () => {},
+        disabled = false,
+        value = $bindable(),
+        onFocus = () => {},
+        onBlur = () => {},
+        onKeyPress,
+        onClick = () => {},
+        optional = false,
+        variant = "",
+        size = "",
+        height = "h-[85px]",
+        info
+    }: Props = $props();
 
     let uniqueId = id || `input-${Math.random().toString(36).substring(2, 9)} `;
 
@@ -29,14 +48,14 @@
 </script>
 
 <div class="flex flex-col">
-    <div class="input-label" class:hidden={!label && !SLOTS.info && !optional}>
+    <div class="input-label" class:hidden={!label && !info && !optional}>
         {#if label}
             <label for={uniqueId} class="relative grow">{label}</label>
         {/if}
 
-        {#if SLOTS.info}
+        {#if info}
             <InfoButton>
-                <slot name="info" />
+                {@render info?.()}
             </InfoButton>
         {/if}
 
@@ -57,13 +76,13 @@
             class:input-text-lg={size === "lg"}
             bind:value
             placeholder={placeHolder}
-            on:keypress={onKeyPress}
-            on:focus={onFocus}
-            on:blur={onBlur}
-            on:change={onChange}
-            on:click={onClick}
-            on:input={autoResize}
+            onkeypress={onKeyPress}
+            onfocus={onFocus}
+            onblur={onBlur}
+            onchange={onChange}
+            onclick={onClick}
+            oninput={autoResize}
             {disabled}
-        />
+></textarea>
     </div>
 </div>

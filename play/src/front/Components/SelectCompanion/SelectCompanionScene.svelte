@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, handlers } from 'svelte/legacy';
+
     import { LL } from "../../../i18n/i18n-svelte";
     import type { Game } from "../../Phaser/Game/Game";
     import type { SelectCompanionScene } from "../../Phaser/Login/SelectCompanionScene";
@@ -7,9 +9,13 @@
     import { analyticsClient } from "../../Administration/AnalyticsClient";
     import { IconChevronLeft, IconChevronRight } from "@wa-icons";
 
-    export let game: Game;
+    interface Props {
+        game: Game;
+    }
 
-    const selectCompanionScene = game.scene.getScene(SelectCompanionSceneName) as SelectCompanionScene;
+    let { game }: Props = $props();
+
+    let selectCompanionScene = $derived(game.scene.getScene(SelectCompanionSceneName) as SelectCompanionScene);
 
     /*function selectLeft() {
         selectCompanionScene.moveToLeft();
@@ -43,11 +49,11 @@
 </section>
 <section class="category flex flex-row justify-center">
     {#if $collectionsSizeStore > 1 && $selectedCollection}
-        <button class="light mr-2 selectCharacterButton" on:click|preventDefault={selectLeftCollection}>
+        <button class="light mr-2 selectCharacterButton" onclick={preventDefault(selectLeftCollection)}>
             <IconChevronLeft />
         </button>
         <strong class="category-text">{$selectedCollection}</strong>
-        <button class="outline ml-2 selectCharacterButton" on:click|preventDefault={selectRightCollection}>
+        <button class="outline ml-2 selectCharacterButton" onclick={preventDefault(selectRightCollection)}>
             <IconChevronRight />
         </button>
     {/if}
@@ -60,13 +66,12 @@
     >
         <button
             class="btn btn-light btn-lg btn-ghost w-full md:w-1/2 block selectCompanionSceneFormBack"
-            on:click|preventDefault={noCompanion}>{$LL.companion.select.any()}</button
+            onclick={preventDefault(noCompanion)}>{$LL.companion.select.any()}</button
         >
         <button
             type="submit"
             class="btn btn-secondary btn-lg w-full md:w-1/2 block selectCompanionSceneFormSubmit"
-            on:click|preventDefault={() => analyticsClient.selectCompanion()}
-            on:click|preventDefault={selectCompanion}>{$LL.companion.select.continue()}</button
+            onclick={handlers(preventDefault(() => analyticsClient.selectCompanion()), preventDefault(selectCompanion))}>{$LL.companion.select.continue()}</button
         >
     </section>
 </div>

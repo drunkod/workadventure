@@ -6,7 +6,11 @@
     import { ProximityChatRoom } from "../../../Chat/Connection/Proximity/ProximityChatRoom";
     import { IconX } from "@wa-icons";
 
-    export let last: boolean | undefined = undefined;
+    interface Props {
+        last?: boolean | undefined;
+    }
+
+    let { last = undefined }: Props = $props();
 
     function closeChat() {
         chatVisibilityStore.set(false);

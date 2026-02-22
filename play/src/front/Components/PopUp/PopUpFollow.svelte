@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { createEventDispatcher } from "svelte";
     import { followRoleStore, followStateStore, followUsersStore } from "../../Stores/FollowStore";
     import LL from "../../../i18n/i18n-svelte";
@@ -44,7 +46,7 @@
     }
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 <PopUpContainer reduceOnSmallScreen={true}>
     {#if $followStateStore === "requesting" && $followRoleStore === "follower"}
@@ -116,53 +118,55 @@
         </div>
     {/if}
 
-    <svelte:fragment slot="buttons">
-        {#if $followStateStore === "requesting" && $followRoleStore === "follower"}
-            <button type="button" class="btn btn-light btn-ghost w-1/2 justify-center" on:click|preventDefault={reset}
-                >{$LL.follow.interactMenu.no()}
-            </button>
-            <button
-                type="button"
-                class="btn btn-secondary w-1/2 justify-center"
-                on:click|preventDefault={acceptFollowRequest}
-                >{$LL.follow.interactMenu.yes()}
-            </button>
-        {/if}
-
-        {#if $followStateStore === "ending"}
-            <button type="button" class="btn btn-secondary w-1/2 justify-center" on:click|preventDefault={reset}
-                >{$LL.follow.interactMenu.yes()}</button
-            >
-            <button
-                type="button"
-                class="btn btn-light btn-ghost w-1/2 justify-center"
-                on:click|preventDefault={abortEnding}>{$LL.follow.interactMenu.no()}</button
-            >
-        {/if}
-
-        {#if $followStateStore === "active" || $followStateStore === "ending"}
-            {#if $followRoleStore === "follower"}
-                <button
-                    type="button"
-                    class="btn btn-sm btn-danger w-full justify-center"
-                    on:click|preventDefault={reset}
-                    >{$LL.actionbar.help.unfollow.title()}
+    {#snippet buttons()}
+    
+            {#if $followStateStore === "requesting" && $followRoleStore === "follower"}
+                <button type="button" class="btn btn-light btn-ghost w-1/2 justify-center" onclick={preventDefault(reset)}
+                    >{$LL.follow.interactMenu.no()}
                 </button>
-            {:else if $followUsersStore.length === 1}
                 <button
                     type="button"
-                    class="btn btn-sm btn-danger w-full justify-center"
-                    on:click|preventDefault={reset}
-                    >{$LL.actionbar.help.unfollow.title()}
-                </button>
-            {:else if $followUsersStore.length > 2}
-                <button
-                    type="button"
-                    class="btn btn-sm btn-danger w-full justify-center"
-                    on:click|preventDefault={reset}
-                    >{$LL.actionbar.cancel()}
+                    class="btn btn-secondary w-1/2 justify-center"
+                    onclick={preventDefault(acceptFollowRequest)}
+                    >{$LL.follow.interactMenu.yes()}
                 </button>
             {/if}
-        {/if}
-    </svelte:fragment>
+
+            {#if $followStateStore === "ending"}
+                <button type="button" class="btn btn-secondary w-1/2 justify-center" onclick={preventDefault(reset)}
+                    >{$LL.follow.interactMenu.yes()}</button
+                >
+                <button
+                    type="button"
+                    class="btn btn-light btn-ghost w-1/2 justify-center"
+                    onclick={preventDefault(abortEnding)}>{$LL.follow.interactMenu.no()}</button
+                >
+            {/if}
+
+            {#if $followStateStore === "active" || $followStateStore === "ending"}
+                {#if $followRoleStore === "follower"}
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-danger w-full justify-center"
+                        onclick={preventDefault(reset)}
+                        >{$LL.actionbar.help.unfollow.title()}
+                    </button>
+                {:else if $followUsersStore.length === 1}
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-danger w-full justify-center"
+                        onclick={preventDefault(reset)}
+                        >{$LL.actionbar.help.unfollow.title()}
+                    </button>
+                {:else if $followUsersStore.length > 2}
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-danger w-full justify-center"
+                        onclick={preventDefault(reset)}
+                        >{$LL.actionbar.cancel()}
+                    </button>
+                {/if}
+            {/if}
+        
+    {/snippet}
 </PopUpContainer>

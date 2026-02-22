@@ -41,11 +41,11 @@
 >
     <div class="flex flex-col justify-center gap-2">
         <div class="flex flex-col justify-center gap-1">
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class="group flex justify-center items-center p-1 rounded hover:bg-white/30 cursor-pointer"
-                on:click={zoomIn}
+                onclick={zoomIn}
             >
                 <IconPlus />
                 <div
@@ -54,11 +54,11 @@
                     {$LL.mapEditor.explorer.zoomIn()}
                 </div>
             </div>
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class="group flex justify-center items-center p-1 rounded hover:bg-white/30 cursor-pointer"
-                on:click={zoomOut}
+                onclick={zoomOut}
             >
                 <IconMinus />
                 <div
@@ -69,11 +69,11 @@
             </div>
         </div>
         {#if $mapExplorationModeStore === false}
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class="group flex justify-center items-center p-1 rounded hover:bg-white/30 cursor-pointer"
-                on:click={openMapExplorer}
+                onclick={openMapExplorer}
             >
                 <IconMapSearch />
                 <div
@@ -83,11 +83,11 @@
                 </div>
             </div>
         {:else}
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class="group flex justify-center items-center p-1 rounded hover:bg-white/30 cursor-pointer"
-                on:click={centerToUser}
+                onclick={centerToUser}
             >
                 <IconFocusCentered />
                 <div

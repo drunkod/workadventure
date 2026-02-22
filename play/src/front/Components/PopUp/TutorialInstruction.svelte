@@ -5,6 +5,11 @@
     import XIcon from "../Icons/XIcon.svelte";
     import { currentBannerIndex } from "../../Stores/PopupStore";
     import PopUpContainer from "./PopUpContainer.svelte";
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         close: void;
@@ -33,7 +38,7 @@
                     ? ''
                     : 'opacity-20'}"
                 id="chevron-left"
-                on:click={goToPreviousBanner}
+                onclick={goToPreviousBanner}
             >
                 <ChevronLeftIcon height="h-4" width="w-4" />
             </button>
@@ -42,13 +47,13 @@
             <button
                 class="btn btn-light btn-ghost btn-sm {$currentBannerIndex === 4 ? 'opacity-20 disbabled' : ''}"
                 id="chevron-right"
-                on:click={goToNextBanner}
+                onclick={goToNextBanner}
             >
                 <ChevronRightIcon height="h-4" width="w-4" />
             </button>
         </div>
         <div class="">
-            <button class="btn btn-secondary btn-sm" on:click={closeBanner}>
+            <button class="btn btn-secondary btn-sm" onclick={closeBanner}>
                 <XIcon height="h-4" width="w-4" />
             </button>
         </div>
@@ -195,21 +200,23 @@
             </svg>
         </div>
         <div class="flex flex-col">
-            <slot />
+            {@render children?.()}
         </div>
     </div>
-    <svelte:fragment slot="buttons">
-        <button class="btn btn-light btn-sm btn-ghost w-1/2 justify-center responsive-message"
-            >View full tutorial</button
-        >
-        <button
-            data-testId="close-tutorial-button"
-            class="btn btn-secondary btn-sm w-1/2 justify-center"
-            on:click={closeBanner}
-        >
-            Close
-        </button>
-    </svelte:fragment>
+    {#snippet buttons()}
+    
+            <button class="btn btn-light btn-sm btn-ghost w-1/2 justify-center responsive-message"
+                >View full tutorial</button
+            >
+            <button
+                data-testId="close-tutorial-button"
+                class="btn btn-secondary btn-sm w-1/2 justify-center"
+                onclick={closeBanner}
+            >
+                Close
+            </button>
+        
+    {/snippet}
 </PopUpContainer>
 
 <style>

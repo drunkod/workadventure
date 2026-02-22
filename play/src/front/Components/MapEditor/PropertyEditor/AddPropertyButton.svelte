@@ -4,19 +4,30 @@
     import { fade } from "svelte/transition";
     import { createFloatingUiActions } from "../../../Utils/svelte-floatingui";
 
-    export let headerText: string | undefined;
-    export let descriptionText: string | undefined;
-    export let img: string | ComponentType | undefined;
-    export let style: string | undefined;
-    export let disabled = false;
-    export let testId: string | undefined;
+    interface Props {
+        headerText: string | undefined;
+        descriptionText: string | undefined;
+        img: string | ComponentType | undefined;
+        style: string | undefined;
+        disabled?: boolean;
+        testId: string | undefined;
+    }
+
+    let {
+        headerText,
+        descriptionText,
+        img,
+        style,
+        disabled = false,
+        testId
+    }: Props = $props();
     const dispatch = createEventDispatcher<{
         change: undefined;
         close: undefined;
         click: undefined;
     }>();
 
-    let isHovered = false;
+    let isHovered = $state(false);
 
     const [floatingUiRef, floatingUiContent, arrowAction] = createFloatingUiActions(
         {
@@ -43,14 +54,14 @@
 </script>
 
 <button
-    on:mouseenter={onMouseEnter}
-    on:mouseleave={onMouseLeave}
+    onmouseenter={onMouseEnter}
+    onmouseleave={onMouseLeave}
     class="add-property-button tooltip p-3 flex justify-center items-center
     border border-solid border-white/25 text-gray-500 rounded-lg relative flex-col m-[0.25rem_0.125rem]"
     use:floatingUiRef
     data-testid={testId}
     {style}
-    on:click={() => {
+    onclick={() => {
         if (disabled) return;
         dispatch("click");
     }}
@@ -60,7 +71,8 @@
         {#if typeof img === "string"}
             <img draggable="false" class="max-w-[75%] max-h-[75%]" src={img} alt="info icon" />
         {:else if img !== undefined}
-            <svelte:component this={img} class="text-white" font-size="20" />
+            {@const SvelteComponent = img}
+            <SvelteComponent class="text-white" font-size="20" />
         {/if}
     </div>
 </button>
@@ -71,7 +83,7 @@
         use:floatingUiContent
         transition:fade={{ duration: 200 }}
     >
-        <div use:arrowAction />
+        <div use:arrowAction></div>
         <p class="text-sm m-0 font-semibold">{headerText}</p>
         {descriptionText}
     </div>

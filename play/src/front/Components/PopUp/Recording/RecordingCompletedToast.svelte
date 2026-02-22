@@ -7,7 +7,11 @@
     import { analyticsClient } from "../../../Administration/AnalyticsClient";
     import ToastContainer from "../../Toasts/ToastContainer.svelte";
 
-    export let toastUuid: string;
+    interface Props {
+        toastUuid: string;
+    }
+
+    let { toastUuid }: Props = $props();
 
     function openRecordingList() {
         analyticsClient.openedRecordingList();
@@ -62,14 +66,16 @@
         </div>
     </div>
 
-    <svelte:fragment slot="buttons">
-        <button class="btn btn-ghost btn-sm w-1/2" on:click={() => recordingStore.hideCompletedPopup()}>
-            {$LL.recording.close()}
-        </button>
-        <button class="btn btn-secondary btn-sm w-1/2" on:click={openRecordingList}>
-            {$LL.recording.notification.viewRecordings()}
-        </button>
-    </svelte:fragment>
+    {#snippet buttons()}
+    
+            <button class="btn btn-ghost btn-sm w-1/2" onclick={() => recordingStore.hideCompletedPopup()}>
+                {$LL.recording.close()}
+            </button>
+            <button class="btn btn-secondary btn-sm w-1/2" onclick={openRecordingList}>
+                {$LL.recording.notification.viewRecordings()}
+            </button>
+        
+    {/snippet}
 </ToastContainer>
 
 <style lang="scss">

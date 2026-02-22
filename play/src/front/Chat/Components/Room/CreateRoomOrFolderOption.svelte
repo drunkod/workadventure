@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation } from 'svelte/legacy';
+
     import { readable } from "svelte/store";
     import { openModal } from "svelte-modals";
     import { EventType } from "matrix-js-sdk";
@@ -11,18 +13,22 @@
     import RoomOption from "./RoomMenu/RoomOption.svelte";
     import { IconDots, IconFolder, IconLogout, IconMessage, IconUserEdit } from "@wa-icons";
 
-    export let parentID: string | undefined = undefined;
-    export let parentName = "";
-    export let folder: (RoomFolder & ChatRoomModeration) | undefined;
-    let optionButtonRef: HTMLButtonElement | undefined = undefined;
-    let hideFolderOptions = true;
+    interface Props {
+        parentID?: string | undefined;
+        parentName?: string;
+        folder: (RoomFolder & ChatRoomModeration) | undefined;
+    }
 
-    let hasPermissionToCreateRoom = folder?.hasPermissionForRoomStateEvent(EventType.SpaceChild) ?? readable(false);
+    let { parentID = undefined, parentName = "", folder }: Props = $props();
+    let optionButtonRef: HTMLButtonElement | undefined = $state(undefined);
+    let hideFolderOptions = $state(true);
+
+    let hasPermissionToCreateRoom = $state(folder?.hasPermissionForRoomStateEvent(EventType.SpaceChild) ?? readable(false));
     const hasPermissionToInvite = folder?.hasPermissionTo("invite") ?? readable(false);
     const hasPermissionToKick = folder?.hasPermissionTo("kick") ?? readable(false);
     const hasPermissionToBan = folder?.hasPermissionTo("ban") ?? readable(false);
 
-    $: shouldDisplayManageParticipantButton = $hasPermissionToInvite || $hasPermissionToKick || $hasPermissionToBan;
+    let shouldDisplayManageParticipantButton = $derived($hasPermissionToInvite || $hasPermissionToKick || $hasPermissionToBan);
 
     function toggleSpaceOption() {
         hasPermissionToCreateRoom = folder?.hasPermissionForRoomStateEvent(EventType.SpaceChild) ?? readable(false);
@@ -65,7 +71,7 @@
         ? 'bg-transparent'
         : 'bg-secondary'}"
     bind:this={optionButtonRef}
-    on:click|preventDefault|stopPropagation={toggleSpaceOption}
+    onclick={stopPropagation(preventDefault(toggleSpaceOption))}
 >
     <IconDots />
 </button>

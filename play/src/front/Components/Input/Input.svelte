@@ -4,44 +4,85 @@
     import { inputFormFocusStore } from "../../Stores/UserInputStore";
     import InfoButton from "./InfoButton.svelte";
 
-    export let id: string | undefined = undefined;
-    export let dataTestId: string | undefined = undefined;
-    export let label: string | undefined = undefined;
-    export let placeholder = "";
-    export let onChange = () => {};
-    export let onBlur = () => {};
-    export let disabled = false;
-    export let type: "text" | "url" | "number" | "color" = "text";
-    export let value: string | number | null | undefined;
-    export let onClick = () => {};
-    export let variant: "light" | "" = "";
-    export let size: "xs" | "sm" | "lg" | "" = "";
-    export let appendSide: "left" | "right" = "right";
-    export let status: "error" | "success" | "" = "";
-    export let errorHelperText: string | null = null;
-    // min, max, step are used only if type == "number"
-    export let min = 0;
-    export let max = 50;
-    export let step = 0;
-    export let onKeyPress = () => {};
-    export let onKeyDown: (event: KeyboardEvent) => void = () => {};
-    export let optional = false;
-    export let isValid = true;
-    export let rounded = false;
-    export let onerror = () => {};
-    export let onInput = () => {};
-    export let onFocusin = (event: FocusEvent) => {};
-    export let onFocusout = (event: FocusEvent) => {};
-    export let extraInputClasses: string | undefined = undefined;
-    export let maxlength: number | undefined = 524288; // for text input only
+    
+    interface Props {
+        id?: string | undefined;
+        dataTestId?: string | undefined;
+        label?: string | undefined;
+        placeholder?: string;
+        onChange?: any;
+        onBlur?: any;
+        disabled?: boolean;
+        type?: "text" | "url" | "number" | "color";
+        value: string | number | null | undefined;
+        onClick?: any;
+        variant?: "light" | "";
+        size?: "xs" | "sm" | "lg" | "";
+        appendSide?: "left" | "right";
+        status?: "error" | "success" | "";
+        errorHelperText?: string | null;
+        // min, max, step are used only if type == "number"
+        min?: number;
+        max?: number;
+        step?: number;
+        onKeyPress?: any;
+        onKeyDown?: (event: KeyboardEvent) => void;
+        optional?: boolean;
+        isValid?: boolean;
+        rounded?: boolean;
+        onerror?: any;
+        onInput?: any;
+        onFocusin?: any;
+        onFocusout?: any;
+        extraInputClasses?: string | undefined;
+        maxlength?: number | undefined; // for text input only
+        info?: import('svelte').Snippet;
+        inputAppend?: import('svelte').Snippet;
+        helper?: import('svelte').Snippet;
+        [key: string]: any
+    }
+
+    let {
+        id = undefined,
+        dataTestId = undefined,
+        label = undefined,
+        placeholder = "",
+        onChange = () => {},
+        onBlur = () => {},
+        disabled = false,
+        type = "text",
+        value = $bindable(),
+        onClick = () => {},
+        variant = "",
+        size = "",
+        appendSide = "right",
+        status = "",
+        errorHelperText = null,
+        min = 0,
+        max = 50,
+        step = 0,
+        onKeyPress = () => {},
+        onKeyDown = () => {},
+        optional = false,
+        isValid = $bindable(true),
+        rounded = false,
+        onerror = () => {},
+        onInput = () => {},
+        onFocusin = (event: FocusEvent) => {},
+        onFocusout = (event: FocusEvent) => {},
+        extraInputClasses = undefined,
+        maxlength = 524288,
+        info,
+        inputAppend,
+        helper,
+        ...rest
+    } = $props<Props>();
 
     export function focusInput() {
         inputElement.focus();
     }
-    let inputElement: HTMLInputElement;
+    let inputElement: HTMLInputElement = $state();
     let isComposing = false;
-
-    const SLOTS = $$slots;
 
     function onCompositionStart() {
         isComposing = true;
@@ -84,14 +125,14 @@
 </script>
 
 <div class="flex flex-col w-full">
-    <div class="input-label" class:hidden={!label && !SLOTS.info && !optional}>
+    <div class="input-label" class:hidden={!label && !info && !optional}>
         {#if label}
             <label for={uniqueId} class="relative grow">{label}</label>
         {/if}
 
-        {#if SLOTS.info}
+        {#if info}
             <InfoButton>
-                <slot name="info" />
+                {@render info?.()}
             </InfoButton>
         {/if}
 
@@ -116,20 +157,20 @@
                 class:error={status === "error"}
                 class:success={status === "success"}
                 class:rounded-full={rounded}
-                {...$$restProps}
+                {...rest}
                 bind:value
                 {placeholder}
-                on:keypress={onKeyPress}
-                on:keydown={handleKeyDown}
-                on:compositionstart={onCompositionStart}
-                on:compositionend={onCompositionEnd}
-                on:change={onChange}
-                on:click={onClick}
-                on:input={validateInput}
-                on:focusin={onFocusin}
-                on:focusout={onFocusout}
-                on:error={onerror}
-                on:blur={onBlur}
+                onkeypress={onKeyPress}
+                onkeydown={handleKeyDown}
+                oncompositionstart={onCompositionStart}
+                oncompositionend={onCompositionEnd}
+                onchange={onChange}
+                onclick={onClick}
+                oninput={validateInput}
+                onfocusin={onFocusin}
+                onfocusout={onFocusout}
+                {onerror}
+                onblur={onBlur}
                 {disabled}
                 bind:this={inputElement}
                 {maxlength}
@@ -153,10 +194,10 @@
                 data-testid={dataTestId}
                 bind:value
                 {placeholder}
-                on:change={onChange}
-                on:click={onClick}
-                on:input={validateInput}
-                on:blur={onBlur}
+                onchange={onChange}
+                onclick={onClick}
+                oninput={validateInput}
+                onblur={onBlur}
                 min="{min}.toString()"
                 {max}
                 {step}
@@ -177,10 +218,10 @@
                 data-testid={dataTestId}
                 bind:value
                 {placeholder}
-                on:change={onChange}
-                on:click={onClick}
-                on:input={validateInput}
-                on:blur={onBlur}
+                onchange={onChange}
+                onclick={onClick}
+                oninput={validateInput}
+                onblur={onBlur}
                 {min}
                 {max}
                 {step}
@@ -201,30 +242,30 @@
                 data-testid={dataTestId}
                 bind:value
                 {placeholder}
-                on:change={onChange}
-                on:click={onClick}
-                on:input={validateInput}
-                on:blur={onBlur}
+                onchange={onChange}
+                onclick={onClick}
+                oninput={validateInput}
+                onblur={onBlur}
                 {min}
                 {max}
                 {step}
                 {disabled}
             />{/if}
-        {#if SLOTS.inputAppend}
+        {#if inputAppend}
             <div
                 class="absolute inset-y-0 flex items-center pb-2"
                 class:left-3={appendSide === "left"}
                 class:right-3={appendSide === "right"}
             >
-                <slot name="inputAppend" />
+                {@render inputAppend?.()}
             </div>
         {/if}
     </div>
 
-    {#if SLOTS.helper}
+    {#if helper}
         <div class="flex items-center px-3 space-x-1.5 opacity-50">
             <div class="text-sm text-white grow">
-                <slot name="helper" />
+                {@render helper?.()}
             </div>
         </div>
     {/if}

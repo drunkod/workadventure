@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run, preventDefault, stopPropagation } from 'svelte/legacy';
+
     import { createEventDispatcher } from "svelte";
     import { v4 as uuidv4 } from "uuid";
     import type { OpenFilePropertyData } from "@workadventure/map-editor";
@@ -14,12 +16,16 @@
     import { gameSceneStore } from "../../../../Stores/GameSceneStore";
     import { IconCloudUpload } from "@wa-icons";
 
-    export let property: OpenFilePropertyData;
+    interface Props {
+        property: OpenFilePropertyData;
+    }
 
-    let selectedFile: File | undefined = undefined;
-    let files: FileList | undefined = undefined;
-    let dropZoneRef: HTMLDivElement;
-    let errorOnFile: string | undefined;
+    let { property = $bindable() }: Props = $props();
+
+    let selectedFile: File | undefined = $state(undefined);
+    let files: FileList | undefined = $state(undefined);
+    let dropZoneRef: HTMLDivElement = $state();
+    let errorOnFile: string | undefined = $state();
     let fileToUpload: UploadFileMessage | undefined = undefined;
     const BYTES_TO_MB = 1024 * 1024;
 
@@ -32,21 +38,6 @@
         (format) => format.trim().split("/")[1]
     );
 
-    $: {
-        if (files) {
-            const file = files.item(0);
-            if (file && isASupportedFormat(file.type)) {
-                selectedFile = file;
-                handleFileChange().catch((error) => {
-                    console.error("Error in handleFileChange:", error);
-                    Sentry.captureException(error);
-                });
-            } else {
-                console.error("File format not supported");
-                errorOnFile = $LL.mapEditor.properties.openFile.uploadFile.errorOnFileFormat();
-            }
-        }
-    }
 
     async function handleFileChange(): Promise<void> {
         if (!selectedFile) {
@@ -113,17 +104,32 @@
 
         dropZoneRef.classList.remove("border-cyan-400");
     }
+    run(() => {
+        if (files) {
+            const file = files.item(0);
+            if (file && isASupportedFormat(file.type)) {
+                selectedFile = file;
+                handleFileChange().catch((error) => {
+                    console.error("Error in handleFileChange:", error);
+                    Sentry.captureException(error);
+                });
+            } else {
+                console.error("File format not supported");
+                errorOnFile = $LL.mapEditor.properties.openFile.uploadFile.errorOnFileFormat();
+            }
+        }
+    });
 </script>
 
 <div class="p-1 bg-white/10 rounded-md flex flex-col gap-2">
     {#if !property.link}
         <p class="m-0">{$LL.mapEditor.properties.openFile.uploadFile.title()}</p>
         <p class="opacity-50">{$LL.mapEditor.properties.openFile.uploadFile.description()}</p>
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
-            on:drop|preventDefault|stopPropagation={dropHandler}
-            on:dragover|preventDefault={() => dropZoneRef.classList.add("border-cyan-400")}
-            on:dragleave|preventDefault={() => dropZoneRef.classList.remove("border-cyan-400")}
+            ondrop={stopPropagation(preventDefault(dropHandler))}
+            ondragover={preventDefault(() => dropZoneRef.classList.add("border-cyan-400"))}
+            ondragleave={preventDefault(() => dropZoneRef.classList.remove("border-cyan-400"))}
             bind:this={dropZoneRef}
             class="hover:cursor-pointer h-32 flex flex-col border border-dashed rounded-md items-center justify-center bg-white bg-opacity-10"
         >

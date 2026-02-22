@@ -18,12 +18,12 @@
 
     const connection: GameScene["connection"] = gameManager.getCurrentGameScene().connection;
 
-    let recordings: NonUndefinedFields<Recording>[] = [];
-    let isLoading: boolean = false;
-    let isError: boolean = false;
+    let recordings: NonUndefinedFields<Recording>[] = $state([]);
+    let isLoading: boolean = $state(false);
+    let isError: boolean = $state(false);
 
-    let hoveredRecordIndex: number = -1;
-    let thumbnailIndex: number = 1;
+    let hoveredRecordIndex: number = $state(-1);
+    let thumbnailIndex: number = $state(1);
     let thumbnailInterval: number | null = null;
 
     let currentContextMenuRecord: NonUndefinedFields<Recording> | null = null;
@@ -187,7 +187,7 @@
                 <div class="w-full flex justify-between">
                     <button
                         class="btn btn-sm h-fit flex flex-row items-center gap-2 bg-white/10 hover:bg-white/20"
-                        on:click={() => queryRecordings()}
+                        onclick={() => queryRecordings()}
                     >
                         {$LL.recording.refresh()}
                         <IconRefresh />
@@ -215,11 +215,11 @@
                                     class="flex flex-col items-center justify-between gap-0 w-full aspect-video relative rounded-md bg-gradient-to-t to-50% group-hover:to-10% to-transparent from-secondary-900 group cursor-pointer"
                                     role="button"
                                     tabindex="0"
-                                    on:mouseenter={() => startThumbnailCycle(index, record.thumbnails)}
-                                    on:mouseleave={stopThumbnailCycle}
-                                    on:click={() =>
+                                    onmouseenter={() => startThumbnailCycle(index, record.thumbnails)}
+                                    onmouseleave={stopThumbnailCycle}
+                                    onclick={() =>
                                         openVideoInCoWebsite(record.videoFile.key, record.videoFile.filename)}
-                                    on:keydown={(e) => {
+                                    onkeydown={(e) => {
                                         if (e.key === "Enter") {
                                             openVideoInCoWebsite(record.videoFile.key, record.videoFile.filename).catch(
                                                 (e) => {
@@ -253,7 +253,7 @@
                                         <button
                                             data-testid="recording-context-menu-trigger"
                                             class="btn btn-contrast/80 hover:bg-contrast/80 btn-xs cursor-pointer hover:!opacity-100 group-hover:opacity-40 aspect-square context-menu-trigger"
-                                            on:click={(e) => {
+                                            onclick={(e) => {
                                                 e.stopPropagation();
                                                 showContextMenu(e, record);
                                             }}
@@ -270,15 +270,17 @@
                     {/if}
                 </div>
             </div>
-            <div slot="buttons" class="flex flex-row justify-center w-full">
-                <button
-                    class="btn btn-lg btn-secondary w-full m-auto"
-                    data-testid="close-recording-modal"
-                    on:click={close}
-                >
-                    {$LL.recording.close()}
-                </button>
-            </div>
+            {#snippet buttons()}
+                        <div  class="flex flex-row justify-center w-full">
+                    <button
+                        class="btn btn-lg btn-secondary w-full m-auto"
+                        data-testid="close-recording-modal"
+                        onclick={close}
+                    >
+                        {$LL.recording.close()}
+                    </button>
+                </div>
+                    {/snippet}
         </PopUpContainer>
     </div>
 </div>

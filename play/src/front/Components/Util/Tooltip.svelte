@@ -4,13 +4,17 @@
 
     import tooltipArrow from "../images/arrow-top.svg";
 
-    export let text: string;
-    export let rightPosition = "false";
-    export let leftPosition = "false";
+    interface Props {
+        text: string;
+        rightPosition?: string;
+        leftPosition?: string;
+    }
 
-    let tooltipElement: HTMLDivElement;
-    let textElement: HTMLSpanElement;
-    let toolTipPosition = "top-tooltip";
+    let { text, rightPosition = "false", leftPosition = "false" }: Props = $props();
+
+    let tooltipElement: HTMLDivElement = $state();
+    let textElement: HTMLSpanElement = $state();
+    let toolTipPosition = $state("top-tooltip");
 
     function hide() {
         textElement?.style.setProperty("visibility", "hidden");

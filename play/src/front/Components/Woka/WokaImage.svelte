@@ -1,17 +1,30 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { onMount, onDestroy } from "svelte";
     import type { WokaData, WokaTexture } from "./WokaTypes";
 
-    export let selectedTextures: Record<string, string>;
-    export let wokaData: WokaData | null = null;
-    export let canvasSize = 64;
-    export let direction: number = 0;
-    export let getTextureUrl: (url: string) => string = (url) => url;
-    export let classList: string = "";
+    interface Props {
+        selectedTextures: Record<string, string>;
+        wokaData?: WokaData | null;
+        canvasSize?: number;
+        direction?: number;
+        getTextureUrl?: (url: string) => string;
+        classList?: string;
+    }
+
+    let {
+        selectedTextures,
+        wokaData = null,
+        canvasSize = 64,
+        direction = 0,
+        getTextureUrl = (url) => url,
+        classList = ""
+    }: Props = $props();
 
     const bodyPartOrder = ["body", "eyes", "hair", "clothes", "hat", "accessory", "woka"];
 
-    let canvas: HTMLCanvasElement;
+    let canvas: HTMLCanvasElement = $state();
     let ctx: CanvasRenderingContext2D;
     let images: Record<string, HTMLImageElement> = {};
     let frame: number = 0;
@@ -58,9 +71,11 @@
         raf = requestAnimationFrame(animate);
     }
 
-    $: if (selectedTextures) {
-        loadImages();
-    }
+    run(() => {
+        if (selectedTextures) {
+            loadImages();
+        }
+    });
 
     onMount(() => {
         const context = canvas.getContext("2d");
@@ -80,4 +95,4 @@
     height={canvasSize}
     style="image-rendering: pixelated;"
     class={classList}
-/>
+></canvas>

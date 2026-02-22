@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { onMount } from "svelte";
     import { mapEditorAskToClaimPersonalAreaStore } from "../../Stores/MapEditorStore";
     import LL from "../../../i18n/i18n-svelte";
@@ -8,7 +10,7 @@
     import PopUpContainer from "../PopUp/PopUpContainer.svelte";
     import Input from "../Input/Input.svelte";
 
-    let name = "";
+    let name = $state("");
     const mapEditorModeManager = gameManager.getCurrentGameScene().getMapEditorModeManager();
 
     // function to check key press and if it is enter key then click on yes button
@@ -50,20 +52,22 @@
             bind:value={name}
             onKeyDown={emitKeypressEvents}
         />
-        <div slot="buttons" class="flex flex-row justify-content-center w-full gap-2">
-            <button
-                type="button"
-                class="btn btn-outline w-full hover:bg-contrast-600/50"
-                on:click|preventDefault={() => mapEditorAskToClaimPersonalAreaStore.set(undefined)}
-                >{$LL.area.personalArea.buttons.no()}
-            </button>
-            <button
-                data-testid="claimPersonalAreaButton"
-                type="button"
-                class="btn btn-secondary w-full"
-                on:click={() => mapEditorModeManager.claimPersonalArea(name)}
-                >{$LL.area.personalArea.buttons.yes()}
-            </button>
-        </div>
+        {#snippet buttons()}
+                <div  class="flex flex-row justify-content-center w-full gap-2">
+                <button
+                    type="button"
+                    class="btn btn-outline w-full hover:bg-contrast-600/50"
+                    onclick={preventDefault(() => mapEditorAskToClaimPersonalAreaStore.set(undefined))}
+                    >{$LL.area.personalArea.buttons.no()}
+                </button>
+                <button
+                    data-testid="claimPersonalAreaButton"
+                    type="button"
+                    class="btn btn-secondary w-full"
+                    onclick={() => mapEditorModeManager.claimPersonalArea(name)}
+                    >{$LL.area.personalArea.buttons.yes()}
+                </button>
+            </div>
+            {/snippet}
     </PopUpContainer>
 </div>

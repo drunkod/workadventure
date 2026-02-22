@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     //import { fly } from "svelte/transition";
     import { onMount, onDestroy } from "svelte";
@@ -7,8 +5,12 @@
     import { gameManager } from "../../Phaser/Game/GameManager";
     import VideoMediaBox from "./VideoMediaBox.svelte";
 
-    export let videoBox: VideoBox;
-    export let fullScreen: boolean = false;
+    interface Props {
+        videoBox: VideoBox;
+        fullScreen?: boolean;
+    }
+
+    let { videoBox, fullScreen = false }: Props = $props();
 
     const gameScene = gameManager.getCurrentGameScene();
 

@@ -1,13 +1,26 @@
 <script lang="ts">
+    import type { Snippet } from "svelte";
     import { fly } from "svelte/transition";
     import { onDestroy, onMount } from "svelte";
     import { toastStore } from "../../Stores/ToastStore";
 
-    const SLOTS = $$props.$$slots;
-    export let extraClasses = "";
-    export let duration: number | undefined = undefined;
-    export let toastUuid: string | undefined = undefined;
-    export let theme: "success" | "error" = "success";
+    interface Props {
+        extraClasses?: string;
+        duration?: number;
+        toastUuid?: string;
+        theme?: "success" | "error";
+        children?: Snippet;
+        buttons?: Snippet;
+    }
+
+    let {
+        extraClasses = "",
+        duration = undefined,
+        toastUuid = undefined,
+        theme = "success",
+        children,
+        buttons,
+    }: Props = $props();
 
     let timeout: ReturnType<typeof setTimeout>;
 
@@ -47,12 +60,12 @@
 
     <div class="flex items-center p-4 pointer-events-auto justify-center grow">
         <div class="text-center leading-6 responsive-message">
-            <slot />
+            {@render children?.()}
         </div>
     </div>
-    {#if SLOTS.buttons}
+    {#if buttons}
         <div class="buttons-wrapper flex items-center justify-center p-2 space-x-2 bg-contrast pointer-events-auto">
-            <slot name="buttons" />
+            {@render buttons()}
         </div>
     {/if}
 </div>

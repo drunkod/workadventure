@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { stopPropagation } from 'svelte/legacy';
+
     import { createEventDispatcher } from "svelte";
     import CopyIcon from "../Icons/CopyIcon.svelte";
     import ExternalLinkIcon from "../Icons/ExternalLinkIcon.svelte";
@@ -9,9 +11,13 @@
     import { popupStore } from "../../Stores/PopupStore";
     import { analyticsClient } from "../../Administration/AnalyticsClient";
 
-    export let coWebsite: CoWebsite;
-    export let isLoading = false;
-    export let active = false;
+    interface Props {
+        coWebsite: CoWebsite;
+        isLoading?: boolean;
+        active?: boolean;
+    }
+
+    let { coWebsite, isLoading = false, active = false }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         click: void;
@@ -47,13 +53,13 @@
     }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
     class="text h-full flex items-center px-2 rounded transition-all hover:stroke-white {active
         ? 'text-contrast bg-white hover:bg-white/90 tab justify-between bg-contrast/80' // translate-y-2 rounded-b-none for animation but not working inside dropdown
         : 'text-white cursor-pointer bg-white/10 hover:bg-white/20 tab'}"
-    on:click={select}
+    onclick={select}
 >
     {#if !isLoading}
         <img draggable="false" src={coWebsite.getIcon()} alt="" class="h-6 w-6 bg-black rounded-lg align-middle" />
@@ -78,7 +84,7 @@
                 {#if !isLoading}
                     {coWebsite.getTitle()}
                 {:else}
-                    <div class="w-[100px] h-2 animate-pulse rounded-sm {active ? 'bg-contrast/10' : 'bg-white/20'}" />
+                    <div class="w-[100px] h-2 animate-pulse rounded-sm {active ? 'bg-contrast/10' : 'bg-white/20'}"></div>
                 {/if}
             </div>
             {#if !coWebsite.getHideUrl()}
@@ -90,7 +96,7 @@
                             class="w-[150px] h-1 mt-1 animate-pulse rounded-sm {active
                                 ? 'bg-contrast/10'
                                 : 'bg-white/20'}"
-                        />
+></div>
                     {/if}
                 </div>
             {/if}
@@ -102,7 +108,7 @@
                     class="group {active
                         ? 'hover:bg-contrast/10'
                         : 'hover:bg-white/10'} transition-all aspect-ratio h-8 w-8 rounded flex items-center justify-center"
-                    on:click|stopPropagation={copyUrl}
+                    onclick={stopPropagation(copyUrl)}
                 >
                     <CopyIcon
                         height="h-6"
@@ -117,7 +123,7 @@
                     class="group {active
                         ? 'hover:bg-contrast/10'
                         : 'hover:bg-white/10'} transition-all aspect-ratio h-8 w-8 rounded flex items-center justify-center"
-                    on:click|stopPropagation={openInNewTab}
+                    onclick={stopPropagation(openInNewTab)}
                 >
                     <ExternalLinkIcon
                         height="h-6"
@@ -132,7 +138,7 @@
                     class="group {active
                         ? 'hover:bg-contrast/10'
                         : 'hover:bg-white/10'} transition-all aspect-ratio h-8 w-8 rounded flex items-center justify-center"
-                    on:click|stopPropagation={closeTab}
+                    onclick={stopPropagation(closeTab)}
                 >
                     <XIcon
                         height="h-6"

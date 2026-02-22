@@ -12,8 +12,12 @@
     import { selectedRoomStore } from "../../../Chat/Stores/SelectRoomStore";
     import { chatNotificationStore } from "../../../Stores/ProximityNotificationStore";
 
-    export let last: boolean | undefined = undefined;
-    export let chatEnabledInAdmin = false;
+    interface Props {
+        last?: boolean | undefined;
+        chatEnabledInAdmin?: boolean;
+    }
+
+    let { last = undefined, chatEnabledInAdmin = false }: Props = $props();
 
     const emptyUnreadMessagesCount = writable(0);
 
@@ -46,7 +50,7 @@
 
     const shortcut = ["c"];
 
-    let chatAvailable = false;
+    let chatAvailable = $state(false);
     gameManager
         .getChatConnection()
         .then(() => {
@@ -62,9 +66,9 @@
     const nbUnreadInvitationsMessages = gameManager.chatConnection.nbUnreadInvitationsMessages;
 
     // Calculate total unread count and format it (max 99+)
-    $: totalUnreadCount =
-        $nbUnreadRoomsMessages + $nbUnreadDirectRoomsMessages + $nbUnreadInvitationsMessages + $unreadMessagesCount;
-    $: displayCount = totalUnreadCount > 99 ? "99+" : totalUnreadCount.toString();
+    let totalUnreadCount =
+        $derived($nbUnreadRoomsMessages + $nbUnreadDirectRoomsMessages + $nbUnreadInvitationsMessages + $unreadMessagesCount);
+    let displayCount = $derived(totalUnreadCount > 99 ? "99+" : totalUnreadCount.toString());
 </script>
 
 <ActionBarButton
@@ -94,8 +98,8 @@
 </ActionBarButton>
 {#if $chatZoneLiveStore || totalUnreadCount > 0}
     <div>
-        <span class="w-4 h-4 block rounded-full absolute -top-1 -start-1 animate-ping bg-white" />
-        <span class="w-3 h-3 block rounded-full absolute -top-0.5 -start-0.5 bg-white" />
+        <span class="w-4 h-4 block rounded-full absolute -top-1 -start-1 animate-ping bg-white"></span>
+        <span class="w-3 h-3 block rounded-full absolute -top-0.5 -start-0.5 bg-white"></span>
     </div>
 {/if}
 {#if totalUnreadCount > 0}

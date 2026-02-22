@@ -12,17 +12,17 @@
     import TextArea from "../../Input/TextArea.svelte";
     import { IconInfoCircle } from "@wa-icons";
 
-    let dynamicStrings = {
+    let dynamicStrings = $state({
         error: {
             name: false,
             confirmSave: false,
         },
-    };
-    let name = "";
-    let description = "";
+    });
+    let name = $state("");
+    let description = $state("");
     let thumbnail = "";
-    let copyright = "";
-    let tags: InputTagOption[] = [];
+    let copyright = $state("");
+    let tags: InputTagOption[] = $state([]);
     let _tag: InputTagOption[] = [
         {
             value: "member",

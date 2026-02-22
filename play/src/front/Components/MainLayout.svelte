@@ -105,11 +105,11 @@
         inputFormFocusStore.set(false);
     });
 
-    $: marginLeft = $chatVisibilityStore ? $chatSidebarWidthStore : 0;
-    $: marginRight =
-        $mapEditorVisibilityStore && $mapEditorSelectedToolStore !== EditorToolName.WAMSettingsEditor
+    let marginLeft = $derived($chatVisibilityStore ? $chatSidebarWidthStore : 0);
+    let marginRight =
+        $derived($mapEditorVisibilityStore && $mapEditorSelectedToolStore !== EditorToolName.WAMSettingsEditor
             ? $mapEditorSideBarWidthStore
-            : 0;
+            : 0);
 </script>
 
 <!-- Components ordered by z-index -->
@@ -122,7 +122,7 @@
     style="padding-inline-start : {marginLeft}px; padding-inline-end: {marginRight}px "
 >
     {#if $modalVisibilityStore}
-        <div class="bg-black/60 w-full h-full fixed start-0 end-0" />
+        <div class="bg-black/60 w-full h-full fixed start-0 end-0"></div>
     {/if}
 
     {#if $highlightedEmbedScreen && $highlightFullScreen}
@@ -139,8 +139,7 @@
                 <div class="popups flex items-end relative w-full justify-center mobile:mb-24 mb-4 h-[calc(100%-96px)]">
                     {#each $popupStore.slice().reverse() as popup, index (popup.uuid)}
                         <div class="popupwrapper popupwrapper-{index} w-full flex-1" in:fly={{ y: 150, duration: 550 }}>
-                            <svelte:component
-                                this={popup.component}
+                            <popup.component
                                 {...popup.props}
                                 on:close={() => popupStore.removePopup(popup.uuid)}
                             />
@@ -207,7 +206,7 @@
                 <div class="absolute top-0 right-2 z-[999] flex flex-col gap-2 items-end">
                     {#each [...$toastStore.entries()] as toastEntry (toastEntry[0])}
                         {@const toast = toastEntry[1]}
-                        <svelte:component this={toast.component} {...toast.props} />
+                        <toast.component {...toast.props} />
                     {/each}
                 </div>
             {/if}
@@ -217,9 +216,11 @@
             {/if}
 
             {#if !$highlightFullScreen}
-                <PictureInPicture let:inPictureInPicture>
-                    <PresentationLayout {inPictureInPicture} />
-                </PictureInPicture>
+                <PictureInPicture >
+                    {#snippet children({ inPictureInPicture })}
+                                        <PresentationLayout {inPictureInPicture} />
+                                                        {/snippet}
+                                </PictureInPicture>
             {/if}
 
             <!-- Because of a bug in PIP, new content cannot play sound (it does not inherit UserActivation) -->

@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { onMount } from "svelte";
     import MediaBox from "../Video/MediaBox.svelte";
     import type { VideoBox } from "../../Space/Space";
@@ -7,21 +9,32 @@
     import type { TokenRemovalHandle } from "../../Utils/TokenBucket";
     import { videoBoxVisibilityTokenBucket } from "./VideoBoxVisibilityTokenBucket";
 
-    export let videoBox: VideoBox;
-    export let isOnOneLine: boolean;
-    export let oneLineMode: "vertical" | "horizontal";
-    export let videoWidth: number;
-    export let videoHeight: number | undefined;
-    export let intersectionObserver: IntersectionObserver | undefined;
+    interface Props {
+        videoBox: VideoBox;
+        isOnOneLine: boolean;
+        oneLineMode: "vertical" | "horizontal";
+        videoWidth: number;
+        videoHeight: number | undefined;
+        intersectionObserver: IntersectionObserver | undefined;
+    }
 
-    let isVisible = !intersectionObserver;
-    let videoBoxElement: HTMLDivElement | undefined;
+    let {
+        videoBox,
+        isOnOneLine,
+        oneLineMode,
+        videoWidth,
+        videoHeight,
+        intersectionObserver
+    }: Props = $props();
 
-    const orderStore = videoBox.displayOrder;
+    let isVisible = $state(false);
+    let videoBoxElement: HTMLDivElement | undefined = $state();
 
-    $: isFirst = $orderStore === 0;
+    let orderStore = $derived(videoBox.displayOrder);
 
-    $: isLast = $orderStore === $oneLineStreamableCollectionStore.length - 1;
+    let isFirst = $derived($orderStore === 0);
+
+    let isLast = $derived($orderStore === $oneLineStreamableCollectionStore.length - 1);
 
     onMount(() => {
         if (!videoBoxElement) {
@@ -60,9 +73,9 @@
         };
     });
 
-    let oldIntersectionObserver: IntersectionObserver | undefined = undefined;
+    let oldIntersectionObserver: IntersectionObserver | undefined = $state(undefined);
 
-    $: {
+    run(() => {
         if (videoBoxElement && oldIntersectionObserver !== intersectionObserver) {
             oldIntersectionObserver?.unobserve(videoBoxElement);
             oldIntersectionObserver = intersectionObserver;
@@ -71,7 +84,7 @@
                 isVisible = true;
             }
         }
-    }
+    });
 </script>
 
 <div

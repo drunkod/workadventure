@@ -1,5 +1,7 @@
 <!-- https://lihautan.com/notes/svelte-lazy-load/ -->
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import type { ComponentType } from "svelte";
     import { createEventDispatcher } from "svelte";
 
@@ -9,14 +11,16 @@
         error: void;
     }>();
 
-    export let when = false;
-    export let component: () => Promise<{ default: ComponentType }>;
-
-    let loading: Promise<{ default: ComponentType }> | null = null;
-
-    $: if (when) {
-        load();
+    interface Props {
+        when?: boolean;
+        component: () => Promise<{ default: ComponentType }>;
+        [key: string]: any
     }
+
+    let { when = false, component, ...rest }: Props = $props();
+
+    let loading: Promise<{ default: ComponentType }> | null = $state(null);
+
 
     function load() {
         loading = component();
@@ -29,13 +33,18 @@
                 dispatch("error");
             });
     }
+    run(() => {
+        if (when) {
+            load();
+        }
+    });
 </script>
 
 {#if when}
     {#await loading then result}
         {@const Component = result?.default}
         {#if Component}
-            <Component {...$$restProps} />
+            <Component {...rest} />
         {/if}
     {/await}
 {/if}

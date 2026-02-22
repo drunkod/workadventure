@@ -18,10 +18,19 @@
     import FileUpload from "./FileUpload/FileUpload.svelte";
     import PropertyEditorBase from "./PropertyEditorBase.svelte";
 
-    export let property: OpenFilePropertyData;
-    export let isArea = false;
-    export let triggerOptionActivated = true;
-    export let triggerOnActionChoosen: boolean = property.trigger === ON_ACTION_TRIGGER_BUTTON;
+    interface Props {
+        property: OpenFilePropertyData;
+        isArea?: boolean;
+        triggerOptionActivated?: boolean;
+        triggerOnActionChoosen?: boolean;
+    }
+
+    let {
+        property = $bindable(),
+        isArea = false,
+        triggerOptionActivated = true,
+        triggerOnActionChoosen = $bindable(property.trigger === ON_ACTION_TRIGGER_BUTTON)
+    }: Props = $props();
 
     type Option = {
         value: string;
@@ -29,8 +38,8 @@
         created: boolean | undefined;
     };
 
-    let optionAdvancedActivated = shouldDisplayAdvancedOption();
-    let policy: Option[] | undefined = undefined;
+    let optionAdvancedActivated = $state(shouldDisplayAdvancedOption());
+    let policy: Option[] | undefined = $state(undefined);
     let policyOption: InputTagOption[] = [
         { value: "accelerometer", label: "accelerometer", created: undefined },
         { value: "ambient-light-sensor", label: "ambient-light-sensor", created: undefined },
@@ -123,119 +132,123 @@
         dispatch("close");
     }}
 >
-    <span slot="header" class="flex justify-center items-center">
-        <IconFile font-size="18" class="mr-2" />
-        {$LL.mapEditor.properties.openFile.label()}
-    </span>
+    {#snippet header()}
+        <span  class="flex justify-center items-center">
+            <IconFile font-size="18" class="mr-2" />
+            {$LL.mapEditor.properties.openFile.label()}
+        </span>
+    {/snippet}
 
-    <span slot="content">
-        {#if isArea}
-            <Select
-                id="trigger"
-                label={$LL.mapEditor.properties.openWebsite.trigger()}
-                bind:value={property.trigger}
-                onChange={onTriggerValueChange}
-            >
-                <option value={ON_ACTION_TRIGGER_ENTER}
-                    >{$LL.mapEditor.properties.openWebsite.triggerShowImmediately()}</option
+    {#snippet content()}
+        <span >
+            {#if isArea}
+                <Select
+                    id="trigger"
+                    label={$LL.mapEditor.properties.openWebsite.trigger()}
+                    bind:value={property.trigger}
+                    onChange={onTriggerValueChange}
                 >
-                {#if !property.newTab}
-                    <option value={ON_ICON_TRIGGER_BUTTON}
-                        >{$LL.mapEditor.properties.openWebsite.triggerOnClick()}</option
+                    <option value={ON_ACTION_TRIGGER_ENTER}
+                        >{$LL.mapEditor.properties.openWebsite.triggerShowImmediately()}</option
                     >
-                {/if}
-                <option value={ON_ACTION_TRIGGER_BUTTON}
-                    >{$LL.mapEditor.properties.openWebsite.triggerOnAction()}</option
-                >
-            </Select>
-        {/if}
-
-        <FileUpload
-            {property}
-            on:change={() => {
-                dispatch("change");
-            }}
-            on:deleteFile={() => {
-                deleteFile();
-            }}
-        />
-
-        {#if !property.hideButtonLabel}
-            <div class=" flex flex-col">
-                <Input
-                    label={$LL.mapEditor.entityEditor.buttonLabel()}
-                    id="linkButton"
-                    type="text"
-                    bind:value={property.buttonLabel}
-                    onChange={onValueChange}
-                />
-            </div>
-        {/if}
-
-        <InputSwitch
-            id="advancedOption"
-            label={$LL.mapEditor.properties.advancedOptions()}
-            bind:value={optionAdvancedActivated}
-        />
-
-        <div class:active={optionAdvancedActivated} class="advanced-option">
-            {#if (isArea && triggerOptionActivated && triggerOnActionChoosen) || !isArea}
-                <Input
-                    id="triggerMessage"
-                    type="text"
-                    placeholder={$LL.trigger.object()}
-                    label={$LL.mapEditor.properties.openWebsite.triggerMessage()}
-                    bind:value={property.triggerMessage}
-                    onChange={onValueChange}
-                />
+                    {#if !property.newTab}
+                        <option value={ON_ICON_TRIGGER_BUTTON}
+                            >{$LL.mapEditor.properties.openWebsite.triggerOnClick()}</option
+                        >
+                    {/if}
+                    <option value={ON_ACTION_TRIGGER_BUTTON}
+                        >{$LL.mapEditor.properties.openWebsite.triggerOnAction()}</option
+                    >
+                </Select>
             {/if}
 
-            <InputSwitch
-                id="newTab"
-                label={$LL.mapEditor.properties.openWebsite.newTabLabel()}
-                bind:value={property.newTab}
-                onChange={onValueChange}
+            <FileUpload
+                {property}
+                on:change={() => {
+                    dispatch("change");
+                }}
+                on:deleteFile={() => {
+                    deleteFile();
+                }}
             />
 
-            <InputSwitch
-                id="hideUrl"
-                label={$LL.mapEditor.properties.openWebsite.hideUrlLabel()}
-                bind:value={property.hideUrl}
-                onChange={onValueChange}
-            />
-
-            {#if !property.newTab}
-                <div class="mt-3 mb-3">
-                    <RangeSlider
-                        id="websiteWidth"
-                        min={15}
-                        label={$LL.mapEditor.properties.openWebsite.width()}
-                        max={85}
-                        bind:value={property.width}
+            {#if !property.hideButtonLabel}
+                <div class=" flex flex-col">
+                    <Input
+                        label={$LL.mapEditor.entityEditor.buttonLabel()}
+                        id="linkButton"
+                        type="text"
+                        bind:value={property.buttonLabel}
                         onChange={onValueChange}
-                        variant="secondary"
-                        buttonShape="square"
                     />
                 </div>
+            {/if}
 
-                <InputCheckbox
-                    id="closable"
-                    label={$LL.mapEditor.properties.openWebsite.closable()}
-                    bind:value={property.closable}
+            <InputSwitch
+                id="advancedOption"
+                label={$LL.mapEditor.properties.advancedOptions()}
+                bind:value={optionAdvancedActivated}
+            />
+
+            <div class:active={optionAdvancedActivated} class="advanced-option">
+                {#if (isArea && triggerOptionActivated && triggerOnActionChoosen) || !isArea}
+                    <Input
+                        id="triggerMessage"
+                        type="text"
+                        placeholder={$LL.trigger.object()}
+                        label={$LL.mapEditor.properties.openWebsite.triggerMessage()}
+                        bind:value={property.triggerMessage}
+                        onChange={onValueChange}
+                    />
+                {/if}
+
+                <InputSwitch
+                    id="newTab"
+                    label={$LL.mapEditor.properties.openWebsite.newTabLabel()}
+                    bind:value={property.newTab}
                     onChange={onValueChange}
                 />
 
-                {#if policy != undefined}
-                    <InputTags
-                        label={$LL.mapEditor.properties.openWebsite.policy()}
-                        options={policyOption}
-                        bind:value={policy}
-                        handleChange={handlePolicyChange}
+                <InputSwitch
+                    id="hideUrl"
+                    label={$LL.mapEditor.properties.openWebsite.hideUrlLabel()}
+                    bind:value={property.hideUrl}
+                    onChange={onValueChange}
+                />
+
+                {#if !property.newTab}
+                    <div class="mt-3 mb-3">
+                        <RangeSlider
+                            id="websiteWidth"
+                            min={15}
+                            label={$LL.mapEditor.properties.openWebsite.width()}
+                            max={85}
+                            bind:value={property.width}
+                            onChange={onValueChange}
+                            variant="secondary"
+                            buttonShape="square"
+                        />
+                    </div>
+
+                    <InputCheckbox
+                        id="closable"
+                        label={$LL.mapEditor.properties.openWebsite.closable()}
+                        bind:value={property.closable}
+                        onChange={onValueChange}
                     />
+
+                    {#if policy != undefined}
+                        <InputTags
+                            label={$LL.mapEditor.properties.openWebsite.policy()}
+                            options={policyOption}
+                            bind:value={policy}
+                            handleChange={handlePolicyChange}
+                        />
+                    {/if}
                 {/if}
-            {/if}
-        </div>
-    </span>
+            </div>
+        </span>
+    {/snippet}
 </PropertyEditorBase>
 
 <style lang="scss">

@@ -1,14 +1,21 @@
 <script lang="ts">
-    //STYLE: Classes factorizing tailwind's ones are defined in video-ui.scss
+    import { run } from 'svelte/legacy';
 
-    export let volume = [0, 0, 0, 0, 0, 0, 0];
+    
+
     let display = true;
-    export let cssClass: string | undefined = undefined;
-    export let barColor = "white";
+    interface Props {
+        //STYLE: Classes factorizing tailwind's ones are defined in video-ui.scss
+        volume?: any;
+        cssClass?: string | undefined;
+        barColor?: string;
+    }
 
-    let barClass: string;
+    let { volume = [0, 0, 0, 0, 0, 0, 0], cssClass = undefined, barColor = "white" }: Props = $props();
 
-    $: {
+    let barClass: string = $state();
+
+    run(() => {
         if (barColor && barColor === "blue") {
             barClass = "bg-light-blue";
         } else if (barColor && barColor === "black") {
@@ -16,7 +23,7 @@
         } else {
             barClass = "bg-white";
         }
-    }
+    });
 
     /* eslint-disable svelte/require-each-key */
 </script>
@@ -37,7 +44,7 @@
                 class:scale-y-[80%]={bar > 90 && bar < 120}
                 class:scale-y-[90%]={bar > 120 && bar < 140}
                 class:scale-y-[100%]={bar >= 140}
-            />
+></div>
         {/each}
     {/if}
 </div>

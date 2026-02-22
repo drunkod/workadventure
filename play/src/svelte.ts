@@ -4,6 +4,7 @@ import "./front/style/index.scss";
 import App from "./front/Components/App.svelte";
 import { HtmlUtils } from "./front/WebRtc/HtmlUtils";
 import { e2eHooks } from "./front/Utils/E2EHooks";
+import { mount } from "svelte";
 
 // Initialize E2E hooks
 declare global {
@@ -13,7 +14,7 @@ declare global {
 }
 window.e2eHooks = e2eHooks;
 
-const app = new App({
+const app = mount(App, {
     target: HtmlUtils.getElementByIdOrFail("app"),
 });
 

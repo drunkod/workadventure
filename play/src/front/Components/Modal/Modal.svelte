@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation } from 'svelte/legacy';
+
     import { blur } from "svelte/transition";
     import { onDestroy, onMount } from "svelte";
     import { iframeListener } from "../../Api/IframeListener";
@@ -7,10 +9,10 @@
     import { gameManager } from "../../Phaser/Game/GameManager";
     import { IconX, IconArrowsMaximize, IconArrowsMinimize } from "@wa-icons";
 
-    let modalIframe: HTMLIFrameElement;
-    let mainModal: HTMLDivElement;
+    let modalIframe: HTMLIFrameElement = $state();
+    let mainModal: HTMLDivElement = $state();
 
-    let isFullScreened = false;
+    let isFullScreened = $state(false);
 
     function close() {
         modalVisibilityStore.set(false);
@@ -52,13 +54,13 @@
         ? new URL($modalIframeStore.src, gameManager.currentStartedRoom.mapUrl).toString()
         : undefined;
 
-    let isMobile = isMediaBreakpointUp("md");
+    let isMobile = $state(isMediaBreakpointUp("md"));
     const resizeObserver = new ResizeObserver(() => {
         isMobile = isMediaBreakpointUp("md");
     });
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 <div
     class="menu-container fixed h-dvh w-dvw z-[2000] pointer-events-auto top-0 transition-all {isMobile
@@ -84,7 +86,7 @@
                 {#if $modalIframeStore?.allowFullScreen}
                     <button
                         class="btn btn-light btn-ghost rounded hidden @lg/main-layout:block"
-                        on:click={() => (isFullScreened = !isFullScreened)}
+                        onclick={() => (isFullScreened = !isFullScreened)}
                     >
                         {#if isFullScreened}
                             <IconArrowsMinimize font-size="20" class="text-white" />
@@ -96,7 +98,7 @@
             {/if}
             {#if $modalIframeStore?.closable == undefined || $modalIframeStore?.closable == true}
                 <button
-                    on:click|preventDefault|stopPropagation={close}
+                    onclick={stopPropagation(preventDefault(close))}
                     class="btn btn-danger rounded m-0"
                     style={isFullScreened == true ? "" : "margin: 0px;"}
                     data-testid="close-modal-button"
@@ -117,7 +119,7 @@
                 class="border-0 relative z-40"
                 allowtransparency
                 style="color-scheme: auto"
-            />
+></iframe>
         {/if}
     </div>
 </div>

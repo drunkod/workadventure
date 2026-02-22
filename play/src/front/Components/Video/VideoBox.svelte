@@ -4,12 +4,23 @@
     import { playerMovedInTheLast10Seconds } from "../../Stores/VideoLayoutStore";
     import VideoBoxOptimizer from "./VideoBoxOptimizer.svelte";
 
-    export let videoBox: VideoBox;
-    export let isOnOneLine: boolean;
-    export let oneLineMode: "vertical" | "horizontal";
-    export let videoWidth: number;
-    export let videoHeight: number | undefined;
-    export let intersectionObserver: IntersectionObserver | undefined;
+    interface Props {
+        videoBox: VideoBox;
+        isOnOneLine: boolean;
+        oneLineMode: "vertical" | "horizontal";
+        videoWidth: number;
+        videoHeight: number | undefined;
+        intersectionObserver: IntersectionObserver | undefined;
+    }
+
+    let {
+        videoBox,
+        isOnOneLine,
+        oneLineMode,
+        videoWidth,
+        videoHeight,
+        intersectionObserver
+    }: Props = $props();
 
     const streamable = videoBox.streamable;
 </script>

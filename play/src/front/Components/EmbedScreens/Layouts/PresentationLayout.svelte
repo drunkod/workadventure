@@ -1,79 +1,25 @@
 <script lang="ts">
-    import { afterUpdate, onMount } from "svelte";
-    import { writable } from "svelte/store";
     import { highlightedEmbedScreen } from "../../../Stores/HighlightedEmbedScreenStore";
     import CamerasContainer from "../CamerasContainer.svelte";
     import MediaBox from "../../Video/MediaBox.svelte";
     import ListenerBox from "../../Video/ListenerBox.svelte";
     import { inExternalServiceStore, proximityMeetingStore } from "../../../Stores/MyMediaStore";
     import { streamableCollectionStore } from "../../../Stores/StreamableCollectionStore";
-    import { highlightFullScreen } from "../../../Stores/ActionsCamStore";
     import { isOnOneLine, playerMovedInTheLast10Seconds } from "../../../Stores/VideoLayoutStore";
     import PictureInPictureActionBar from "../../ActionBar/PictureInPictureActionBar.svelte";
     import { activePictureInPictureStore } from "../../../Stores/PeerStore";
     import { isListenerStore } from "../../../Stores/MediaStore";
 
-    export let inPictureInPicture: boolean;
-
-    let camContainer: HTMLDivElement;
-    let highlightScreen: HTMLDivElement;
-    let containerHeight = 0;
-
-    const windowSize = writable({
-        height: window.innerHeight,
-        width: window.innerWidth,
-        camHeight: 0,
-        screenShareHeight: 0,
-    });
-
-    const handleResize = () => {
-        windowSize.set({
-            height: window.innerHeight,
-            width: window.innerWidth,
-            camHeight: camContainer?.offsetHeight || 0,
-            screenShareHeight: highlightScreen?.offsetHeight || 0,
-        });
-        resizeHeight();
-    };
-
-    afterUpdate(() => {
-        modifySizeCamIfScreenShare();
-    });
-
-    onMount(() => {
-        resizeHeight();
-        window.addEventListener("resize", handleResize);
-
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        };
-    });
-
-    function resizeHeight() {
-        let availableHeight = window.innerHeight - (camContainer?.offsetHeight || 0) - 72;
-        if (availableHeight < 0) {
-            availableHeight = 0;
-        }
+    interface Props {
+        inPictureInPicture: boolean;
     }
 
-    $: if ($highlightedEmbedScreen) modifySizeCamIfScreenShare();
-    $: if ($highlightFullScreen) modifySizeCamIfScreenShare();
+    let { inPictureInPicture }: Props = $props();
 
-    function modifySizeCamIfScreenShare() {
-        /*if (camContainer) {
-            if ($highlightedEmbedScreen !== undefined && !$highlightFullScreen) {
-                camContainer.style.transform = "scale(0.7)";
-                camContainer.style.marginTop = "-24px";
-                camContainer.style.marginBottom = "-8px";
-            } else {
-                camContainer.style.transform = "scale(1)";
-                camContainer.style.marginTop = "0px";
-                camContainer.style.marginBottom = "0px";
-            }
-        }*/
-    }
-
-    $: oneLineMaxHeight = containerHeight * 0.2;
+    let camContainer: HTMLDivElement | undefined = $state();
+    let highlightScreen: HTMLDivElement | undefined = $state();
+    let containerHeight = $state(0);
+    let oneLineMaxHeight = $derived(containerHeight * 0.2);
 </script>
 
 {#if $proximityMeetingStore === true && !$inExternalServiceStore}

@@ -8,21 +8,35 @@
         change: InputTagOption[] | undefined;
     }>();
 
-    export let optional = false;
-    export let label: string | undefined = undefined;
-    export let value: InputTagOption[] | undefined;
-    export let options: InputTagOption[] = [];
-    export let placeholder: string | undefined = undefined;
-    export let onFocus = () => {};
-    export let onBlur = () => {};
-    export let handleChange = () => {};
-    export let testId: string | undefined = undefined;
-    export let queryOptions: undefined | ((filterText: string) => Promise<{ value: string; label: string }[]>) =
-        undefined;
+    interface Props {
+        optional?: boolean;
+        label?: string | undefined;
+        value: InputTagOption[] | undefined;
+        options?: InputTagOption[];
+        placeholder?: string | undefined;
+        onFocus?: any;
+        onBlur?: any;
+        handleChange?: any;
+        testId?: string | undefined;
+        queryOptions?: undefined | ((filterText: string) => Promise<{ value: string; label: string }[]>);
+        info?: import('svelte').Snippet;
+    }
 
-    let filterText = "";
-    const SLOTS = $$slots;
+    let {
+        optional = false,
+        label = undefined,
+        value = $bindable(),
+        options = $bindable([]),
+        placeholder = undefined,
+        onFocus = () => {},
+        onBlur = () => {},
+        handleChange = () => {},
+        testId = undefined,
+        queryOptions = undefined,
+        info
+    }: Props = $props();
 
+    let filterText = $state("");
     function handleFilter() {
         if (value?.find((i) => i.label === filterText)) return;
         if (options?.find((i) => i.label === filterText)) return;
@@ -42,16 +56,16 @@
 </script>
 
 <div class="flex flex-col text-dark-purple">
-    <div class="input-label" class:hidden={!label && !SLOTS.info && !optional}>
+    <div class="input-label" class:hidden={!label && !info && !optional}>
         {#if label}
             <label for="selector" class="text-white relative grow">
                 {label}
             </label>
         {/if}
 
-        {#if SLOTS.info}
+        {#if info}
             <InfoButton>
-                <slot name="info" />
+                {@render info?.()}
             </InfoButton>
         {/if}
 
@@ -101,8 +115,10 @@
         inputAttributes={{ "data-testid": testId }}
         class="!bg-contrast !rounded-md !border-contrast-400 !outline-none !w-full"
     >
-        <div slot="item" let:item>
-            {item.created ? $LL.notification.addNewTag({ tag: filterText }) : item.label}
-        </div>
+        {#snippet item({ item })}
+                <div  >
+                {item.created ? $LL.notification.addNewTag({ tag: filterText }) : item.label}
+            </div>
+            {/snippet}
     </Select>
 </div>

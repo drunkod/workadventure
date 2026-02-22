@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation } from 'svelte/legacy';
+
     import { writable } from "svelte/store";
     import { onMount } from "svelte";
     import type { OpenWebsitePropertyData } from "@workadventure/map-editor";
@@ -24,7 +26,7 @@
     import { WOKA_SPEED } from "../../Enum/EnvironmentVariable";
     import { IconChevronUp, IconEye, IconWalk } from "@wa-icons";
 
-    let filter = "";
+    let filter = $state("");
     let selectFilters = writable<Array<string>>(new Array<string>());
     let entitiesListFiltered = writable<Map<string, Entity>>(new Map());
     let areasListFiltered = writable<Map<string, AreaPreview>>(new Map());
@@ -98,8 +100,8 @@
         });
         onChangeFilterHandle();
     }
-    let entityListActive = false;
-    let areaListActive = false;
+    let entityListActive = $state(false);
+    let areaListActive = $state(false);
     function toggleEntityList() {
         entityListActive = !entityListActive;
     }
@@ -376,7 +378,7 @@
                 <button
                     class="transition-all group-hover:bg-white/10 p-1 rounded-lg aspect-square flex items-center justify-center text-white"
                     data-testid="toggleFolderEntity"
-                    on:click={toggleEntityList}
+                    onclick={toggleEntityList}
                 >
                     <IconChevronUp class={`transform transition ${!entityListActive ? "" : "rotate-180"}`} />
                 </button>
@@ -385,13 +387,13 @@
             {#if entityListActive && $entitiesListFiltered.size > 0}
                 <div class="entity-items p-2 flex flex-col">
                     {#each [...$entitiesListFiltered] as [key, entity] (key)}
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <div
                             id={entity.entityId}
-                            on:mouseenter={() => highlightEntity(entity)}
-                            on:mouseleave={() => unhighlightEntity(entity)}
-                            on:click={() => handlerToSelectEntity(entity)}
+                            onmouseenter={() => highlightEntity(entity)}
+                            onmouseleave={() => unhighlightEntity(entity)}
+                            onclick={() => handlerToSelectEntity(entity)}
                             class="item p-2 rounded flex flex-row justify-start gap-2 items-center cursor-pointer hover:bg-white/10 transition-all"
                             class:active={$mapExplorationObjectSelectedStore === entity}
                         >
@@ -409,13 +411,13 @@
                             >
                             <button
                                 class="transition-all hover:bg-white/10 p-2 rounded-md aspect-square flex items-center justify-center m-0"
-                                on:click|preventDefault|stopPropagation={() => goTo(entity)}
+                                onclick={stopPropagation(preventDefault(() => goTo(entity)))}
                             >
                                 <IconWalk font-size="16" />
                             </button>
                             <button
                                 class="transition-all hover:bg-white/10 p-2 rounded-md aspect-square flex items-center justify-center m-0"
-                                on:click|preventDefault|stopPropagation={() => handlerToSelectEntity(entity)}
+                                onclick={stopPropagation(preventDefault(() => handlerToSelectEntity(entity)))}
                             >
                                 <IconEye font-size="16" />
                             </button>
@@ -447,7 +449,7 @@
                 <button
                     class="transition-all group-hover:bg-white/10 p-1 rounded-lg aspect-square flex items-center justify-center text-white"
                     data-testid="toggleFolderArea"
-                    on:click={toggleAreaList}
+                    onclick={toggleAreaList}
                 >
                     <IconChevronUp class={`transform transition ${!areaListActive ? "" : "rotate-180"}`} />
                 </button>
@@ -456,13 +458,13 @@
                 <div class="area-items p-2 flex flex-col">
                     {#if $areasListFiltered.size > 0}
                         {#each [...$areasListFiltered] as [key, area] (key)}
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <!-- svelte-ignore a11y-no-static-element-interactions -->
+                            <!-- svelte-ignore a11y_click_events_have_key_events -->
+                            <!-- svelte-ignore a11y_no_static_element_interactions -->
                             <div
                                 id={key}
-                                on:mouseenter={() => highlightArea(area)}
-                                on:mouseleave={() => unhighlightArea(area)}
-                                on:click={() => handlerToSelectArea(area)}
+                                onmouseenter={() => highlightArea(area)}
+                                onmouseleave={() => unhighlightArea(area)}
+                                onclick={() => handlerToSelectArea(area)}
                                 class="item p-2 rounded flex flex-row justify-start gap-2 items-center cursor-pointer hover:bg-white/10 transition-all"
                                 class:active={$mapExplorationObjectSelectedStore === area}
                                 title={area.getAreaData().name || "No name"}
@@ -482,13 +484,13 @@
                                 </span>
                                 <button
                                     class="transition-all hover:bg-white/10 p-2 rounded-md aspect-square flex items-center justify-center m-0"
-                                    on:click|preventDefault|stopPropagation={() => goTo(area)}
+                                    onclick={stopPropagation(preventDefault(() => goTo(area)))}
                                 >
                                     <IconWalk font-size="16" />
                                 </button>
                                 <button
                                     class="transition-all hover:bg-white/10 p-2 rounded-md aspect-square flex items-center justify-center m-0"
-                                    on:click|preventDefault|stopPropagation={() => handlerToSelectArea(area)}
+                                    onclick={stopPropagation(preventDefault(() => handlerToSelectArea(area)))}
                                 >
                                     <IconEye font-size="16" />
                                 </button>

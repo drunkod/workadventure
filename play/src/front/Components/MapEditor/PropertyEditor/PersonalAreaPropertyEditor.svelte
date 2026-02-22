@@ -16,17 +16,21 @@
     import PropertyEditorBase from "./PropertyEditorBase.svelte";
     import { IconInfoCircle, IconUser, IconDesk } from "@wa-icons";
 
-    export let personalAreaPropertyData: PersonalAreaPropertyData;
+    interface Props {
+        personalAreaPropertyData: PersonalAreaPropertyData;
+    }
 
-    let _tags: InputTagOption[] | undefined = personalAreaPropertyData.allowedTags
+    let { personalAreaPropertyData = $bindable() }: Props = $props();
+
+    let _tags: InputTagOption[] | undefined = $state(personalAreaPropertyData.allowedTags
         ? personalAreaPropertyData.allowedTags.map((allowedTag) => ({
               value: allowedTag,
               created: false,
               label: allowedTag,
           }))
-        : undefined;
+        : undefined);
 
-    let personalAreaOwner: string | null = personalAreaPropertyData.ownerId;
+    let personalAreaOwner: string | null = $state(personalAreaPropertyData.ownerId);
 
     const dispatch = createEventDispatcher<{
         change: boolean | undefined;
@@ -121,92 +125,98 @@
 </script>
 
 <PropertyEditorBase on:close={onRemoveProperty}>
-    <span slot="header" class="flex justify-center items-center">
-        <IconDesk class="w-6 mr-1" />
-        {$LL.mapEditor.properties.personalAreaPropertyData.label()}
-    </span>
-    <span slot="content">
-        {#if personalAreaPropertyData !== undefined}
-            <div class="overflow-y-auto overflow-x-hidden flex flex-col gap-2">
-                <p class="help-text">
-                    <IconInfoCircle font-size="18" />
-                    {$LL.mapEditor.properties.personalAreaPropertyData.description()}
-                </p>
-                {#if personalAreaOwner}
-                    <div class="flex flex-col">
-                        <div class="flex flex-col gap-2 bg-black/10 rounded-md p-2">
-                            <div class="flex items-center justify-center gap-2 p-2">
-                                <IconUser />
-                                <span>{$LL.mapEditor.properties.personalAreaPropertyData.owner()}</span>
-                            </div>
-                            <div class="bg-white p-2 rounded flex flex-row items-center justify-between">
-                                <div class="m-0 text-black flex items-center gap-2">
-                                    {personalAreaOwner}
+    {#snippet header()}
+        <span  class="flex justify-center items-center">
+            <IconDesk class="w-6 mr-1" />
+            {$LL.mapEditor.properties.personalAreaPropertyData.label()}
+        </span>
+    {/snippet}
+    {#snippet content()}
+        <span >
+            {#if personalAreaPropertyData !== undefined}
+                <div class="overflow-y-auto overflow-x-hidden flex flex-col gap-2">
+                    <p class="help-text">
+                        <IconInfoCircle font-size="18" />
+                        {$LL.mapEditor.properties.personalAreaPropertyData.description()}
+                    </p>
+                    {#if personalAreaOwner}
+                        <div class="flex flex-col">
+                            <div class="flex flex-col gap-2 bg-black/10 rounded-md p-2">
+                                <div class="flex items-center justify-center gap-2 p-2">
+                                    <IconUser />
+                                    <span>{$LL.mapEditor.properties.personalAreaPropertyData.owner()}</span>
                                 </div>
-                                <ButtonClose
-                                    size="sm"
-                                    textColor="text-black"
-                                    bgColor="bg-black/10"
-                                    hoverColor="hover:bg-black/20"
-                                    on:click={revokeOwner}
-                                />
+                                <div class="bg-white p-2 rounded flex flex-row items-center justify-between">
+                                    <div class="m-0 text-black flex items-center gap-2">
+                                        {personalAreaOwner}
+                                    </div>
+                                    <ButtonClose
+                                        size="sm"
+                                        textColor="text-black"
+                                        bgColor="bg-black/10"
+                                        hoverColor="hover:bg-black/20"
+                                        on:click={revokeOwner}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <button
-                            class="flex items-center justify-center text-white p-2 bg-red-500/80 hover:bg-red-500 rounded mt-2"
-                            data-testid="revokeAccessButton"
-                            on:click={revokeOwner}
-                        >
-                            {$LL.mapEditor.properties.personalAreaPropertyData.revokeAccess()}
-                        </button>
-                    </div>
-                {:else}
-                    <div>
-                        <Select
-                            id="accessClaimMode"
-                            dataTestId="accessClaimMode"
-                            label={$LL.mapEditor.properties.personalAreaPropertyData.accessClaimMode()}
-                            bind:value={personalAreaPropertyData.accessClaimMode}
-                            on:change={onClaimModeChange}
-                        >
-                            {#each PersonalAreaAccessClaimMode.options as claimMode (claimMode)}
-                                <option value={claimMode}
-                                    >{$LL.mapEditor.properties.personalAreaPropertyData[
-                                        `${claimMode}AccessClaimMode`
-                                    ]()}</option
-                                >
-                            {/each}
-                            <div slot="helper">
-                                <p class="help-text">
-                                    <IconInfoCircle font-size="18" />
-                                    {$LL.mapEditor.properties.personalAreaPropertyData[
-                                        `${personalAreaPropertyData.accessClaimMode}AccessDescription`
-                                    ]()}
-                                </p>
-                            </div>
-                        </Select>
-                    </div>
-                    <div>
-                        {#if personalAreaPropertyData.accessClaimMode === PersonalAreaAccessClaimMode.enum.static}
-                            <label for="allowedUserInput" class="input-label"
-                                >{$LL.mapEditor.properties.personalAreaPropertyData.allowedUser()}</label
+                            <button
+                                class="flex items-center justify-center text-white p-2 bg-red-500/80 hover:bg-red-500 rounded mt-2"
+                                data-testid="revokeAccessButton"
+                                onclick={revokeOwner}
                             >
-                            <MemberAutocomplete
-                                value={personalAreaPropertyData.ownerId}
-                                placeholder={$LL.mapEditor.properties.personalAreaPropertyData.allowedUser()}
-                                on:onSelect={({ detail: selectedUserId }) => setOwnerId(selectedUserId)}
-                            />
-                        {:else}
-                            <InputRoomTags
-                                label={$LL.mapEditor.properties.personalAreaPropertyData.allowedTags()}
-                                bind:value={_tags}
-                                handleChange={() => handleTagChange(_tags)}
-                                testId="allowedTags"
-                            />
-                        {/if}
-                    </div>
-                {/if}
-            </div>
-        {/if}
-    </span>
+                                {$LL.mapEditor.properties.personalAreaPropertyData.revokeAccess()}
+                            </button>
+                        </div>
+                    {:else}
+                        <div>
+                            <Select
+                                id="accessClaimMode"
+                                dataTestId="accessClaimMode"
+                                label={$LL.mapEditor.properties.personalAreaPropertyData.accessClaimMode()}
+                                bind:value={personalAreaPropertyData.accessClaimMode}
+                                on:change={onClaimModeChange}
+                            >
+                                {#each PersonalAreaAccessClaimMode.options as claimMode (claimMode)}
+                                    <option value={claimMode}
+                                        >{$LL.mapEditor.properties.personalAreaPropertyData[
+                                            `${claimMode}AccessClaimMode`
+                                        ]()}</option
+                                    >
+                                {/each}
+                                {#snippet helper()}
+                                                        <div >
+                                        <p class="help-text">
+                                            <IconInfoCircle font-size="18" />
+                                            {$LL.mapEditor.properties.personalAreaPropertyData[
+                                                `${personalAreaPropertyData.accessClaimMode}AccessDescription`
+                                            ]()}
+                                        </p>
+                                    </div>
+                                                    {/snippet}
+                            </Select>
+                        </div>
+                        <div>
+                            {#if personalAreaPropertyData.accessClaimMode === PersonalAreaAccessClaimMode.enum.static}
+                                <label for="allowedUserInput" class="input-label"
+                                    >{$LL.mapEditor.properties.personalAreaPropertyData.allowedUser()}</label
+                                >
+                                <MemberAutocomplete
+                                    value={personalAreaPropertyData.ownerId}
+                                    placeholder={$LL.mapEditor.properties.personalAreaPropertyData.allowedUser()}
+                                    on:onSelect={({ detail: selectedUserId }) => setOwnerId(selectedUserId)}
+                                />
+                            {:else}
+                                <InputRoomTags
+                                    label={$LL.mapEditor.properties.personalAreaPropertyData.allowedTags()}
+                                    bind:value={_tags}
+                                    handleChange={() => handleTagChange(_tags)}
+                                    testId="allowedTags"
+                                />
+                            {/if}
+                        </div>
+                    {/if}
+                </div>
+            {/if}
+        </span>
+    {/snippet}
 </PropertyEditorBase>

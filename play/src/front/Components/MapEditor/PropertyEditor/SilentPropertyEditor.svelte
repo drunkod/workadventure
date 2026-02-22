@@ -15,10 +15,12 @@
         dispatch("close");
     }}
 >
-    <span slot="header" class="flex justify-center items-center">
-        <IconMicrophoneOff font-size="18" class="mr-2" />
-        {$LL.mapEditor.properties.silent.label()}
-    </span>
+    {#snippet header()}
+        <span  class="flex justify-center items-center">
+            <IconMicrophoneOff font-size="18" class="mr-2" />
+            {$LL.mapEditor.properties.silent.label()}
+        </span>
+    {/snippet}
 </PropertyEditorBase>
 
 <style lang="scss">

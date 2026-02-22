@@ -7,7 +7,11 @@
     import { IconMicrophone } from "../../Icons";
     import PropertyEditorBase from "./PropertyEditorBase.svelte";
 
-    export let property: SpeakerMegaphonePropertyData;
+    interface Props {
+        property: SpeakerMegaphonePropertyData;
+    }
+
+    let { property = $bindable() }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         change: undefined;
@@ -30,36 +34,40 @@
         dispatch("close");
     }}
 >
-    <span slot="header" class="flex justify-center items-center">
-        <IconMicrophone font-size="18" class="mr-2" />
-        {$LL.mapEditor.properties.speakerMegaphone.label()}
-    </span>
-    <span slot="content">
-        <div class="value-input">
-            <Input
-                id="tabLink"
-                type="text"
-                label={$LL.mapEditor.properties.speakerMegaphone.nameLabel()}
-                placeholder={$LL.mapEditor.properties.speakerMegaphone.namePlaceholder()}
-                bind:value={property.name}
-                onChange={onValueChange}
-            />
-        </div>
-        <div class="value-switch">
-            <InputSwitch
-                id="chatEnabled"
-                label={$LL.mapEditor.properties.chatEnabled()}
-                bind:value={property.chatEnabled}
-                onChange={onValueChange}
-            />
-        </div>
-        <div class="value-switch">
-            <InputSwitch
-                id="seeAttendees"
-                label={$LL.mapEditor.properties.seeAttendees()}
-                bind:value={property.seeAttendees}
-                onChange={onValueChange}
-            />
-        </div>
-    </span>
+    {#snippet header()}
+        <span  class="flex justify-center items-center">
+            <IconMicrophone font-size="18" class="mr-2" />
+            {$LL.mapEditor.properties.speakerMegaphone.label()}
+        </span>
+    {/snippet}
+    {#snippet content()}
+        <span >
+            <div class="value-input">
+                <Input
+                    id="tabLink"
+                    type="text"
+                    label={$LL.mapEditor.properties.speakerMegaphone.nameLabel()}
+                    placeholder={$LL.mapEditor.properties.speakerMegaphone.namePlaceholder()}
+                    bind:value={property.name}
+                    onChange={onValueChange}
+                />
+            </div>
+            <div class="value-switch">
+                <InputSwitch
+                    id="chatEnabled"
+                    label={$LL.mapEditor.properties.chatEnabled()}
+                    bind:value={property.chatEnabled}
+                    onChange={onValueChange}
+                />
+            </div>
+            <div class="value-switch">
+                <InputSwitch
+                    id="seeAttendees"
+                    label={$LL.mapEditor.properties.seeAttendees()}
+                    bind:value={property.seeAttendees}
+                    onChange={onValueChange}
+                />
+            </div>
+        </span>
+    {/snippet}
 </PropertyEditorBase>

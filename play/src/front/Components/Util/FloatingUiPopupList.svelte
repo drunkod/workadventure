@@ -1,5 +1,6 @@
 <script lang="ts">
     import { floatingUiComponents } from "../../Utils/svelte-floatingui-show";
+    const rest: Record<string, unknown> = {};
 </script>
 
 {#each [...$floatingUiComponents.entries()] as [key, value] (`${key}`)}
@@ -8,8 +9,8 @@
     {@const arrowAction = value.arrowAction}
     <div class="absolute z-[3000]" use:action>
         {#if arrowAction}
-            <div use:arrowAction />
+            <div use:arrowAction></div>
         {/if}
-        <svelte:component this={value.componentType} {...$$restProps} {...valueProps} />
+        <value.componentType {...rest} {...valueProps} />
     </div>
 {/each}

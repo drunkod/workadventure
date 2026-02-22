@@ -5,14 +5,26 @@
     import type { WebRtcStreamable } from "../../../Stores/StreamableCollectionStore";
     import InnerWebRtcVideo from "./InnerWebRtcVideo.svelte";
 
-    export let style: string;
-    export let className: string;
-    export let videoWidth: number;
-    export let videoHeight: number;
-    export let onLoadVideoElement: (event: Event) => void;
-    export let loop = false;
 
-    export let media: WebRtcStreamable;
+    interface Props {
+        style: string;
+        className: string;
+        videoWidth: number;
+        videoHeight: number;
+        onLoadVideoElement: (event: Event) => void;
+        loop?: boolean;
+        media: WebRtcStreamable;
+    }
+
+    let {
+        style,
+        className,
+        videoWidth = $bindable(),
+        videoHeight = $bindable(),
+        onLoadVideoElement,
+        loop = false,
+        media
+    }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         video: undefined;

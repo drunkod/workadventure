@@ -33,7 +33,7 @@
     const gameScene = gameManager.getCurrentGameScene();
     const MESSAGE_TYPE = AdminMessageEventTypes.admin;
     let quill: Quill;
-    let QUILL_EDITOR: HTMLDivElement;
+    let QUILL_EDITOR: HTMLDivElement = $state();
 
     export const handleSending = {
         sendTextMessage(broadcastToWorld: boolean) {
@@ -71,7 +71,7 @@
 </script>
 
 <section class="section-input-send-text test">
-    <div class="input-send-text" role="textbox" bind:this={QUILL_EDITOR} />
+    <div class="input-send-text" role="textbox" bind:this={QUILL_EDITOR}></div>
 </section>
 
 <style lang="scss">

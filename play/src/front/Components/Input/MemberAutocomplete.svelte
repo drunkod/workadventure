@@ -3,16 +3,24 @@
     import { createEventDispatcher } from "svelte";
     import { gameManager } from "../../Phaser/Game/GameManager";
 
-    export let placeholder: string;
-    export let value: string | undefined | null = undefined;
+    interface Props {
+        placeholder: string;
+        value?: string | undefined | null;
+    }
 
-    let selectedValue: { index: number; label: string; value: string } | undefined = value
-        ? {
-              index: 1,
-              label: value,
-              value,
-          }
-        : undefined;
+    let { placeholder, value = undefined }: Props = $props();
+
+    let selectedValue: { index: number; label: string; value: string } | undefined = $state(undefined);
+
+    $effect(() => {
+        selectedValue = value
+            ? {
+                  index: 1,
+                  label: value,
+                  value,
+              }
+            : undefined;
+    });
 
     const dispatch = createEventDispatcher<{
         onSelect: { index: number; label: string; value: string };

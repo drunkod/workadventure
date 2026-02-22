@@ -4,9 +4,13 @@
     import EntityItem from "./EntityItem/EntityItem.svelte";
     import { IconPhotoOff } from "@wa-icons";
 
-    export let entityPrefabVariants: EntityVariant[];
-    export let onSelectEntity: (entityVariant: EntityVariant) => void;
-    export let currentSelectedEntityId: string | undefined;
+    interface Props {
+        entityPrefabVariants: EntityVariant[];
+        onSelectEntity: (entityVariant: EntityVariant) => void;
+        currentSelectedEntityId: string | undefined;
+    }
+
+    let { entityPrefabVariants, onSelectEntity, currentSelectedEntityId }: Props = $props();
 </script>
 
 {#if entityPrefabVariants.length === 0}

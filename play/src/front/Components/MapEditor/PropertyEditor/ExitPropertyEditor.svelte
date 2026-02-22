@@ -10,21 +10,25 @@
     import { IconDoorOut } from "../../Icons";
     import PropertyEditorBase from "./PropertyEditorBase.svelte";
 
-    export let property: ExitPropertyData;
+    interface Props {
+        property: ExitPropertyData;
+    }
+
+    let { property = $bindable() }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         change: undefined;
         close: undefined;
     }>();
     // Key: room URL
-    let mapsUrl = new Map<
+    let mapsUrl = $state(new Map<
         string,
         {
             name: string;
             wamUrl: string | undefined;
         }
-    >();
-    let startAreas: string[] = [];
+    >());
+    let startAreas: string[] = $state([]);
     function onValueChange() {
         dispatch("change");
     }
@@ -87,38 +91,21 @@
         dispatch("close");
     }}
 >
-    <span slot="header" class="flex justify-center items-center">
-        <IconDoorOut font-size="18" class="mr-2" />
-        {$LL.mapEditor.properties.exit.label()}
-    </span>
-    <span slot="content">
-        <div>
-            <Select
-                id="exitMapSelector"
-                label={$LL.mapEditor.properties.exit.exitMap()}
-                bind:value={property.url}
-                onChange={(value) => {
-                    property.areaName = "";
-                    onValueChange();
-                    fetchStartAreasName().catch((e) => console.error(e));
-                }}
-                on:blur={() => {
-                    onValueChange();
-                    fetchStartAreasName().catch((e) => console.error(e));
-                }}
-            >
-                {#each [...mapsUrl.entries()] as map (map[0])}
-                    <option value={map[0]} selected={map[0] === property.url}>{map[1].name}</option>
-                {/each}
-            </Select>
-        </div>
-        {#if property.url}
+    {#snippet header()}
+        <span  class="flex justify-center items-center">
+            <IconDoorOut font-size="18" class="mr-2" />
+            {$LL.mapEditor.properties.exit.label()}
+        </span>
+    {/snippet}
+    {#snippet content()}
+        <span >
             <div>
                 <Select
-                    id="startAreaNameSelector"
-                    label={$LL.mapEditor.properties.exit.defaultStartArea()}
-                    bind:value={property.areaName}
-                    onChange={() => {
+                    id="exitMapSelector"
+                    label={$LL.mapEditor.properties.exit.exitMap()}
+                    bind:value={property.url}
+                    onChange={(value) => {
+                        property.areaName = "";
                         onValueChange();
                         fetchStartAreasName().catch((e) => console.error(e));
                     }}
@@ -127,14 +114,35 @@
                         fetchStartAreasName().catch((e) => console.error(e));
                     }}
                 >
-                    <option value="" selected={!property.areaName}
-                        >{$LL.mapEditor.properties.exit.defaultStartArea()}</option
-                    >
-                    {#each startAreas as areaName (areaName)}
-                        <option value={areaName} selected={areaName === property.areaName}>{areaName}</option>
+                    {#each [...mapsUrl.entries()] as map (map[0])}
+                        <option value={map[0]} selected={map[0] === property.url}>{map[1].name}</option>
                     {/each}
                 </Select>
             </div>
-        {/if}
-    </span>
+            {#if property.url}
+                <div>
+                    <Select
+                        id="startAreaNameSelector"
+                        label={$LL.mapEditor.properties.exit.defaultStartArea()}
+                        bind:value={property.areaName}
+                        onChange={() => {
+                            onValueChange();
+                            fetchStartAreasName().catch((e) => console.error(e));
+                        }}
+                        on:blur={() => {
+                            onValueChange();
+                            fetchStartAreasName().catch((e) => console.error(e));
+                        }}
+                    >
+                        <option value="" selected={!property.areaName}
+                            >{$LL.mapEditor.properties.exit.defaultStartArea()}</option
+                        >
+                        {#each startAreas as areaName (areaName)}
+                            <option value={areaName} selected={areaName === property.areaName}>{areaName}</option>
+                        {/each}
+                    </Select>
+                </div>
+            {/if}
+        </span>
+    {/snippet}
 </PropertyEditorBase>

@@ -11,13 +11,24 @@
         noVideo: undefined;
     }>();
 
-    export let style: string;
-    export let className: string;
-    export let videoWidth: number;
-    export let videoHeight: number;
-    export let onLoadVideoElement: (event: Event) => void;
 
-    export let remoteVideoTrack: Readable<RemoteVideoTrack | undefined>;
+    interface Props {
+        style: string;
+        className: string;
+        videoWidth: number;
+        videoHeight: number;
+        onLoadVideoElement: (event: Event) => void;
+        remoteVideoTrack: Readable<RemoteVideoTrack | undefined>;
+    }
+
+    let {
+        style,
+        className,
+        videoWidth = $bindable(),
+        videoHeight = $bindable(),
+        onLoadVideoElement,
+        remoteVideoTrack
+    }: Props = $props();
 </script>
 
 {#if $remoteVideoTrack}

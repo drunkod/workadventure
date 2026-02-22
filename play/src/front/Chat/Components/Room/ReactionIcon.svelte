@@ -1,15 +1,20 @@
 <script lang="ts">
     import type { MatrixClient } from "matrix-js-sdk";
 
-    // A valid Matrix reaction key is either a Unicode emoji or an mxc URI pointing to an image, or even some text.
-    export let key: string;
-    export let matrixClient: MatrixClient;
-
-    let imageUrl: string | null = null;
-
-    if (key.startsWith("mxc://")) {
-        imageUrl = matrixClient.mxcUrlToHttp(key, 40, 40);
+    
+    interface Props {
+        // A valid Matrix reaction key is either a Unicode emoji or an mxc URI pointing to an image, or even some text.
+        key: string;
+        matrixClient: MatrixClient;
     }
+
+    let { key = $bindable(), matrixClient }: Props = $props();
+
+    let imageUrl: string | null = $state(null);
+
+    $effect(() => {
+        imageUrl = key.startsWith("mxc://") ? matrixClient.mxcUrlToHttp(key, 40, 40) : null;
+    });
 
     function handleError(event: Event) {
         console.warn(`Failed to load reaction image for key ${key}`, event);
@@ -34,12 +39,12 @@
         return [...str][0] ?? str;
     }
 
-    $: firstGrapheme = getFirstGrapheme(key);
-    $: isMultiGrapheme = firstGrapheme !== key;
+    let firstGrapheme = $derived(getFirstGrapheme(key));
+    let isMultiGrapheme = $derived(firstGrapheme !== key);
 </script>
 
 {#if imageUrl}
-    <img src={imageUrl} alt="Reaction" class="w-5 h-5" on:error={handleError} />
+    <img src={imageUrl} alt="Reaction" class="w-5 h-5" onerror={handleError} />
 {:else if isMultiGrapheme}
     <span title={key}>{firstGrapheme}</span>
 {:else}

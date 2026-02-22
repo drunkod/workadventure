@@ -2,7 +2,11 @@
     import { getAdditionalMenuItemStore } from "../../../Stores/AdditionalItemsMenuStore";
     import CustomActionBarButton from "./CustomActionBarButton.svelte";
 
-    export let menu: "appsMenu" | "buildMenu" | "profileMenu";
+    interface Props {
+        menu: "appsMenu" | "buildMenu" | "profileMenu";
+    }
+
+    let { menu }: Props = $props();
 
     const additionalMenuStore = getAdditionalMenuItemStore(menu);
 </script>

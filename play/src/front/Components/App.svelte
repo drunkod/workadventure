@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     /* eslint no-undef: 0 */
     import { onDestroy, onMount } from "svelte";
     import * as Sentry from "@sentry/svelte";
@@ -29,13 +31,13 @@
     import BrowserNotSupported from "./BrowserNotSupported/BrowserNotSupported.svelte";
 
     let WebGLRenderer = Phaser.Renderer.WebGL.WebGLRenderer;
-    let game: Game;
-    let gameDiv: HTMLDivElement;
-    let activeCowebsite = $coWebsites[0];
-    let gameContainer: HTMLDivElement;
+    let game: Game = $state();
+    let gameDiv: HTMLDivElement = $state();
+    let activeCowebsite = $state($coWebsites[0]);
+    let gameContainer: HTMLDivElement = $state();
     let canvas: HTMLCanvasElement;
     let handleCanvasClick: () => void;
-    let browserNotSupported = false;
+    let browserNotSupported = $state(false);
 
     onMount(() => {
         // Check browser compatibility before initializing the app
@@ -212,18 +214,22 @@
         desktopApi.init();
     });
 
-    $: if ($coWebsites.length > 0) {
-        activeCowebsite = $coWebsites[0];
-    }
+    run(() => {
+        if ($coWebsites.length > 0) {
+            activeCowebsite = $coWebsites[0];
+        }
+    });
 
     function closeCoWebsiteFullScreen() {
         gameContainer.classList.remove("hidden");
         coWebsites.remove(activeCowebsite);
     }
 
-    $: if ($fullScreenCowebsite && $coWebsites.length < 1) {
-        closeCoWebsiteFullScreen();
-    }
+    run(() => {
+        if ($fullScreenCowebsite && $coWebsites.length < 1) {
+            closeCoWebsiteFullScreen();
+        }
+    });
 
     //$: $coWebsites.length < 1 ? (flexBasis = undefined) : null;
 

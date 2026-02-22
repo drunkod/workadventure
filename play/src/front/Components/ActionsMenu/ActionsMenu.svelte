@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, handlers } from 'svelte/legacy';
+
     import type { Unsubscriber } from "svelte/store";
     import { onDestroy } from "svelte";
     import { actionsMenuStore } from "../../Stores/ActionsMenuStore";
@@ -8,8 +10,8 @@
     import type { ActionsMenuAction, ActionsMenuData } from "../../Stores/ActionsMenuStore";
     import { analyticsClient } from "../../Administration/AnalyticsClient";
 
-    let actionsMenuData: ActionsMenuData | undefined;
-    let sortedActions: ActionsMenuAction[] | undefined;
+    let actionsMenuData: ActionsMenuData | undefined = $state();
+    let sortedActions: ActionsMenuAction[] | undefined = $state();
 
     let actionsMenuStoreUnsubscriber: Unsubscriber | null;
 
@@ -23,7 +25,7 @@
         actionsMenuStore.clear();
     }
 
-    let buttonsLayout: "row" | "column" = "row";
+    let buttonsLayout: "row" | "column" = $state("row");
 
     actionsMenuStoreUnsubscriber = actionsMenuStore.subscribe((value) => {
         actionsMenuData = value;
@@ -56,7 +58,7 @@
     });
 </script>
 
-<svelte:window on:keydown={onKeyDown} />
+<svelte:window onkeydown={onKeyDown} />
 
 {#if actionsMenuData}
     <div
@@ -113,10 +115,9 @@
                         class="btn btn-light btn-ghost text-nowrap justify-center w-full h-full !bg-white/10 hover:!bg-white/20 {action.style ??
                             ''}"
                         class:mx-2={buttonsLayout === "column"}
-                        on:click={() => analyticsClient.clickPropertyMapEditor(action.actionName, action.style)}
-                        on:click|preventDefault={async () => {
+                        onclick={handlers(() => analyticsClient.clickPropertyMapEditor(action.actionName, action.style), preventDefault(async () => {
                             await action.callback();
-                        }}
+                        }))}
                     >
                         <span class="flex flex-row gap-2 items-center justify-center text-nowrap">
                             {#if action.actionIcon}
@@ -125,7 +126,7 @@
                                     style="background-color: {action.iconColor ?? 'white'};
                                 -webkit-mask: url({action.actionIcon}) no-repeat center;
                                     mask: url({action.actionIcon}) no-repeat center;"
-                                />
+></div>
                             {/if}
                             {action.actionName}
                         </span>

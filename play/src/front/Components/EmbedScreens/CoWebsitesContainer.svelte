@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run, handlers } from 'svelte/legacy';
+
     import { onDestroy, onMount } from "svelte";
     import type { Unsubscriber } from "svelte/store";
     import { coWebsiteRatio, coWebsites, fullScreenCowebsite } from "../../Stores/CoWebsiteStore";
@@ -17,8 +19,8 @@
     import { IconChevronLeft, IconChevronRight, IconArrowsMinimize } from "@wa-icons";
 
     //let container: HTMLElement;
-    let activeCowebsite: CoWebsite = $coWebsites[0];
-    let resizeBar: HTMLElement;
+    let activeCowebsite: CoWebsite = $state($coWebsites[0]);
+    let resizeBar: HTMLElement = $state();
     let unsubscribeCowebsitesUpdate: Unsubscriber | undefined;
 
     onMount(() => {
@@ -145,12 +147,10 @@
         document.removeEventListener("touchend", handleTouchEnd);
     });
 
-    let tabsContainer: HTMLElement | undefined;
-    let tabsContainerWidth = 0;
-    let tabsOverflowing = false;
-    let tabsScrollX = 0;
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    $: tabsContainerWidth, $coWebsites, (tabsOverflowing = areTabsOverflowing());
+    let tabsContainer: HTMLElement | undefined = $state();
+    let tabsContainerWidth = $state(0);
+    let tabsOverflowing = $state(false);
+    let tabsScrollX = $state(0);
 
     function areTabsOverflowing(): boolean {
         if (!tabsContainer) {
@@ -197,6 +197,10 @@
     function onTabsScroll() {
         tabsScrollX = tabsContainer?.scrollLeft ?? 0;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    run(() => {
+        tabsContainerWidth, $coWebsites, (tabsOverflowing = areTabsOverflowing());
+    });
 </script>
 
 <div
@@ -212,7 +216,7 @@
                 <div class="flex-0 w-10">
                     <button
                         class="w-10 h-10 rounded flex items-center justify-center hover:bg-white/10 me-2"
-                        on:click={scrollTabsLeft}
+                        onclick={scrollTabsLeft}
                     >
                         <IconChevronLeft font-size="20" class="text-white" />
                     </button>
@@ -224,11 +228,11 @@
                 <div
                     bind:this={tabsContainer}
                     class="flex items-stretch overflow-x-hidden space-x-2 snap-x touch-pan-x"
-                    on:scroll={onTabsScroll}
+                    onscroll={onTabsScroll}
                 >
                     {#each $coWebsites as coWebsite, index (coWebsite.getId())}
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <div data-testid="tab{index + 1}" class="snap-start">
                             <CoWebsiteTab
                                 {coWebsite}
@@ -246,19 +250,19 @@
                 <div class="flex-0 w-10">
                     <button
                         class="w-10 h-10 rounded flex items-center justify-center hover:bg-white/10 me-2"
-                        on:click={scrollTabsRight}
+                        onclick={scrollTabsRight}
                     >
                         <IconChevronRight font-size="20" class="text-white" />
                     </button>
                 </div>
             {/if}
 
-            <!-- svelte-ignore a11y-click-events-have-key-events -->
-            <!-- svelte-ignore a11y-no-static-element-interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div class="flex justify-end w-10 flex-none">
                 <div
                     class="ms-full h-10 w-10 rounded flex items-center justify-center hover:bg-white/10 me-2 cursor-pointer"
-                    on:click={toggleFullScreen}
+                    onclick={toggleFullScreen}
                 >
                     {#if !$fullScreenCowebsite}
                         <IconArrowsMinimize font-size="20" class="text-white" />
@@ -291,22 +295,21 @@
         </div>
     </div>
     <!-- We make the drag handle bigger than it really is to make it more easily selectable (especially on mobile) with "after" pseudo element -->
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
         class={$screenOrientationStore === "portrait"
             ? "-mt-1.5 mx-auto w-40 h-1 bg-white rounded cursor-row-resize relative after:content-[''] after:absolute after:-start-4 after:-top-1  after:w-48 after:h-6"
             : "absolute start-1 top-0 bottom-0 m-auto w-1 h-40 bg-white rounded cursor-col-resize after:content-[''] after:absolute after:-start-4 after:-top-4 after:h-48 after:w-6"}
         class:hidden={$fullScreenCowebsite}
         bind:this={resizeBar}
-        on:mousedown={addDivForResize}
-        on:mouseup={removeDivForResize}
-        on:touchstart={addDivForResize}
-        on:touchstart={() => {
+        onmousedown={addDivForResize}
+        onmouseup={removeDivForResize}
+        ontouchstart={handlers(addDivForResize, () => {
             /*isResized.set(true)*/
-        }}
-        on:dragend={removeDivForResize}
-        on:touchend={removeDivForResize}
-    />
+        })}
+        ondragend={removeDivForResize}
+        ontouchend={removeDivForResize}
+></div>
 </div>
 
 <style>

@@ -9,7 +9,11 @@
     import InputCheckbox from "../../Input/InputCheckbox.svelte";
     import { IconMessage } from "../../Icons";
     import PropertyEditorBase from "./PropertyEditorBase.svelte";
-    export let property: MatrixRoomPropertyData;
+    interface Props {
+        property: MatrixRoomPropertyData;
+    }
+
+    let { property = $bindable() }: Props = $props();
 
     const dispatch = createEventDispatcher<{
         change: undefined;
@@ -27,34 +31,38 @@
         dispatch("close");
     }}
 >
-    <span slot="header" class="flex justify-center items-center">
-        <IconMessage font-size="18" class="mr-2" />
-        {$LL.mapEditor.properties.matrixRoomPropertyData.label()}
-    </span>
-    <span slot="content">
-        {#if !isCreatingRoom && !creationRoomError && isChatIdSentToPusher}
-            <div class="area-name-container">
-                <Input
-                    id="objectName"
-                    label={$LL.mapEditor.properties.matrixRoomPropertyData.roomNameLabel()}
-                    type="text"
-                    disabled={!property.serverData?.matrixRoomId}
-                    placeholder={$LL.mapEditor.properties.matrixRoomPropertyData.roomNameLabelPlaceholder()}
-                    bind:value={property.displayName}
+    {#snippet header()}
+        <span  class="flex justify-center items-center">
+            <IconMessage font-size="18" class="mr-2" />
+            {$LL.mapEditor.properties.matrixRoomPropertyData.label()}
+        </span>
+    {/snippet}
+    {#snippet content()}
+        <span >
+            {#if !isCreatingRoom && !creationRoomError && isChatIdSentToPusher}
+                <div class="area-name-container">
+                    <Input
+                        id="objectName"
+                        label={$LL.mapEditor.properties.matrixRoomPropertyData.roomNameLabel()}
+                        type="text"
+                        disabled={!property.serverData?.matrixRoomId}
+                        placeholder={$LL.mapEditor.properties.matrixRoomPropertyData.roomNameLabelPlaceholder()}
+                        bind:value={property.displayName}
+                        onChange={onValueChange}
+                    />
+                </div>
+                <InputCheckbox
+                    id="openAutomaticallyChatLabel"
+                    label={$LL.mapEditor.properties.matrixRoomPropertyData.openAutomaticallyChatLabel()}
+                    dataTestId="shouldOpenAutomaticallyCheckbox"
+                    bind:value={property.shouldOpenAutomatically}
                     onChange={onValueChange}
                 />
-            </div>
-            <InputCheckbox
-                id="openAutomaticallyChatLabel"
-                label={$LL.mapEditor.properties.matrixRoomPropertyData.openAutomaticallyChatLabel()}
-                dataTestId="shouldOpenAutomaticallyCheckbox"
-                bind:value={property.shouldOpenAutomatically}
-                onChange={onValueChange}
-            />
-        {:else if isCreatingRoom && !creationRoomError}
-            <ChatLoader label={$LL.chat.createRoom.loadingCreation()} />
-        {:else}
-            <ChatError label={$LL.chat.createRoom.error()} />
-        {/if}
-    </span>
+            {:else if isCreatingRoom && !creationRoomError}
+                <ChatLoader label={$LL.chat.createRoom.loadingCreation()} />
+            {:else}
+                <ChatError label={$LL.chat.createRoom.error()} />
+            {/if}
+        </span>
+    {/snippet}
 </PropertyEditorBase>

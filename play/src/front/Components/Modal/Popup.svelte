@@ -3,8 +3,21 @@
     import { closeModal } from "svelte-modals";
     import ButtonClose from "../Input/ButtonClose.svelte";
 
-    export let isOpen = false;
-    export let withAction = true;
+    interface Props {
+        isOpen?: boolean;
+        withAction?: boolean;
+        title?: import('svelte').Snippet;
+        content?: import('svelte').Snippet;
+        action?: import('svelte').Snippet;
+    }
+
+    let {
+        isOpen = false,
+        withAction = true,
+        title,
+        content,
+        action
+    }: Props = $props();
 </script>
 
 {#if isOpen}
@@ -16,7 +29,7 @@
             <div class="p-8 flex flex-col justify-center items-center">
                 <div class="flex-row flex items-start w-full justify-between gap-4">
                     <div class="p-2">
-                        <slot name="title" />
+                        {@render title?.()}
                     </div>
                     <div>
                         <ButtonClose
@@ -29,13 +42,13 @@
                         />
                     </div>
                 </div>
-                <slot name="content" />
+                {@render content?.()}
             </div>
             {#if withAction}
                 <div
                     class="footer flex flex-row justify-evenly items-center bg-contrast w-full p-4 gap-3 rounded-b-3xl"
                 >
-                    <slot name="action" />
+                    {@render action?.()}
                 </div>
             {/if}
         </div>

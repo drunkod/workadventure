@@ -12,13 +12,18 @@
     import { localUserStore } from "../../Connection/LocalUserStore";
     import {} from "./PictureInPicture/PictureInPictureWindow";
     import { gameManager } from "../../Phaser/Game/GameManager";
+    interface Props {
+        children?: import('svelte').Snippet<[any]>;
+    }
+
+    let { children }: Props = $props();
 
     const debug = Debug("app:PictureInPicture");
 
-    let divElement: HTMLDivElement;
-    let parentDivElement: HTMLDivElement;
+    let divElement: HTMLDivElement = $state();
+    let parentDivElement: HTMLDivElement = $state();
     let pipWindow: Window | undefined;
-    let mapImage: string | undefined = undefined;
+    let mapImage: string | undefined = $state(undefined);
 
     /* eslint-disable svelte/no-dom-manipulating */
 
@@ -220,8 +225,8 @@
             <div
                 class="fixed z-0 top-0 left-0 w-full h-full bg-cover bg-center bg-no-repeat opacity-20 bg-black"
                 style="background-image: url({mapImage});"
-            />
+></div>
         {/if}
-        <slot inPictureInPicture={$activePictureInPictureStore} />
+        {@render children?.({ inPictureInPicture: $activePictureInPictureStore, })}
     </div>
 </div>

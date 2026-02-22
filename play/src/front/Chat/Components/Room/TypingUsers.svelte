@@ -2,7 +2,11 @@
     import Avatar from "../Avatar.svelte";
     import type { PictureStore } from "../../../Stores/PictureStore";
 
-    export let typingMembers: { id: string; name: string | null; pictureStore: PictureStore }[];
+    interface Props {
+        typingMembers: { id: string; name: string | null; pictureStore: PictureStore }[];
+    }
+
+    let { typingMembers }: Props = $props();
     const NUMBER_OF_TYPING_MEMBER_TO_DISPLAY = 3;
 </script>
 
@@ -29,9 +33,9 @@
     <div
         class="message rounded-2xl px-3 rounded-bl-none bg-contrast gap-1 flex items-center justify-center text-lg ml-1 h-10"
     >
-        <div class="animate-bounce-1 h-1 w-1 bg-white/50 rounded-full" />
-        <div class="animate-bounce-2 h-1 w-1 bg-white/50 rounded-full" />
-        <div class="animate-bounce-3 h-1 w-1 bg-white/50 rounded-full" />
+        <div class="animate-bounce-1 h-1 w-1 bg-white/50 rounded-full"></div>
+        <div class="animate-bounce-2 h-1 w-1 bg-white/50 rounded-full"></div>
+        <div class="animate-bounce-3 h-1 w-1 bg-white/50 rounded-full"></div>
     </div>
 </div>
 

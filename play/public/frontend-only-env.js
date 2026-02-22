@@ -11,6 +11,29 @@
         window.history.replaceState({}, "", roomUrl.pathname + search + roomUrl.hash);
     }
 
+    const parseBooleanParam = (paramName, fallbackValue) => {
+        const value = roomUrl.searchParams.get(paramName);
+        if (value === null) {
+            return fallbackValue;
+        }
+        return value === "1" || value === "true" || value === "yes" || value === "on";
+    };
+
+    const parseOptionalParam = (paramName) => {
+        const value = roomUrl.searchParams.get(paramName);
+        return value && value.trim() !== "" ? value : undefined;
+    };
+
+    const enableChat = parseBooleanParam("mockEnableChat", false);
+    const enableChatUpload = parseBooleanParam("mockEnableChatUpload", enableChat);
+    const enableChatOnlineList = parseBooleanParam("mockEnableChatOnlineList", enableChat);
+    const enableChatDisconnectedList = parseBooleanParam("mockEnableChatDisconnectedList", enableChat);
+    const enableJazzChat = parseBooleanParam("mockEnableJazzChat", false);
+    const enableOpenId = parseBooleanParam("mockEnableOpenId", false);
+    const jazzSyncPeer = parseOptionalParam("mockJazzSyncPeer");
+    const jazzApiKey = parseOptionalParam("mockJazzApiKey");
+    const jazzGlobalRoomId = parseOptionalParam("mockJazzGlobalRoomId");
+
     const roomUrlString = roomUrl.toString();
     window.localStorage?.setItem("lastRoomUrl", roomUrlString);
     if ("caches" in window) {
@@ -48,9 +71,9 @@
             POSTHOG_API_KEY: undefined,
             POSTHOG_URL: undefined,
             DISABLE_ANONYMOUS: false,
-            ENABLE_OPENID: false,
+            ENABLE_OPENID: enableOpenId,
             OPID_PROFILE_SCREEN_PROVIDER: undefined,
-            ENABLE_CHAT_UPLOAD: false,
+            ENABLE_CHAT_UPLOAD: enableChatUpload,
             FALLBACK_LOCALE: "en",
             OPID_WOKA_NAME_POLICY: undefined,
             ENABLE_REPORT_ISSUES_MENU: false,
@@ -81,9 +104,13 @@
             MATRIX_PUBLIC_URI: undefined,
             MATRIX_ADMIN_USER: undefined,
             MATRIX_DOMAIN: undefined,
-            ENABLE_CHAT: false,
-            ENABLE_CHAT_ONLINE_LIST: false,
-            ENABLE_CHAT_DISCONNECTED_LIST: false,
+            JAZZ_CHAT_ENABLED: enableJazzChat,
+            JAZZ_SYNC_PEER: jazzSyncPeer,
+            JAZZ_API_KEY: jazzApiKey,
+            JAZZ_GLOBAL_ROOM_ID: jazzGlobalRoomId,
+            ENABLE_CHAT: enableChat,
+            ENABLE_CHAT_ONLINE_LIST: enableChatOnlineList,
+            ENABLE_CHAT_DISCONNECTED_LIST: enableChatDisconnectedList,
             ENABLE_SAY: false,
             ENABLE_ISSUE_REPORT: false,
             GRPC_MAX_MESSAGE_SIZE: 4194304,

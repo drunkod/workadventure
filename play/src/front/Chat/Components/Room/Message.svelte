@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Message from './Message.svelte';
     import type { ComponentType } from "svelte";
     import { createEventDispatcher } from "svelte";
     import { derived } from "svelte/store";
@@ -18,11 +19,15 @@
     import MessageOutcoming from "./Message/MessageOutcoming.svelte";
     import { IconTrash } from "@wa-icons";
 
-    export let message: ChatMessage;
-    export let replyDepth = 0;
-    export let showHeader = true;
+    interface Props {
+        message: ChatMessage;
+        replyDepth?: number;
+        showHeader?: boolean;
+    }
 
-    let messageRef: HTMLDivElement | undefined;
+    let { message, replyDepth = 0, showHeader = true }: Props = $props();
+
+    let messageRef: HTMLDivElement | undefined = $state();
 
     const dispatch = createEventDispatcher<{
         updateMessageBody: { id: string };
@@ -136,7 +141,8 @@
                         <div class="px-2 pt-1 text-xxs font-bold">{isMyMessage ? "You" : sender?.username}</div>
                     {/if}
 
-                    <svelte:component this={messageType[type]} on:updateMessageBody={updateMessageBody} {content} />
+                    {@const SvelteComponent = messageType[type]}
+                    <SvelteComponent on:updateMessageBody={updateMessageBody} {content} />
 
                     {#if $reactionsWithUsers.length > 0}
                         <MessageReactions
@@ -154,7 +160,7 @@
                 {#if quotedMessage && replyDepth < 1 && !$isDeleted}
                     <div class="p-1 opacity-80">
                         <div class="response bg-white/10 rounded">
-                            <svelte:self replyDepth={replyDepth + 1} message={quotedMessage} />
+                            <Message replyDepth={replyDepth + 1} message={quotedMessage} />
                         </div>
                     </div>
                 {/if}

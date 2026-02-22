@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
     import { writable } from "svelte/store";
     import { selectDefaultSpeaker, speakerSelectedStore } from "../../../Stores/MediaStore";
@@ -7,13 +5,17 @@
     import type { VideoBox } from "../../../Space/Space";
     import AudioStream from "./AudioStream.svelte";
 
-    export let videoBox: VideoBox;
-    const streamable = videoBox.streamable;
+    interface Props {
+        videoBox: VideoBox;
+    }
 
-    $: muteAudioStore = $streamable?.muteAudio;
-    $: muteAudio = $muteAudioStore ?? false;
+    let { videoBox }: Props = $props();
+    let streamable = $derived(videoBox.streamable);
 
-    $: hasAudio = $streamable?.hasAudio ?? writable(false);
+    let muteAudioStore = $derived($streamable?.muteAudio);
+    let muteAudio = $derived($muteAudioStore ?? false);
+
+    let hasAudio = $derived($streamable?.hasAudio ?? writable(false));
 </script>
 
 {#if $streamable && ($streamable?.media.type === "webrtc" || $streamable?.media.type === "livekit") && !muteAudio && $hasAudio}

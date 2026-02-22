@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { fly } from "svelte/transition";
     import { onMount } from "svelte";
     import { EditorToolName } from "../../Phaser/Game/MapEditor/MapEditorModeManager";
@@ -18,24 +20,26 @@
 
     const direction = document.documentElement.getAttribute("dir") || "ltr";
 
-    let mapEditor: HTMLElement;
+    let mapEditor: HTMLElement = $state();
 
     function hideMapEditor() {
         mapEditorVisibilityStore.set(false);
     }
 
-    $: mapEditorSideBarWidth =
-        $mapEditorVisibilityStore && $mapEditorSelectedToolStore !== EditorToolName.WAMSettingsEditor
+    let mapEditorSideBarWidth =
+        $derived($mapEditorVisibilityStore && $mapEditorSelectedToolStore !== EditorToolName.WAMSettingsEditor
             ? $mapEditorSideBarWidthStore
-            : 0;
+            : 0);
 
     function onResize(width: number) {
         mapEditorSideBarWidthStore.set(width);
     }
 
-    $: if (mapEditor) {
-        mapEditor.style.width = `${mapEditorSideBarWidth}px`;
-    }
+    run(() => {
+        if (mapEditor) {
+            mapEditor.style.width = `${mapEditorSideBarWidth}px`;
+        }
+    });
 
     function closeMapEditor() {
         mapEditorVisibilityStore.set(false);
@@ -87,7 +91,7 @@
                         class="h-8 w-8 rounded flex items-center justify-center hover:bg-white/20 transition-all aspect-square cursor-pointer text-2xl opacity-50 hover:opacity-100"
                         class:right-4={direction === "ltr"}
                         class:left-4={direction === "rtl"}
-                        on:click={hideMapEditor}
+                        onclick={hideMapEditor}
                     >
                         <ArrowBarRight
                             height="h-5"

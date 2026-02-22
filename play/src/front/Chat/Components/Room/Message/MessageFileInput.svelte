@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import { get } from "svelte/store";
     import { createEventDispatcher, onMount } from "svelte";
     import type { ChatRoom } from "../../../Connection/ChatConnection";
@@ -11,22 +13,14 @@
         fileUploaded: void;
     }>();
 
-    let files: FileList | undefined = undefined;
-    export let room: ChatRoom;
-    const isProximityChatRoom = room instanceof ProximityChatRoom;
-
-    $: {
-        if (files) {
-            room.sendFiles(files)
-                .then(() => {
-                    // Infinite loop is not possible because the first thing we do in the reactive statement is test for "files" not undefined.
-                    // eslint-disable-next-line svelte/infinite-reactive-loop
-                    files = undefined;
-                    unselectChatMessageToReplyIfSelected();
-                })
-                .catch((error) => console.error(error));
-        }
+    let files: FileList | undefined = $state(undefined);
+    interface Props {
+        room: ChatRoom;
     }
+
+    let { room }: Props = $props();
+    let isProximityChatRoom = $derived(room instanceof ProximityChatRoom);
+
 
     function unselectChatMessageToReplyIfSelected() {
         if (get(selectedChatMessageToReply) !== null) {
@@ -49,6 +43,18 @@
         const input = document.getElementById("labelUpload");
         input?.click();
     });
+    run(() => {
+        if (files) {
+            room.sendFiles(files)
+                .then(() => {
+                    // Infinite loop is not possible because the first thing we do in the reactive statement is test for "files" not undefined.
+                    // eslint-disable-next-line svelte/infinite-reactive-loop
+                    files = undefined;
+                    unselectChatMessageToReplyIfSelected();
+                })
+                .catch((error) => console.error(error));
+        }
+    });
 </script>
 
 <div class="relative">
@@ -60,8 +66,8 @@
         multiple
         bind:files
         data-testid="uploadChatCustomAsset"
-        on:focusin={focusChatInput}
-        on:focusout={unfocusChatInput}
+        onfocusin={focusChatInput}
+        onfocusout={unfocusChatInput}
     />
     <label
         id="labelUpload"
@@ -72,14 +78,14 @@
             <IconLoader class="animate-spin" font-size={18} />
         {:else}
             <IconPaperclip
-                class="hover:!cursor-pointer {room instanceof ProximityChatRoom ? 'opacity-30 !cursor-none' : ''}"
+                class="hover:!cursor-pointer {isProximityChatRoom ? 'opacity-30 !cursor-none' : ''}"
                 font-size={18}
             />
         {/if}
     </label>
     <button
         class="absolute top-0 right-0 m-1 hover:bg-white/10 cursor-pointer"
-        on:click={() => unselectChatMessageToReplyIfSelected()}
+        onclick={() => unselectChatMessageToReplyIfSelected()}
     >
         <IconX class=" text-white/50 hover:text-white transition-all" font-size={16} />
     </button>

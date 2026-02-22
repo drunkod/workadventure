@@ -6,9 +6,13 @@
     import type { VerificationEmojiDialogProps } from "./MatrixSecurity";
     import { matrixSecurity } from "./MatrixSecurity";
 
-    export let isOpen: boolean;
-    export let startVerificationPromise: Promise<VerificationEmojiDialogProps>;
-    export let isInitiatedByMe = false;
+    interface Props {
+        isOpen: boolean;
+        startVerificationPromise: Promise<VerificationEmojiDialogProps>;
+        isInitiatedByMe?: boolean;
+    }
+
+    let { isOpen, startVerificationPromise, isInitiatedByMe = false }: Props = $props();
 
     startVerificationPromise
         .then((verificationEmojiProps) => {
@@ -21,10 +25,14 @@
 </script>
 
 <Popup {isOpen} withAction={false}>
-    <h1 slot="title">
-        {isInitiatedByMe
-            ? $LL.chat.verificationEmojiDialog.titleVerifyThisDevice()
-            : $LL.chat.verificationEmojiDialog.titleVerifyOtherDevice()}
-    </h1>
-    <div slot="content"><ChatLoader label={$LL.chat.verificationEmojiDialog.waitForOtherDevice()} /></div>
+    {#snippet title()}
+        <h1 >
+            {isInitiatedByMe
+                ? $LL.chat.verificationEmojiDialog.titleVerifyThisDevice()
+                : $LL.chat.verificationEmojiDialog.titleVerifyOtherDevice()}
+        </h1>
+    {/snippet}
+    {#snippet content()}
+        <div ><ChatLoader label={$LL.chat.verificationEmojiDialog.waitForOtherDevice()} /></div>
+    {/snippet}
 </Popup>

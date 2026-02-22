@@ -428,6 +428,15 @@ export const EnvironmentVariables = z.object({
     MATRIX_ADMIN_USER: z.string().optional().describe("Matrix administrator username"),
     MATRIX_ADMIN_PASSWORD: z.string().optional().describe("Matrix administrator password"),
     MATRIX_DOMAIN: z.string().optional().describe("Matrix server domain"),
+    JAZZ_CHAT_ENABLED: BoolAsString.optional()
+        .transform((val) => toBool(val, false))
+        .describe("Enable Jazz chat provider on the frontend. Defaults to false"),
+    JAZZ_SYNC_PEER: z.string().optional().describe("Jazz sync peer URL (for example wss://cloud.jazz.tools/?key=...)"),
+    JAZZ_API_KEY: z.string().optional().describe("Jazz API key used to build default cloud peer URL"),
+    JAZZ_GLOBAL_ROOM_ID: z
+        .string()
+        .optional()
+        .describe("Optional global Jazz room CoValue ID shared by all users in a world"),
     EMBEDLY_KEY: z.string().optional().describe("Embedly API key for rich link previews"),
     GRPC_MAX_MESSAGE_SIZE: PositiveIntAsString.optional()
         .or(z.string().max(0))

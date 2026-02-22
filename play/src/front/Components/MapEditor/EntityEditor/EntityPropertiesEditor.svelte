@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation } from 'svelte/legacy';
+
     import type { EntityDataProperties, EntityDataPropertiesKeys, EntityDataProperty } from "@workadventure/map-editor";
     import { onDestroy } from "svelte";
     import type { ApplicationDefinitionInterface } from "@workadventure/messages";
@@ -21,11 +23,11 @@
     import OpenFilePropertyEditor from "../PropertyEditor/OpenFilePropertyEditor.svelte";
     import type { Entity } from "../../../Phaser/ECS/Entity";
 
-    let properties: EntityDataProperties = [];
-    let entityName = "";
-    let entityDescription = "";
-    let entitySearchable = false;
-    let showDescriptionField = false;
+    let properties: EntityDataProperties = $state([]);
+    let entityName = $state("");
+    let entityDescription = $state("");
+    let entitySearchable = $state(false);
+    let showDescriptionField = $state(false);
     let selectedEntity: Entity | undefined = undefined;
 
     let selectedEntityUnsubscriber = mapEditorSelectedEntityStore.subscribe((currentEntity) => {
@@ -277,9 +279,9 @@
         <div class="header-container">
             <h3>{$LL.mapEditor.entityEditor.editing({ name: $mapEditorSelectedEntityStore.getPrefab().name })}</h3>
         </div>
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-        <p on:click|preventDefault={backToSelectObject} class="flex flex-row items-center text-xs m-0">
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+        <p onclick={preventDefault(backToSelectObject)} class="flex flex-row items-center text-xs m-0">
             <IconArrowLeft font-size="12" class="cursor-pointer" />
             <span class="ml-1 cursor-pointer">{$LL.mapEditor.entityEditor.itemPicker.backToSelectObject()}</span>
         </p>
@@ -394,11 +396,11 @@
                 <a
                     href="#addDescriptionField"
                     class="pl-0 text-blue-500 flex flex-row items-center"
-                    on:click|preventDefault|stopPropagation={toggleDescriptionField}
+                    onclick={stopPropagation(preventDefault(toggleDescriptionField))}
                     >+ {$LL.mapEditor.entityEditor.addDescriptionField()}</a
                 >
             {:else}
-                <button class="pl-0 text-blue-500 flex flex-row items-center" on:click={toggleDescriptionField}>
+                <button class="pl-0 text-blue-500 flex flex-row items-center" onclick={toggleDescriptionField}>
                     <IconChevronDown />{$LL.mapEditor.entityEditor.addDescriptionField()}</button
                 >
 

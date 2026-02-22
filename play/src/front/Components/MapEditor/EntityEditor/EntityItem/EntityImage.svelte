@@ -2,12 +2,16 @@
     import { createEventDispatcher } from "svelte";
     import { IconLoader, IconPhotoOff } from "@wa-icons";
 
-    export let classNames: string | undefined = undefined;
-    export let imageSource: string;
-    export let imageAlt: string;
-    let imageElementRef: HTMLImageElement;
-    let imageRetry = false;
-    let imageError = false;
+    interface Props {
+        classNames?: string | undefined;
+        imageSource: string;
+        imageAlt: string;
+    }
+
+    let { classNames = undefined, imageSource, imageAlt }: Props = $props();
+    let imageElementRef: HTMLImageElement = $state();
+    let imageRetry = $state(false);
+    let imageError = $state(false);
     let MAX_RETRY = 10;
     let retry = 0;
 
@@ -48,11 +52,11 @@
     style="image-rendering: pixelated"
     src={imageSource}
     alt={imageAlt}
-    on:load={() => {
+    onload={() => {
         dispatch("onImageLoad", imageElementRef);
         imageError = false;
         imageRetry = false;
     }}
     bind:this={imageElementRef}
-    on:error={() => retryImageLoading()}
+    onerror={() => retryImageLoading()}
 />

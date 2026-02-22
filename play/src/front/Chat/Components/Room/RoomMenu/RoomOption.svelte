@@ -1,12 +1,24 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation } from 'svelte/legacy';
+
     import type { ComponentType } from "svelte";
     import { createEventDispatcher } from "svelte";
 
-    export let IconComponent: ComponentType;
-    export let title: string;
-    export let dataTestId: string | undefined = undefined;
-    export let bg = "hover:bg-white/10";
-    export let disabled = false;
+    interface Props {
+        IconComponent: ComponentType;
+        title: string;
+        dataTestId?: string | undefined;
+        bg?: string;
+        disabled?: boolean;
+    }
+
+    let {
+        IconComponent,
+        title,
+        dataTestId = undefined,
+        bg = "hover:bg-white/10",
+        disabled = false
+    }: Props = $props();
     const dispatch = createEventDispatcher<{
         click: void;
     }>();
@@ -15,9 +27,9 @@
 <button
     class="flex gap-2 items-center {bg} m-0 p-2 w-full text-sm rounded"
     data-testid={dataTestId}
-    on:click|stopPropagation|preventDefault={() => dispatch("click")}
+    onclick={stopPropagation(preventDefault(() => dispatch("click")))}
     {disabled}
 >
-    <svelte:component this={IconComponent} />
+    <IconComponent />
     <span>{title}</span>
 </button>

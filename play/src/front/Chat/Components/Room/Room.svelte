@@ -13,19 +13,23 @@
     import RoomMenu from "./RoomMenu/RoomMenu.svelte";
     import { IconBellOff } from "@wa-icons";
 
-    export let room: ChatRoom & ChatRoomMembershipManagement & ChatRoomModeration & ChatRoomNotificationControl;
+    interface Props {
+        room: ChatRoom & ChatRoomMembershipManagement & ChatRoomModeration & ChatRoomNotificationControl;
+    }
+
+    let { room }: Props = $props();
 
     let hasUnreadMessage = room.hasUnreadMessages;
     let roomName = room.name;
     let isEncrypted = room.isEncrypted;
     const areNotificationsMuted = room.areNotificationsMuted;
 
-    $: chunks = highlightWords({
+    let chunks = $derived(highlightWords({
         text: $roomName.match(/\[\d*]/) ? $roomName.substring(0, $roomName.search(/\[\d*]/)) : $roomName,
         query: $chatSearchBarValue,
-    });
+    }));
 
-    $: isSelected = $selectedRoomStore?.id === room.id;
+    let isSelected = $derived($selectedRoomStore?.id === room.id);
 </script>
 
 <div
@@ -33,8 +37,8 @@
     class:bg-white={isSelected}
     class:bg-opacity-10={isSelected}
     class:rounded={isSelected}
-    on:click={() => selectedRoomStore.set(room)}
-    on:keyup={() => selectedRoomStore.set(room)}
+    onclick={() => selectedRoomStore.set(room)}
+    onkeyup={() => selectedRoomStore.set(room)}
     role="button"
     tabindex="0"
     data-testid={$roomName}
@@ -61,8 +65,8 @@
     <RoomMenu {room} />
     {#if $hasUnreadMessage}
         <div class="flex items-center justify-center h-7 w-7 relative">
-            <div class="rounded-full bg-secondary-200 h-2 w-2 animate-ping absolute" />
-            <div class="rounded-full bg-secondary-200 h-1.5 w-1.5 absolute" />
+            <div class="rounded-full bg-secondary-200 h-2 w-2 animate-ping absolute"></div>
+            <div class="rounded-full bg-secondary-200 h-1.5 w-1.5 absolute"></div>
         </div>
     {/if}
 </div>

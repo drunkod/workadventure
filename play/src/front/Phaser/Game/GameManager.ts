@@ -23,9 +23,16 @@ import { SelectCompanionSceneName } from "../Login/SelectCompanionScene";
 import { errorScreenStore } from "../../Stores/ErrorScreenStore";
 import { hasCapability } from "../../Connection/Capabilities";
 import type { ChatConnectionInterface } from "../../Chat/Connection/ChatConnection";
-import { MATRIX_PUBLIC_URI } from "../../Enum/EnvironmentVariable";
+import {
+    JAZZ_API_KEY,
+    JAZZ_CHAT_ENABLED,
+    JAZZ_GLOBAL_ROOM_ID,
+    JAZZ_SYNC_PEER,
+    MATRIX_PUBLIC_URI,
+} from "../../Enum/EnvironmentVariable";
 import { InvalidLoginTokenError, MatrixClientWrapper } from "../../Chat/Connection/Matrix/MatrixClientWrapper";
 import { MatrixChatConnection } from "../../Chat/Connection/Matrix/MatrixChatConnection";
+import { JazzChatConnection } from "../../Chat/Connection/Jazz/JazzChatConnection";
 import { VoidChatConnection } from "../../Chat/Connection/VoidChatConnection";
 import { loginTokenErrorStore, isMatrixChatEnabledStore } from "../../Stores/ChatStore";
 import { initializeChatVisibilitySubscription } from "../../Chat/Stores/ChatStore";
@@ -341,6 +348,51 @@ export class GameManager {
     public async getChatConnection(): Promise<ChatConnectionInterface> {
         if (this.chatConnectionPromise) {
             return this.chatConnectionPromise;
+        }
+
+        if (JAZZ_CHAT_ENABLED) {
+            const jazzChatConnection = new JazzChatConnection({
+                roomStorageKey: this.startRoom?.key ?? "default",
+                defaultRoomName: this.startRoom?.roomName ?? "Jazz chat",
+                syncPeer: JAZZ_SYNC_PEER && JAZZ_SYNC_PEER.trim() !== "" ? JAZZ_SYNC_PEER : undefined,
+                apiKey: JAZZ_API_KEY && JAZZ_API_KEY.trim() !== "" ? JAZZ_API_KEY : undefined,
+                globalRoomId: JAZZ_GLOBAL_ROOM_ID && JAZZ_GLOBAL_ROOM_ID.trim() !== "" ? JAZZ_GLOBAL_ROOM_ID : undefined,
+            });
+            this._chatConnection = jazzChatConnection;
+            this.chatConnectionPromise = jazzChatConnection.init().then(() => jazzChatConnection);
+            isMatrixChatEnabledStore.set(true);
+
+            try {
+                await this.chatConnectionPromise;
+
+                try {
+                    const gameScene = await waitForGameSceneStore();
+
+                    if (gameScene.room.isChatEnabled) {
+                        return this.chatConnectionPromise;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Sentry.captureException(error);
+                }
+
+                jazzChatConnection.destroy().catch((error) => {
+                    console.error(error);
+                    Sentry.captureException(error);
+                });
+                this._chatConnection = undefined;
+                this.chatConnectionPromise = undefined;
+                return new VoidChatConnection();
+            } catch (error) {
+                console.error("Failed to initialize Jazz chat connection, fallback to Matrix", error);
+                Sentry.captureException(error);
+                jazzChatConnection.destroy().catch((destroyError) => {
+                    console.error(destroyError);
+                    Sentry.captureException(destroyError);
+                });
+                this._chatConnection = undefined;
+                this.chatConnectionPromise = undefined;
+            }
         }
 
         const matrixServerUrl = this.getMatrixServerUrl() ?? MATRIX_PUBLIC_URI;

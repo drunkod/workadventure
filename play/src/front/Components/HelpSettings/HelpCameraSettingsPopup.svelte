@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { fly } from "svelte/transition";
     import { getNavigatorType, isAndroid as isAndroidFct, NavigatorType } from "../../WebRtc/DeviceUtils";
     import { LL } from "../../../i18n/i18n-svelte";
@@ -8,7 +10,7 @@
     let isAndroid = isAndroidFct();
     let isFirefox = getNavigatorType() === NavigatorType.firefox;
     let isChrome = getNavigatorType() === NavigatorType.chrome;
-    let showDetails = false;
+    let showDetails = $state(false);
 
     function allow() {
         showDetails = !showDetails;
@@ -21,7 +23,7 @@
 
 <form
     class="helpCameraSettings z-[600] bg-contrast/80 backdrop-filter text-center rounded-lg text-white self-center pointer-events-auto flex flex-col w-full md:w-2/3 xl:w-[380px] text-sm md:text-base overflow-hidden"
-    on:submit|preventDefault={close}
+    onsubmit={preventDefault(close)}
     transition:fly={{ y: -50, duration: 500 }}
 >
     <section class="mb-0">
@@ -63,10 +65,10 @@
         {/if}
     </section>
     <section class="flex row justify-center p-4 bg-contrast">
-        <button class="btn btn-sm btn-border btn-success mr-2 w-full justify-center" on:click|preventDefault={allow}
+        <button class="btn btn-sm btn-border btn-success mr-2 w-full justify-center" onclick={preventDefault(allow)}
             >{$LL.camera.help.allow()}</button
         >
-        <button type="submit" class="btn btn-danger btn-sm w-full justify-center" on:click|preventDefault={close}
+        <button type="submit" class="btn btn-danger btn-sm w-full justify-center" onclick={preventDefault(close)}
             >{$LL.camera.help.continue()}</button
         >
     </section>

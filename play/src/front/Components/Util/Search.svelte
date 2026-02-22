@@ -2,12 +2,21 @@
     import { LL } from "../../../i18n/i18n-svelte";
     import { searchValue } from "../../Stores/Utils/SearchStore";
 
-    export let id: string | undefined;
-    export let placeHolder: string = $LL.chat.userList.search();
-    export let disabled = false;
-    export let onChangeSearchHandler = (value: string) => {
+    interface Props {
+        id: string | undefined;
+        placeHolder?: string;
+        disabled?: boolean;
+        onChangeSearchHandler?: any;
+    }
+
+    let {
+        id,
+        placeHolder = $LL.chat.userList.search(),
+        disabled = false,
+        onChangeSearchHandler = (value: string) => {
         searchValue.set(value);
-    };
+    }
+    }: Props = $props();
 </script>
 
 <form>
@@ -17,7 +26,7 @@
         name="search-input"
         class="h-full rounded-none"
         placeholder={placeHolder}
-        on:input={(event) => onChangeSearchHandler(event.currentTarget.value)}
+        oninput={(event) => onChangeSearchHandler(event.currentTarget.value)}
         {disabled}
     />
     <button type="submit" class="h-full m-0 rounded-l-none">

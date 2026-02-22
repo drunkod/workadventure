@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { fly } from "svelte/transition";
     import {
         audioManagerFileStore,
@@ -33,31 +35,31 @@
         IconCameraUp,
     } from "@wa-icons";
 
-    let fullscreen: boolean = localUserStore.getFullscreen();
-    let notification: boolean = localUserStore.getNotification();
-    let allowPictureInPicture: boolean = localUserStore.getAllowPictureInPicture();
-    let blockAudio: boolean = localUserStore.getBlockAudio();
-    let forceCowebsiteTrigger: boolean = localUserStore.getForceCowebsiteTrigger();
-    let ignoreFollowRequests: boolean = localUserStore.getIgnoreFollowRequests();
-    let decreaseAudioPlayerVolumeWhileTalking: boolean = localUserStore.getDecreaseAudioPlayerVolumeWhileTalking();
-    let disableAnimations: boolean = localUserStore.getDisableAnimations();
-    let valueLocale: string = $locale;
-    let valueCameraPrivacySettings = localUserStore.getCameraPrivacySettings();
-    let valueMicrophonePrivacySettings = localUserStore.getMicrophonePrivacySettings();
+    let fullscreen: boolean = $state(localUserStore.getFullscreen());
+    let notification: boolean = $state(localUserStore.getNotification());
+    let allowPictureInPicture: boolean = $state(localUserStore.getAllowPictureInPicture());
+    let blockAudio: boolean = $state(localUserStore.getBlockAudio());
+    let forceCowebsiteTrigger: boolean = $state(localUserStore.getForceCowebsiteTrigger());
+    let ignoreFollowRequests: boolean = $state(localUserStore.getIgnoreFollowRequests());
+    let decreaseAudioPlayerVolumeWhileTalking: boolean = $state(localUserStore.getDecreaseAudioPlayerVolumeWhileTalking());
+    let disableAnimations: boolean = $state(localUserStore.getDisableAnimations());
+    let valueLocale: string = $state($locale);
+    let valueCameraPrivacySettings = $state(localUserStore.getCameraPrivacySettings());
+    let valueMicrophonePrivacySettings = $state(localUserStore.getMicrophonePrivacySettings());
     const initialVideoQuality = localUserStore.getVideoQuality();
-    let valueVideoQuality = initialVideoQuality === "high" ? 3 : initialVideoQuality === "low" ? 1 : 2;
+    let valueVideoQuality = $state(initialVideoQuality === "high" ? 3 : initialVideoQuality === "low" ? 1 : 2);
     const initialScreenShareQuality = localUserStore.getScreenShareQuality();
     let valueScreenShareQuality =
-        initialScreenShareQuality === "high" ? 3 : initialScreenShareQuality === "low" ? 1 : 2;
-    let bandwidthConstrainedPreference = localUserStore.getBandwidthConstrainedScreenSharePreference();
+        $state(initialScreenShareQuality === "high" ? 3 : initialScreenShareQuality === "low" ? 1 : 2);
+    let bandwidthConstrainedPreference = $state(localUserStore.getBandwidthConstrainedScreenSharePreference());
 
-    let volumeProximityDiscussion = localUserStore.getVolumeProximityDiscussion();
+    let volumeProximityDiscussion = $state(localUserStore.getVolumeProximityDiscussion());
 
     let previewCameraPrivacySettings = valueCameraPrivacySettings;
     let previewMicrophonePrivacySettings = valueMicrophonePrivacySettings;
 
-    let valueBubbleSound = localUserStore.getBubbleSound();
-    let videoQualityStats = localUserStore.getDisplayVideoQualityStats();
+    let valueBubbleSound = $state(localUserStore.getBubbleSound());
+    let videoQualityStats = $state(localUserStore.getDisplayVideoQualityStats());
 
     async function updateLocale() {
         await setCurrentLocale(valueLocale as Locales);
@@ -239,11 +241,11 @@
                             : 'opacity-50 hover:opacity-80'}"
                     >
                         <IconAntennaBarsLow />
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <span
                             class="absolute -bottom-4 cursor-pointer"
-                            on:click|preventDefault={() => (valueVideoQuality = 1)}
+                            onclick={preventDefault(() => (valueVideoQuality = 1))}
                             >{$LL.menu.settings.videoBandwidth.low()}</span
                         >
                     </li>
@@ -253,11 +255,11 @@
                             : 'opacity-50 hover:opacity-80'}"
                     >
                         <IconAntennaBarsMid />
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <span
                             class="absolute -bottom-4 cursor-pointer"
-                            on:click|preventDefault={() => (valueVideoQuality = 2)}
+                            onclick={preventDefault(() => (valueVideoQuality = 2))}
                             >{$LL.menu.settings.videoBandwidth.recommended()}</span
                         >
                     </li>
@@ -267,11 +269,11 @@
                             : 'opacity-50 hover:opacity-80'}"
                     >
                         <IconAntennaBarsHigh />
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <span
                             class="absolute -bottom-4 cursor-pointer"
-                            on:click|preventDefault={() => (valueVideoQuality = 3)}
+                            onclick={preventDefault(() => (valueVideoQuality = 3))}
                             >{$LL.menu.settings.videoBandwidth.high()}</span
                         >
                     </li>
@@ -302,11 +304,11 @@
                             : 'opacity-50 hover:opacity-80'}"
                     >
                         <IconAntennaBarsLow />
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <span
                             class="absolute -bottom-4 cursor-pointer"
-                            on:click|preventDefault={() => (valueScreenShareQuality = 1)}
+                            onclick={preventDefault(() => (valueScreenShareQuality = 1))}
                             >{$LL.menu.settings.shareScreenBandwidth.low()}</span
                         >
                     </li>
@@ -316,11 +318,11 @@
                             : 'opacity-50 hover:opacity-80'}"
                     >
                         <IconAntennaBarsMid />
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <span
                             class="absolute -bottom-4 cursor-pointer"
-                            on:click|preventDefault={() => (valueScreenShareQuality = 2)}
+                            onclick={preventDefault(() => (valueScreenShareQuality = 2))}
                             >{$LL.menu.settings.shareScreenBandwidth.recommended()}</span
                         >
                     </li>
@@ -330,11 +332,11 @@
                             : 'opacity-50 hover:opacity-80'}"
                     >
                         <IconAntennaBarsHigh />
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                        <!-- svelte-ignore a11y_no_static_element_interactions -->
                         <span
                             class="absolute -bottom-4 cursor-pointer"
-                            on:click|preventDefault={() => (valueScreenShareQuality = 3)}
+                            onclick={preventDefault(() => (valueScreenShareQuality = 3))}
                             >{$LL.menu.settings.shareScreenBandwidth.high()}</span
                         >
                     </li>
@@ -446,7 +448,7 @@
             <select
                 class="w-full languages-switcher bg-contrast rounded border border-solid border-white/20 mb-0"
                 bind:value={valueLocale}
-                on:change={updateLocale}
+                onchange={updateLocale}
             >
                 {#each displayableLocales as locale (locale.id)}
                     <option value={locale.id}>

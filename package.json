@@ -2,6 +2,7 @@
   "name": "workadventure",
   "private": true,
   "devDependencies": {
+    "baseline-browser-mapping": "^2.10.0",
     "husky": "^7.0.1",
     "typescript": "5.8.3"
   },
@@ -49,7 +50,6 @@
     },
     "@antfu/install-pkg": "0.3.3",
     "package-manager-detector": "1.1.0",
-
     "unplugin-icons": {
       ".": "0.19.0",
       "@iconify/utils": {

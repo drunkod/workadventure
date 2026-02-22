@@ -2,7 +2,11 @@
     import type { Readable } from "svelte/store";
     import type { ChatMessageContent } from "../../../Connection/ChatConnection";
 
-    export let content: Readable<ChatMessageContent>;
+    interface Props {
+        content: Readable<ChatMessageContent>;
+    }
+
+    let { content }: Props = $props();
 </script>
 
 <a href={$content.url} target="_blank" class="cursor-pointer relative group block p-1 pb-0">

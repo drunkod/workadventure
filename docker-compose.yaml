@@ -157,6 +157,10 @@ services:
       MATRIX_ADMIN_USER: admin
       MATRIX_ADMIN_PASSWORD: MySecretPassword
       MATRIX_DOMAIN: matrix.workadventure.localhost
+      JAZZ_CHAT_ENABLED: "${JAZZ_CHAT_ENABLED:-false}"
+      JAZZ_SYNC_PEER: "${JAZZ_SYNC_PEER:-}"
+      JAZZ_API_KEY: "${JAZZ_API_KEY:-}"
+      JAZZ_GLOBAL_ROOM_ID: "${JAZZ_GLOBAL_ROOM_ID:-}"
       # oEmbed providers
       EMBEDLY_KEY: "$EMBEDLY_KEY"
       # Map editor restrictions (allow all users when OIDC is enabled by default)

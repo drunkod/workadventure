@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { handlers } from 'svelte/legacy';
+
     import { onDestroy } from "svelte";
     import { analyticsClient } from "../../Administration/AnalyticsClient";
     import { LL } from "../../../i18n/i18n-svelte";
@@ -8,14 +10,14 @@
     import { IconCheck, IconShare } from "@wa-icons";
 
     const TIMEOUT_COPY_LINK_BUTTON = 5000;
-    let walkAutomatically = false;
-    let showZoneSelect = false;
-    let linkCopied = false;
+    let walkAutomatically = $state(false);
+    let showZoneSelect = $state(false);
+    let linkCopied = $state(false);
     const gameScene = gameManager.getCurrentGameScene();
     const currentPlayer = gameScene.CurrentPlayer;
     const playerPos = { x: Math.floor(currentPlayer.x), y: Math.floor(currentPlayer.y) };
     const startPositions = gameScene.getStartPositionNames();
-    let entryPoint: string = startPositions[0];
+    let entryPoint: string = $state(startPositions[0]);
     let timeout: ReturnType<typeof setTimeout> | null = null;
 
     function copyLink() {
@@ -89,7 +91,7 @@
                 <div class="pb-4 text-lg font-semibold">
                     {$LL.menu.invite.description()}
                 </div>
-                <button type="button" class="btn btn-secondary w-full" on:click={shareLink}>
+                <button type="button" class="btn btn-secondary w-full" onclick={shareLink}>
                     <IconShare font-size="20" stroke={1.5} class="me-2" />
                     <span class="text-lg font-bold">
                         {$LL.menu.invite.share()}
@@ -111,8 +113,7 @@
                     class="flex items-center btn btn-sm absolute right-2 transition-all text-center justify-center {linkCopied
                         ? 'btn-success'
                         : 'btn-secondary'}"
-                    on:click={changeCopyLinkButtonStatus}
-                    on:click={copyLink}
+                    onclick={handlers(changeCopyLinkButtonStatus, copyLink)}
                 >
                     <span class="flex items-center justify-center {linkCopied ? '' : 'hidden'}">
                         <IconCheck class="text-white" />

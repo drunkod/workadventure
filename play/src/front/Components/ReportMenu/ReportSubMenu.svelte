@@ -1,15 +1,21 @@
 <script lang="ts">
+    import { preventDefault, stopPropagation } from 'svelte/legacy';
+
     import { showReportScreenStore, userReportEmpty } from "../../Stores/ShowReportScreenStore";
     import { gameManager } from "../../Phaser/Game/GameManager";
     import { LL } from "../../../i18n/i18n-svelte";
     import TextArea from "../Input/TextArea.svelte";
 
-    export let userUUID: string | undefined;
-    export let userName: string | undefined;
+    interface Props {
+        userUUID: string | undefined;
+        userName: string | undefined;
+    }
 
-    let reportMessage: string;
-    let hiddenError = true;
-    let hiddenUuidError = true;
+    let { userUUID, userName }: Props = $props();
+
+    let reportMessage: string = $state();
+    let hiddenError = $state(true);
+    let hiddenUuidError = $state(true);
 
     function submitReport() {
         hiddenUuidError = true;
@@ -49,7 +55,7 @@
             {/if}
         </section>
         <section>
-            <button type="submit" class="btn btn-danger w-full" on:click|preventDefault|stopPropagation={submitReport}
+            <button type="submit" class="btn btn-danger w-full" onclick={stopPropagation(preventDefault(submitReport))}
                 >{$LL.report.submit()}</button
             >
         </section>

@@ -145,7 +145,7 @@
                     entityPrefabVariant.defaultPrefab.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
-        if ($selectCategoryStore === "Custom") {
+        if (tag === "Custom") {
             return entitiesPrefabsVariants.filter(
                 (entityPrefabVariant) =>
                     entityPrefabVariant.defaultPrefab.type === "Custom" &&
@@ -158,6 +158,14 @@
                 entityPrefabVariant.defaultPrefab.name.toLowerCase().includes(searchTerm)
         );
     }
+
+    const groupedEntitiesPrefabsVariants = $derived.by(() =>
+        Object.entries(getEntitiesPrefabsVariantsGroupedByTagWithCustomFirst($entitiesPrefabsVariants))
+    );
+
+    const filteredEntitiesPrefabsVariants = $derived.by(() =>
+        getEntitiesPrefabsVariantsFilteredByTag($entitiesPrefabsVariants, $selectCategoryStore, searchTerm)
+    );
 
     onDestroy(() => {
         mapEditorSelectedEntityPrefabStoreUnsubscriber();
@@ -200,7 +208,7 @@
     <div class="flex-1 overflow-auto">
         {#if $selectCategoryStore === undefined && searchTerm === ""}
             <ul class="list-none !p-0 min-w-full">
-                {#each Object.entries(getEntitiesPrefabsVariantsGroupedByTagWithCustomFirst($entitiesPrefabsVariants)) as [tag, entitiesPrefabsVariants] (tag)}
+                {#each groupedEntitiesPrefabsVariants as [tag, entitiesPrefabsVariants] (tag)}
                     <TagListItem
                         on:onSelectedTag={(event) => {
                             onSelectedTag(event.detail);
@@ -279,11 +287,7 @@
                         </span>
                     {/if}
                     <EntitiesGrid
-                        entityPrefabVariants={getEntitiesPrefabsVariantsFilteredByTag(
-                            $entitiesPrefabsVariants,
-                            $selectCategoryStore,
-                            searchTerm
-                        )}
+                        entityPrefabVariants={filteredEntitiesPrefabsVariants}
                         onSelectEntity={onPickEntityVariant}
                         currentSelectedEntityId={pickedEntity?.id}
                     />

@@ -1,7 +1,13 @@
 <script lang="ts">
-    export let src: string;
-    export let customWidth: string | undefined = undefined;
-    export let grayscale = false;
+    import { preventDefault } from 'svelte/legacy';
+
+    interface Props {
+        src: string;
+        customWidth?: string | undefined;
+        grayscale?: boolean;
+    }
+
+    let { src, customWidth = undefined, grayscale = false }: Props = $props();
 
     function noDrag() {
         return false;
@@ -15,7 +21,7 @@
     class:grayscale
     style="    {customWidth ? `--theme-width: ${customWidth};` : ''}"
     draggable="false"
-    on:dragstart|preventDefault={noDrag}
+    ondragstart={preventDefault(noDrag)}
 />
 
 <style lang="scss">

@@ -8,9 +8,13 @@
     import { navChat } from "../../Chat/Stores/ChatStore";
     import LL from "../../../i18n/i18n-svelte";
 
-    export let notification: ProximityNotification;
+    interface Props {
+        notification: ProximityNotification;
+    }
 
-    $: roomName = notification.room.name;
+    let { notification }: Props = $props();
+
+    let roomName = $derived(notification.room.name);
 
     const NOTIFICATION_DURATION = 10000; // 10 seconds
 
@@ -66,10 +70,10 @@
 
 <div
     class="proximity-notification bg-contrast/50 rounded backdrop-blur-md flex gap-3 py-3 pl-5 pr-2 shadow-xl pointer-events-auto z-[900] cursor-pointer hover:bg-contrast/90 transition-colors text-white w-[60%] min-w-[300px] max-w-[600px]"
-    on:click={handleClick}
+    onclick={handleClick}
     role="button"
     tabindex="0"
-    on:keydown={(e) => {
+    onkeydown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             handleClick();

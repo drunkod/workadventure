@@ -3,11 +3,15 @@
     import { chatVisibilityStore } from "../../Stores/ChatStore";
     import { LL } from "../../../i18n/i18n-svelte";
     import { IconX, IconSearch } from "@wa-icons";
-    export let hasSearch;
-    export let hasCloseChat;
-    export let searchActive = false;
+    interface Props {
+        hasSearch: any;
+        hasCloseChat: any;
+        searchActive?: boolean;
+    }
 
-    let menuOpen = false;
+    let { hasSearch, hasCloseChat, searchActive = false }: Props = $props();
+
+    let menuOpen = $state(false);
 
     type Events = {
         toggleSearch: void;
@@ -35,14 +39,14 @@
         {#if searchActive}
             <button
                 class="p-3 hover:bg-white/10 rounded aspect-square w-12 h-12 relative z-50"
-                on:click={handleToggleSearch}
+                onclick={handleToggleSearch}
             >
                 <IconX font-size="20" />
             </button>
         {:else}
             <button
                 class="p-2 mt-2 rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center text-white"
-                on:click={toggleMenu}
+                onclick={toggleMenu}
                 aria-label="Menu actions"
             >
                 <svg
@@ -71,7 +75,7 @@
             >
                 <button
                     class="menu-item w-full flex items-center gap-3 p-3 hover:bg-white/10 rounded-lg text-white text-left transition-colors"
-                    on:click={handleToggleSearch}
+                    onclick={handleToggleSearch}
                 >
                     {#if searchActive}
                         <IconX font-size="20" />
@@ -86,7 +90,7 @@
                 <button
                     class="menu-item w-full flex items-center gap-3 p-3 hover:bg-white/10 rounded-lg text-white text-left transition-colors"
                     data-testid="closeChatButton"
-                    on:click={closeChat}
+                    onclick={closeChat}
                 >
                     <IconX font-size="18" />
                     <span class="text-sm">{$LL.chat.closeChat()}</span>
@@ -95,7 +99,7 @@
         {/if}
     </div>
 {:else if hasSearch && !hasCloseChat}
-    <button class="p-3 hover:bg-white/10 rounded aspect-square w-12 h-12 relative z-50" on:click={handleToggleSearch}>
+    <button class="p-3 hover:bg-white/10 rounded aspect-square w-12 h-12 relative z-50" onclick={handleToggleSearch}>
         {#if !searchActive}
             <IconSearch font-size="20" />
         {:else}
@@ -103,7 +107,7 @@
         {/if}
     </button>
 {:else if !hasSearch && hasCloseChat}
-    <button class="p-3 hover:bg-white/10 rounded aspect-square w-12 h-12 relative z-50" on:click={closeChat}>
+    <button class="p-3 hover:bg-white/10 rounded aspect-square w-12 h-12 relative z-50" onclick={closeChat}>
         <IconX font-size="20" />
     </button>
 {/if}
@@ -111,9 +115,9 @@
 {#if menuOpen && !searchActive}
     <div
         class="fixed inset-0 z-40"
-        on:click={() => (menuOpen = false)}
-        on:keydown={(e) => e.key === "Escape" && (menuOpen = false)}
+        onclick={() => (menuOpen = false)}
+        onkeydown={(e) => e.key === "Escape" && (menuOpen = false)}
         role="button"
         tabindex="-1"
-    />
+></div>
 {/if}

@@ -43,25 +43,25 @@
     import HighlightPropertyEditor from "../PropertyEditor/HighlightPropertyEditor.svelte";
     import { gameManager } from "../../../Phaser/Game/GameManager";
 
-    let properties: AreaDataProperties = [];
-    let areaName = "";
-    let areaDescription = "";
-    let areaSearchable = false;
-    let hasJitsiRoomProperty: boolean;
-    let hasFocusableProperty: boolean;
-    let hasHighlightProperty: boolean;
-    let hasSilentProperty: boolean;
-    let hasSpeakerMegaphoneProperty: boolean;
-    let hasListenerMegaphoneProperty: boolean;
-    let hasStartProperty: boolean;
-    let hasExitProperty: boolean;
-    let hasplayAudioProperty: boolean;
-    let showDescriptionField = false;
-    let hasPersonalAreaProperty: boolean;
-    let hasRightsProperty: boolean;
-    let hasMatrixRoom: boolean;
-    let hasTooltipPropertyData: boolean;
-    let hasLivekitRoomProperty: boolean;
+    let properties: AreaDataProperties = $state([]);
+    let areaName = $state("");
+    let areaDescription = $state("");
+    let areaSearchable = $state(false);
+    let hasJitsiRoomProperty: boolean = $state();
+    let hasFocusableProperty: boolean = $state();
+    let hasHighlightProperty: boolean = $state();
+    let hasSilentProperty: boolean = $state();
+    let hasSpeakerMegaphoneProperty: boolean = $state();
+    let hasListenerMegaphoneProperty: boolean = $state();
+    let hasStartProperty: boolean = $state();
+    let hasExitProperty: boolean = $state();
+    let hasplayAudioProperty: boolean = $state();
+    let showDescriptionField = $state(false);
+    let hasPersonalAreaProperty: boolean = $state();
+    let hasRightsProperty: boolean = $state();
+    let hasMatrixRoom: boolean = $state();
+    let hasTooltipPropertyData: boolean = $state();
+    let hasLivekitRoomProperty: boolean = $state();
 
     const ROOM_AREA_PUSHER_URL = new URL("roomArea", PUSHER_URL).toString();
 
@@ -791,11 +791,11 @@
 
         <div class="area-name-container">
             {#if !showDescriptionField}
-                <button class="ps-0 text-blue-500 flex flex-row items-center" on:click={toggleDescriptionField}>
+                <button class="ps-0 text-blue-500 flex flex-row items-center" onclick={toggleDescriptionField}>
                     <IconChevronRight />{$LL.mapEditor.areaEditor.addDescriptionField()}</button
                 >
             {:else}
-                <button class="ps-0 text-blue-500 flex flex-row items-center" on:click={toggleDescriptionField}>
+                <button class="ps-0 text-blue-500 flex flex-row items-center" onclick={toggleDescriptionField}>
                     <IconChevronDown />{$LL.mapEditor.areaEditor.addDescriptionField()}</button
                 >
 
@@ -931,8 +931,8 @@
                         {:else if property.type === "extensionModule" && extensionModulesAreaMapEditor.length > 0}
                             {#each extensionModulesAreaMapEditor as extensionModuleAreaMapEditor, index (`extensionModulesAreaMapEditor-${index}`)}
                                 {#if extensionModuleAreaMapEditor[property.subtype] != undefined}
-                                    <svelte:component
-                                        this={extensionModuleAreaMapEditor[property.subtype].AreaPropertyEditor}
+                                    {@const SvelteComponent = extensionModuleAreaMapEditor[property.subtype].AreaPropertyEditor}
+                                    <SvelteComponent
                                         {extensionModuleAreaMapEditor}
                                         {property}
                                         on:close={() => {

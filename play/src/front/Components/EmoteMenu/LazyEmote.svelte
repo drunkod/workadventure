@@ -2,11 +2,21 @@
     import type { EmojiClickEvent } from "emoji-picker-element/shared";
     import Lazy from "../Lazy.svelte";
 
-    export let onEmojiClick: (event: EmojiClickEvent) => void = () => {};
-    export let onClose: () => void = () => {};
-    export let onLoad: () => void = () => {};
-    export let onLoaded: () => void = () => {};
-    export let onError: () => void = () => {};
+    interface Props {
+        onEmojiClick?: (event: EmojiClickEvent) => void;
+        onClose?: () => void;
+        onLoad?: () => void;
+        onLoaded?: () => void;
+        onError?: () => void;
+    }
+
+    let {
+        onEmojiClick = () => {},
+        onClose = () => {},
+        onLoad = () => {},
+        onLoaded = () => {},
+        onError = () => {}
+    }: Props = $props();
 </script>
 
 <Lazy

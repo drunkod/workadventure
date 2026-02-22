@@ -8,7 +8,7 @@
     import InputCheckbox from "../Input/InputCheckbox.svelte";
     import resetKeyStorageConfirmationModal from "./ResetKeyStorageConfirmationModal.svelte";
 
-    let chatSounds: boolean = localUserStore.getChatSounds();
+    let chatSounds: boolean = $state(localUserStore.getChatSounds());
     let mychatID = localUserStore.getChatId();
 
     function changeChatSounds() {
@@ -43,7 +43,7 @@
                     <button
                         type="button"
                         class="btn p-2 bg-danger-900 min-w-[220px] flex justify-center items-center"
-                        on:click={openResetKeyStorage}>{$LL.menu.chat.resetKeyStorageUpButtonLabel()}</button
+                        onclick={openResetKeyStorage}>{$LL.menu.chat.resetKeyStorageUpButtonLabel()}</button
                     >
                 </section>
             {:else}
@@ -55,7 +55,7 @@
                         type="button"
                         class="btn light flex justify-center items-center w-1/2"
                         href="/login"
-                        on:click={() => analyticsClient.login()}
+                        onclick={() => analyticsClient.login()}
                     >
                         {$LL.menu.profile.login()}</a
                     >

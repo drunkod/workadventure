@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault } from 'svelte/legacy';
+
     import { fly, fade } from "svelte/transition";
     import { onMount } from "svelte";
     import { gameManager } from "../../Phaser/Game/GameManager";
@@ -6,11 +8,15 @@
     import { banMessageStore } from "../../Stores/TypeMessageStore/BanMessageStore";
     import { LL } from "../../../i18n/i18n-svelte";
 
-    export let message: Message;
+    interface Props {
+        message: Message;
+    }
+
+    let { message }: Props = $props();
 
     const NAME_BUTTON = "Ok";
     let nbSeconds = 10;
-    let nameButton = "";
+    let nameButton = $state("");
 
     onMount(() => {
         timeToRead();
@@ -53,7 +59,7 @@
             type="button"
             class="{nameButton === NAME_BUTTON ? 'light' : 'disabled'} h-10"
             disabled={!(nameButton === NAME_BUTTON)}
-            on:click|preventDefault={closeBanMessage}>{nameButton}</button
+            onclick={preventDefault(closeBanMessage)}>{nameButton}</button
         >
     </div>
 </div>

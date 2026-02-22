@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { preventDefault, handlers } from 'svelte/legacy';
+
     import * as Sentry from "@sentry/svelte";
     import { clickOutside } from "svelte-outside";
     import { AvailabilityStatus } from "@workadventure/messages";
@@ -155,15 +157,15 @@
     );
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div data-testid="action-user" class="flex items-center transition-all pointer-events-auto">
     <div
         class="group bg-contrast/80 backdrop-blur rounded-lg h-16 @sm/actions:h-14 @xl/actions:h-16 p-2 cursor-pointer"
         use:floatingUiRef
-        on:click|preventDefault={() => {
+        onclick={preventDefault(() => {
             openedMenuStore.toggle("profileMenu");
-        }}
+        })}
     >
         <div
             class="h-12 w-12 @sm/actions:h-10 @sm/actions:w-10 @xl/actions:h-12 @xl/actions:w-12 p-1 m-0 items-center justify-center flex @md/actions:hidden"
@@ -193,7 +195,7 @@
                     <div
                         class="aspect-square h-2 w-2 rounded-full me-1.5"
                         style="background-color: {getColorHexOfStatus($availabilityStatusStore)}"
-                    />
+></div>
                     <div
                         class="hidden @xl/actions:block"
                         style="color: {getColorHexOfStatus($availabilityStatusStore)};filter: brightness(200%);"
@@ -222,7 +224,7 @@
                 openedMenuStore.close("profileMenu");
             }}
         >
-            <div use:arrowAction />
+            <div use:arrowAction></div>
             <div class="p-0 m-0 list-none overflow-y-auto max-h-[calc(100vh-96px)]">
                 <ExternalComponents zone="menuTop" />
                 <AvailabilityStatusList statusInformation={getStatusInformation(statusToShow)} />
@@ -300,13 +302,12 @@
                 <AdditionalMenuItems menu="profileMenu" />
 
                 {#each $rightActionBarMenuItemsInBurgerMenu ?? [] as button (button.id)}
-                    <svelte:component this={button.component} {...button.props} />
+                    <button.component {...button.props} />
                 {/each}
 
                 {#if ENABLE_OPENID && $userIsConnected}
                     <button
-                        on:click={() => analyticsClient.logout()}
-                        on:click={() => connectionManager.logout()}
+                        onclick={handlers(() => analyticsClient.logout(), () => connectionManager.logout())}
                         class="group flex p-2 gap-2 items-center hover:bg-danger-600 transition-all cursor-pointer font-bold text-sm w-full pointer-events-auto text-start rounded"
                     >
                         <div class="transition-all w-6 h-6 aspect-square text-center flex items-center justify-center">

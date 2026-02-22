@@ -24,13 +24,13 @@
                 class="border-0 w-full h-dvh"
                 allowtransparency
                 style="color-scheme: auto"
-            />
+></iframe>
         {:else}
             <section>
                 <h3 class="blue-title">{$LL.menu.contact.gettingStarted.title()}</h3>
                 <p>{$LL.menu.contact.gettingStarted.description()}</p>
                 <div class="centered-column">
-                    <button type="button" class="light" on:click={goToGettingStarted}
+                    <button type="button" class="light" onclick={goToGettingStarted}
                         >{$LL.menu.contact.gettingStarted.title()}</button
                     >
                 </div>
@@ -40,7 +40,7 @@
                 <h3 class="blue-title">{$LL.menu.contact.createMap.title()}</h3>
                 <p>{$LL.menu.contact.createMap.description()}</p>
                 <div class="centered-column">
-                    <button type="button" class="light" on:click={goToBuildingMap}
+                    <button type="button" class="light" onclick={goToBuildingMap}
                         >{$LL.menu.contact.createMap.title()}</button
                     >
                 </div>

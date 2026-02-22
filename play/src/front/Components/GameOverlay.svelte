@@ -34,14 +34,19 @@
     import MainModal from "./Modal/MainModal.svelte";
     import DroppingFileScene from "./DroppingFile/DroppingFileScene.svelte";
     import WokaScene from "./Woka/WokaScene.svelte";
+    import JazzProviderBoundary from "../Chat/Jazz/JazzProviderBoundary.svelte";
 
-    export let game: Game;
-
-    /**
+    interface Props {
+        game: Game; /**
      * When changing map from an exit on the current map, the Chat and the MainLayout are not really destroyed
      * due to an internal issue of Svelte, we use a #key directive to force the destruction of the components.
      * https://github.com/sveltejs/svelte/issues/5268
      */
+    }
+
+    let { game }: Props = $props();
+
+    
 </script>
 
 <!-- Preload image loader TODO HUGO : Better way ? -->
@@ -87,7 +92,9 @@
         <RefreshPrompt />
     {/if}
     {#key $forceRefreshChatStore}
-        <ChatSidebar />
+        <JazzProviderBoundary>
+            <ChatSidebar />
+        </JazzProviderBoundary>
         {#if $mapEditorModeStore}
             <MapEditor />
         {/if}

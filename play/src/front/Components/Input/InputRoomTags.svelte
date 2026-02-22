@@ -8,7 +8,13 @@
         change: InputTagOption[] | undefined;
     }>();
 
-    export let value: InputTagOption[] | undefined;
+    interface Props {
+        value: InputTagOption[] | undefined;
+        info?: import("svelte").Snippet;
+        [key: string]: any;
+    }
+
+    let { value = $bindable(), info, ...rest } = $props<Props>();
 
     function _handleChange() {
         dispatch("change", value);
@@ -43,8 +49,6 @@
 
 <div class="flex flex-col w-full">
     <div>
-        <InputTags bind:value queryOptions={searchRoomTags} on:change={_handleChange} {...$$props}>
-            <span slot="info"> <slot name="info" /> </span>
-        </InputTags>
+        <InputTags bind:value queryOptions={searchRoomTags} on:change={_handleChange} info={info} {...rest} />
     </div>
 </div>

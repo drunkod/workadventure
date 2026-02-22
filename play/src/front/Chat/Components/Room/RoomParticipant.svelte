@@ -3,16 +3,20 @@
     import type { ChatRoomMember, ChatRoomMembership, ChatRoomModeration } from "../../Connection/ChatConnection";
     import { ChatPermissionLevel } from "../../Connection/ChatConnection";
     import { IconLoader, IconCheck, IconForbid, IconClock, IconPoint, IconMail, IconDoorExit } from "@wa-icons";
-    export let member: ChatRoomMember;
-    export let room: ChatRoomModeration;
+    interface Props {
+        member: ChatRoomMember;
+        room: ChatRoomModeration;
+    }
 
-    let banInProgress = false;
-    let kickInProgress = false;
-    let unbanInProgress = false;
-    let inviteInProgress = false;
-    let disableModerationButton = banInProgress || kickInProgress || unbanInProgress || inviteInProgress;
+    let { member, room }: Props = $props();
 
-    $: ({ name, membership, id, permissionLevel } = member);
+    let banInProgress = $state(false);
+    let kickInProgress = $state(false);
+    let unbanInProgress = $state(false);
+    let inviteInProgress = $state(false);
+    let disableModerationButton = $derived(banInProgress || kickInProgress || unbanInProgress || inviteInProgress);
+
+    let { name, membership, id, permissionLevel } = $derived(member);
 
     function getTranslatedMembership(membership: ChatRoomMembership) {
         switch (membership) {
@@ -111,11 +115,13 @@
         room.changePermissionLevelFor(member, target.value as ChatPermissionLevel).catch((e) => console.error(e));
     }
 
-    const hasPermissionToInvite = room.hasPermissionTo("invite", member);
-    const hasPermissionToKick = room.hasPermissionTo("kick", member);
-    const hasPermissionToBan = room.hasPermissionTo("ban", member);
+    let hasPermissionToInvite = $derived(room.hasPermissionTo("invite", member));
+    let hasPermissionToKick = $derived(room.hasPermissionTo("kick", member));
+    let hasPermissionToBan = $derived(room.hasPermissionTo("ban", member));
 
-    $: availableRoles = room.canModifyRoleOf($permissionLevel) ? room.getAllowedRolesToAssign() : [];
+    let availableRoles = $derived(room.canModifyRoleOf($permissionLevel) ? room.getAllowedRolesToAssign() : []);
+
+    const SvelteComponent = $derived(getIconForMembership($membership));
 </script>
 
 <tr data-testid={`${id}-participant`}>
@@ -129,7 +135,7 @@
                 {$membership === 'ban' || $membership === 'leave' ? 'bg-danger-900/20 border-danger-900/30' : ''}"
                 data-testid={`${id}-membership`}
             >
-                <svelte:component this={getIconForMembership($membership)} />
+                <SvelteComponent />
                 {getTranslatedMembership($membership)}
             </p>
         </div></td
@@ -138,7 +144,7 @@
         <div class="flex items-center justify-center h-full w-full">
             <select
                 value={$permissionLevel}
-                on:change={onPermissionLevelChange}
+                onchange={onPermissionLevelChange}
                 name="permissionLevel"
                 id="permissionLevel"
                 disabled={availableRoles.length === 0 || $membership !== "join"}
@@ -162,8 +168,8 @@
             {#if $hasPermissionToInvite && $membership === "leave"}
                 <button
                     class="max-h-min m-0 p-2 py-1 bg-success-900/20 hover:bg-success-900/50 rounded-sm"
-                    disabled={disableModerationButton}
-                    on:click={inviteUser}
+                    disabled={$disableModerationButton}
+                    onclick={inviteUser}
                     data-testid={`${id}-inviteButton`}
                 >
                     {#if inviteInProgress}
@@ -176,9 +182,9 @@
             {#if $hasPermissionToKick && $membership !== "leave" && $membership !== "ban"}
                 <button
                     class="max-h-min m-0 p-2 py-1 bg-warning-900/20 hover:bg-warning-900/50 rounded-sm"
-                    disabled={disableModerationButton}
+                    disabled={$disableModerationButton}
                     data-testid={`${id}-kickButton`}
-                    on:click={kickUser}
+                    onclick={kickUser}
                 >
                     {#if kickInProgress}
                         <IconLoader class="animate-spin" />
@@ -190,10 +196,10 @@
             {#if $hasPermissionToBan}
                 {#if $membership === "ban"}
                     <button
-                        disabled={disableModerationButton}
+                        disabled={$disableModerationButton}
                         class="max-h-min m-0 p-2 py-1 bg-success-900/20 hover:bg-success-900/50 rounded-sm"
                         data-testid={`${id}-unbanButton`}
-                        on:click={unbanUser}
+                        onclick={unbanUser}
                     >
                         {#if unbanInProgress}
                             <IconLoader class="animate-spin" />
@@ -204,8 +210,8 @@
                 {:else}
                     <button
                         class="max-h-min m-0 p-2 py-1 bg-danger-900/20 hover:bg-danger-900/50 rounded-sm"
-                        disabled={disableModerationButton}
-                        on:click={banUser}
+                        disabled={$disableModerationButton}
+                        onclick={banUser}
                         data-testid={`${id}-banButton`}
                     >
                         {#if banInProgress}
