@@ -1,9 +1,8 @@
 <script lang="ts">
     import LL from "../../../i18n/i18n-svelte";
-
     // When generics are available, use them instead of "any"
     // See https://www.reddit.com/r/sveltejs/comments/t10qgb/help_typing_generics_for_slot_props/
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     export let items: any[];
     export let maxNumber = 8;
     export let idKey = "id";
@@ -20,7 +19,7 @@
     <div class="flex justify-center">
         <button
             class="flex-col p-0 m-0 text-gray-400 text-center w-full text-sm"
-            on:click={() => (showMore = !showMore)}
+            onclick={() => (showMore = !showMore)}
         >
             {showMore ? $LL.chat.showLess() : $LL.chat.showMore({ number: items.length - 8 })}
         </button>

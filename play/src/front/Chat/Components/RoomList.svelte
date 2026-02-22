@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { get } from "svelte/store";
+    import { get, writable } from "svelte/store";
 
     import { onDestroy, onMount } from "svelte";
     import { gameManager } from "../../Phaser/Game/GameManager";
@@ -30,7 +30,13 @@
 
     export let sideBarWidth: number = INITIAL_SIDEBAR_WIDTH;
 
-    const proximityChatRoom = gameManager.getCurrentGameScene().proximityChatRoom;
+    const proximityChatRoom = (() => {
+        try {
+            return gameManager.getCurrentGameScene().proximityChatRoom;
+        } catch {
+            return undefined;
+        }
+    })();
     const chat = gameManager.chatConnection;
     const shouldRetrySendingEvents = chat.shouldRetrySendingEvents;
 
@@ -41,7 +47,7 @@
     let rooms = chat.rooms;
     let roomInvitations = chat.invitations;
     let roomFolders = chat.folders;
-    let proximityHasUnreadMessages = proximityChatRoom.hasUnreadMessages;
+    let proximityHasUnreadMessages = proximityChatRoom?.hasUnreadMessages ?? writable(false);
 
     let displayDirectRooms = false;
     let displayRooms = false;
@@ -121,6 +127,9 @@
     }
 
     function toggleDisplayProximityChat() {
+        if (!proximityChatRoom) {
+            return;
+        }
         selectedRoomStore.set(proximityChatRoom);
         proximityChatRoom.hasUnreadMessages.set(false);
         proximityChatRoom.unreadMessagesCount.set(0);
@@ -184,48 +193,50 @@
                     </RequireConnection>
                 {/if}
 
-                <div class="px-2 py-3 border border-solid border-x-0 border-t border-y-0 border-b-0 border-white/10">
-                    <div
-                        class="group relative px-3 rounded h-11 w-full flex space-x-2 items-center {$proximityHasUnreadMessages
-                            ? 'hover:bg-contrast-200/20 bg-contrast-200/10'
-                            : 'hover:bg-contrast-200/10'}"
-                    >
-                        <button
-                            class="flex items-center space-x-2 grow m-0 p-0"
-                            on:click={toggleDisplayProximityChat}
-                            data-testid="toggleDisplayProximityChat"
+                {#if proximityChatRoom}
+                    <div class="px-2 py-3 border border-solid border-x-0 border-t border-y-0 border-b-0 border-white/10">
+                        <div
+                            class="group relative px-3 rounded h-11 w-full flex space-x-2 items-center {$proximityHasUnreadMessages
+                                ? 'hover:bg-contrast-200/20 bg-contrast-200/10'
+                                : 'hover:bg-contrast-200/10'}"
                         >
-                            <div class="relative">
-                                <div
-                                    class="rounded-full bg-white/10 h-7 w-7 border border-solid text-white flex items-center justify-center p-[1px] relative {$proximityHasUnreadMessages
-                                        ? 'border-white'
-                                        : 'border-white/70'}"
-                                >
-                                    <div class="absolute overflow-hidden w-full h-full rounded-full">
-                                        <div
-                                            class=" flex items-center justify-center translate-y-[3px] group-hover:translate-y-[0] transition-all"
-                                        >
-                                            <WokaFromUserId userId={-1} customWidth="32px" placeholderSrc="" />
+                            <button
+                                class="flex items-center space-x-2 grow m-0 p-0"
+                                on:click={toggleDisplayProximityChat}
+                                data-testid="toggleDisplayProximityChat"
+                            >
+                                <div class="relative">
+                                    <div
+                                        class="rounded-full bg-white/10 h-7 w-7 border border-solid text-white flex items-center justify-center p-[1px] relative {$proximityHasUnreadMessages
+                                            ? 'border-white'
+                                            : 'border-white/70'}"
+                                    >
+                                        <div class="absolute overflow-hidden w-full h-full rounded-full">
+                                            <div
+                                                class=" flex items-center justify-center translate-y-[3px] group-hover:translate-y-[0] transition-all"
+                                            >
+                                                <WokaFromUserId userId={-1} customWidth="32px" placeholderSrc="" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div
-                                class="cursor-default text-sm grow text-start ps-1 {$proximityHasUnreadMessages
-                                    ? 'text-white font-bold'
-                                    : 'text-white/75'}"
-                            >
-                                {$LL.chat.proximity()}
-                            </div>
-                            {#if $proximityHasUnreadMessages}
-                                <div class="flex items-center justify-center h-7 w-7 relative">
-                                    <div class="rounded-full bg-secondary-200 h-2 w-2 animate-ping absolute" />
-                                    <div class="rounded-full bg-secondary-200 h-1.5 w-1.5 absolute" />
+                                <div
+                                    class="cursor-default text-sm grow text-start ps-1 {$proximityHasUnreadMessages
+                                        ? 'text-white font-bold'
+                                        : 'text-white/75'}"
+                                >
+                                    {$LL.chat.proximity()}
                                 </div>
-                            {/if}
-                        </button>
+                                {#if $proximityHasUnreadMessages}
+                                    <div class="flex items-center justify-center h-7 w-7 relative">
+                                        <div class="rounded-full bg-secondary-200 h-2 w-2 animate-ping absolute" />
+                                        <div class="rounded-full bg-secondary-200 h-1.5 w-1.5 absolute" />
+                                    </div>
+                                {/if}
+                            </button>
+                        </div>
                     </div>
-                </div>
+                {/if}
                 {#if $chatConnectionStatus === "ONLINE"}
                     {#if $joignableRoom.length > 0 && $chatSearchBarValue.trim() !== ""}
                         <p class="p-0 m-0 text-gray-400">{$LL.chat.availableRooms()}</p>
@@ -243,13 +254,13 @@
                             <div class="text-sm font-bold tracking-widest uppercase grow text-start">
                                 {$LL.chat.invitations()}
                             </div>
-                            <button
+                            <div
                                 class="transition-all group-hover:bg-white/10 p-1 rounded-lg aspect-square flex items-center justify-center text-white"
                             >
                                 <IconChevronUp
                                     class={`transform transition ${!displayRoomInvitations ? "" : "rotate-180"}`}
                                 />
-                            </button>
+                            </div>
                         </button>
                         {#if displayRoomInvitations}
                             <div class="flex flex-col overflow-auto ps-3 pr-4 pb-3">
@@ -268,13 +279,13 @@
                             <div class="text-sm font-bold tracking-widest uppercase grow text-start">
                                 {$LL.chat.people()}
                             </div>
-                            <button
+                            <div
                                 class="transition-all group-hover:bg-white/10 p-1 rounded-lg aspect-square flex items-center justify-center text-white"
                             >
                                 <IconChevronUp
                                     class={`transform transition ${!displayDirectRooms ? "" : "rotate-180"}`}
                                 />
-                            </button>
+                            </div>
                         </div>
                     </button>
 
