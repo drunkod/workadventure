@@ -1,5 +1,6 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
+    import { writable, type Readable } from "svelte/store";
     import { navChat } from "../../../Chat/Stores/ChatStore";
     import { analyticsClient } from "../../../Administration/AnalyticsClient";
     import MessageCircleIcon from "../../Icons/MessageCircleIcon.svelte";
@@ -14,8 +15,16 @@
     export let last: boolean | undefined = undefined;
     export let chatEnabledInAdmin = false;
 
-    const proximityChatRoom = gameManager.getCurrentGameScene().proximityChatRoom;
-    const unreadMessagesCount = proximityChatRoom.unreadMessagesCount;
+    const emptyUnreadMessagesCount = writable(0);
+
+    const proximityChatRoom = (() => {
+        try {
+            return gameManager.getCurrentGameScene().proximityChatRoom;
+        } catch {
+            return undefined;
+        }
+    })();
+    const unreadMessagesCount: Readable<number> = proximityChatRoom?.unreadMessagesCount ?? emptyUnreadMessagesCount;
 
     const dispatch = createEventDispatcher<{
         click: void;
@@ -28,8 +37,10 @@
         }
 
         chatVisibilityStore.set(!$chatVisibilityStore);
-        proximityChatRoom.unreadMessagesCount.set(0);
-        chatNotificationStore.clearAll();
+        if (proximityChatRoom) {
+            proximityChatRoom.unreadMessagesCount.set(0);
+            chatNotificationStore.clearAll();
+        }
         dispatch("click");
     }
 
@@ -39,7 +50,7 @@
     gameManager
         .getChatConnection()
         .then(() => {
-            chatAvailable = true;
+            chatAvailable = chatEnabledInAdmin || proximityChatRoom !== undefined;
         })
         .catch((e: unknown) => {
             console.error("Could not get chat", e);
@@ -60,7 +71,7 @@
     on:click={() => {
         toggleChat();
         navChat.switchToChat();
-        if (!chatEnabledInAdmin) {
+        if (!chatEnabledInAdmin && proximityChatRoom) {
             selectedRoomStore.set(proximityChatRoom);
             proximityChatRoom.hasUnreadMessages.set(false);
             proximityChatRoom.unreadMessagesCount.set(0);

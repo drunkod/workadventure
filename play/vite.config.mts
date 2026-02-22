@@ -133,6 +133,7 @@ export default defineConfig(({ mode }) => {
 
 export function frontendOnlyMockPlugin(env: Record<string, string>) {
     const mapsRoot = resolve(process.cwd(), "../maps");
+    const mockWokaData = getMockWokaData(resolve(process.cwd(), "src/pusher/data/woka.json"));
     const mockCompanionData = getMockCompanionData(resolve(process.cwd(), "src/pusher/data/companions.json"));
     const mockMapUrl = env.MOCK_MAP_URL || "/mock-maps/starter/map.json";
     const mockRoomName = env.MOCK_ROOM_NAME || "Frontend Mock Room";
@@ -154,10 +155,10 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
         group: null,
         authenticationMandatory: parseBooleanWithDefault(env.MOCK_AUTH_MANDATORY, false),
         roomName: mockRoomName,
-        provideDefaultWokaName: "fix-plus-random-numbers" as const,
-        defaultWokaName: "Guest",
-        provideDefaultWokaTexture: "fix" as const,
-        defaultWokaTexture: "color_22",
+        provideDefaultWokaName: (env.MOCK_PROVIDE_DEFAULT_WOKA_NAME as "no" | "random" | "fix" | "fix-plus-random-numbers") ?? "no",
+        defaultWokaName: env.MOCK_DEFAULT_WOKA_NAME || undefined,
+        provideDefaultWokaTexture: (env.MOCK_PROVIDE_DEFAULT_WOKA_TEXTURE as "no" | "random" | "fix") ?? "no",
+        defaultWokaTexture: env.MOCK_DEFAULT_WOKA_TEXTURE || undefined,
         skipCameraPage: parseBooleanWithDefault(env.MOCK_SKIP_CAMERA_PAGE, true),
         enableChat: parseBooleanWithDefault(env.MOCK_ENABLE_CHAT, false),
         enableChatUpload: parseBooleanWithDefault(env.MOCK_ENABLE_CHAT_UPLOAD, false),
@@ -206,6 +207,13 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
         res.end(body);
     };
 
+    const sendHtml = (res: any, body: string) => {
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Cache-Control", "no-store");
+        res.end(body);
+    };
+
     const sendWithDelay = (delayMs: number, send: () => void) => {
         if (delayMs <= 0) {
             send();
@@ -228,7 +236,47 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
 
                 const requestUrl = new URL(req.url, "http://localhost");
                 const pathname = requestUrl.pathname;
+                const rawPathname = req.url.split("?")[0] ?? "";
                 const method = req.method || "GET";
+
+                if (pathname === "/local-script" && method === "GET") {
+                    const scriptParam = requestUrl.searchParams.get("script");
+                    if (!scriptParam) {
+                        res.statusCode = 400;
+                        res.end("Invalid query parameters");
+                        return;
+                    }
+
+                    let scriptUrl: URL;
+                    try {
+                        scriptUrl = new URL(scriptParam);
+                    } catch {
+                        res.statusCode = 400;
+                        res.end("Invalid query parameters");
+                        return;
+                    }
+
+                    const hostname = scriptUrl.hostname;
+                    const isLocalhost = hostname === "localhost" || hostname.endsWith(".localhost");
+                    if (!isLocalhost) {
+                        res.statusCode = 400;
+                        res.end("Script URL must be from localhost or *.localhost domain for security reasons");
+                        return;
+                    }
+
+                    sendHtml(
+                        res,
+                        `<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/iframe_api.js"></script>
+    <script type="module" src="${escapeHtmlAttr(scriptParam)}"></script>
+  </head>
+  <body></body>
+</html>`
+                    );
+                    return;
+                }
 
                 if (pathname === "/map" && method === "GET") {
                     sendWithDelay(mapDelayMs, () => {
@@ -263,10 +311,10 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
                             username: env.MOCK_USERNAME || "Guest",
                             locale: env.MOCK_LOCALE || "en",
                             visitCardUrl: null,
-                            isCharacterTexturesValid: parseBooleanWithDefault(env.MOCK_IS_CHARACTER_TEXTURES_VALID, true),
+                            isCharacterTexturesValid: parseBooleanWithDefault(env.MOCK_IS_CHARACTER_TEXTURES_VALID, false),
                             isCompanionTextureValid: parseBooleanWithDefault(
                                 env.MOCK_IS_COMPANION_TEXTURES_VALID ?? env.MOCK_IS_COMPANION_TEXTURE_VALID,
-                                true
+                                false
                             ),
                             matrixUserId: null,
                             matrixServerUrl: null,
@@ -276,7 +324,7 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
                 }
 
                 if (pathname === "/woka/list" && method === "GET") {
-                    sendJson(res, getMockWokaData());
+                    sendJson(res, mockWokaData);
                     return;
                 }
 
@@ -313,12 +361,34 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
                     return;
                 }
 
-                if (!pathname.startsWith("/mock-maps/")) {
+                if (pathname === "/package.json" && method === "GET") {
+                    res.statusCode = 403;
+                    res.end("Forbidden");
+                    return;
+                }
+
+                const mockMapsPathname = rawPathname.startsWith("/mock-maps/") ? rawPathname : pathname;
+
+                if (!mockMapsPathname.startsWith("/mock-maps/")) {
                     next();
                     return;
                 }
 
-                const relativePath = decodeURIComponent(pathname.slice("/mock-maps/".length));
+                let relativePath: string;
+                try {
+                    relativePath = decodeURIComponent(mockMapsPathname.slice("/mock-maps/".length));
+                } catch {
+                    res.statusCode = 400;
+                    res.end("Bad request");
+                    return;
+                }
+
+                if (hasParentTraversalSegment(relativePath)) {
+                    res.statusCode = 403;
+                    res.end("Forbidden");
+                    return;
+                }
+
                 const normalizedPath = normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, "");
                 const filePath = resolve(mapsRoot, normalizedPath);
                 const isInsideMapsRoot =
@@ -339,10 +409,24 @@ export function frontendOnlyMockPlugin(env: Record<string, string>) {
                 res.statusCode = 200;
                 res.setHeader("Content-Type", getContentType(filePath));
                 res.setHeader("Cache-Control", "no-cache");
+                res.setHeader("Access-Control-Allow-Origin", "*");
                 fs.createReadStream(filePath).pipe(res);
             });
         },
     };
+}
+
+function escapeHtmlAttr(value: string): string {
+    return value
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
+
+function hasParentTraversalSegment(relativePath: string): boolean {
+    return relativePath.split(/[\\/]+/).some((segment) => segment === "..");
 }
 
 function parseBooleanWithDefault(value: string | undefined, defaultValue: boolean): boolean {
@@ -414,7 +498,16 @@ function stripMustacheTemplates(html: string): string {
     return transformed;
 }
 
-function getMockWokaData() {
+function getMockWokaData(wokaJsonPath: string) {
+    try {
+        const wokaData = JSON.parse(fs.readFileSync(wokaJsonPath, "utf8"));
+        if (wokaData && typeof wokaData === "object") {
+            return wokaData;
+        }
+    } catch (error) {
+        console.warn(`Unable to load wokas from "${wokaJsonPath}". Falling back to inline mock data.`, error);
+    }
+
     return {
         woka: {
             collections: [

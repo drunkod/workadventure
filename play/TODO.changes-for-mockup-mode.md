@@ -114,7 +114,7 @@ npm run test -- tests/front/MockMode/frontendOnlyMockPlugin.test.ts
 - [ ] Smoke script exists: `play/tests/mock-mode/smoke-dev-front-mock.sh`.
 - [ ] Smoke script passes locally.
 - [ ] NPM command exists: `npm run test:front-mock-smoke`.
-- [ ] CI includes smoke step in `.github/workflows/continuous_integration.yml`.
+- [ ] CI includes smoke step in `.github/workflows/frontend-mock-smoke.yml`.
 
 Quick checks:
 

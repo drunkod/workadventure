@@ -31,12 +31,14 @@
         unsubscriberFileStore = audioManagerFileStore.subscribe((src: string) => {
             (async () => {
                 if (src == "") {
-                    try {
-                        HTMLAudioPlayer.pause();
-                    } catch (error) {
-                        console.warn("The audio player is not paused, so we create a new one", error);
+                    if (HTMLAudioPlayer) {
+                        try {
+                            HTMLAudioPlayer.pause();
+                        } catch (error) {
+                            console.warn("The audio player is not paused, so we create a new one", error);
+                        }
+                        HTMLAudioPlayer.onprogress = null;
                     }
-                    if (HTMLAudioPlayer) HTMLAudioPlayer.onprogress = null;
                     return;
                 }
                 await tick();

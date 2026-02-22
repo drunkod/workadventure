@@ -3,6 +3,12 @@
         return;
     }
 
+    // Start onboarding from a clean user state in frontend-only mock mode.
+    const localUserKeysToReset = ["playerName", "characterTextures", "companion", "authToken", "localUser"];
+    for (const key of localUserKeysToReset) {
+        window.localStorage?.removeItem(key);
+    }
+
     if (window.env === undefined) {
         window.env = {
             DEBUG_MODE: false,
@@ -75,6 +81,11 @@
     }
 
     if (window.capabilities === undefined) {
-        window.capabilities = {};
+        window.capabilities = {
+            "api/save-name": "v1",
+            "api/save-textures": "v1",
+            "api/woka/list": "v1",
+            "api/companion/list": "v1",
+        };
     }
 })();

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { getContext } from "svelte";
-    import { derived } from "svelte/store";
+    import { derived, writable } from "svelte/store";
 
     import { gameManager } from "../../../Phaser/Game/GameManager";
     import { audioManagerVisibilityStore } from "../../../Stores/AudioManagerStore";
@@ -23,7 +23,13 @@
     const inProfileMenu = getContext("profileMenu");
 
     const gameScene = gameManager.getCurrentGameScene();
-    const spacesWithRecording = gameScene.spaceRegistry.spacesWithRecording;
+    const spacesWithRecording = (() => {
+        try {
+            return gameScene.spaceRegistry.spacesWithRecording;
+        } catch {
+            return writable([]);
+        }
+    })();
     const shouldDisplayRecordingButton = derived(
         [spacesWithRecording],
         ([$spacesWithRecording]) => $spacesWithRecording.length > 0

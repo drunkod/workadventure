@@ -120,6 +120,20 @@ describe("frontendOnlyMockPlugin", () => {
         expect(response.body).toContain("\"height\"");
     });
 
+    it("blocks path traversal attempts under /mock-maps", async () => {
+        const middleware = getMockMiddleware();
+        const directTraversal = await runMiddleware(middleware, "/mock-maps/../package.json", "GET");
+        const encodedTraversal = await runMiddleware(middleware, "/mock-maps/%2e%2e/package.json", "GET");
+        const canonicalPackageRequest = await runMiddleware(middleware, "/package.json", "GET");
+
+        expect(directTraversal.statusCode).toBe(403);
+        expect(directTraversal.body).toContain("Forbidden");
+        expect(encodedTraversal.statusCode).toBe(403);
+        expect(encodedTraversal.body).toContain("Forbidden");
+        expect(canonicalPackageRequest.statusCode).toBe(403);
+        expect(canonicalPackageRequest.body).toContain("Forbidden");
+    });
+
     it("returns companion list from /companion/list", async () => {
         const middleware = getMockMiddleware();
         const response = await runMiddleware(

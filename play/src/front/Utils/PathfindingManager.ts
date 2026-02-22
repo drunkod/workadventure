@@ -169,7 +169,7 @@ export class PathfindingManager {
         const mapHeight = this.grid.length ?? 0;
         const mapWidth = this.grid[0]?.length ?? 0;
 
-        return MathUtils.isBetween(tile.x, 0, mapWidth) && MathUtils.isBetween(tile.y, 0, mapHeight);
+        return tile.x >= 0 && tile.x < mapWidth && tile.y >= 0 && tile.y < mapHeight;
     }
 
     /**
