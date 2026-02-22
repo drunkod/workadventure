@@ -43,6 +43,7 @@ import { PinchManager } from "../UserInput/PinchManager";
 import { waScaleManager } from "../Services/WaScaleManager";
 import { lazyLoadPlayerCharacterTextures } from "../Entity/PlayerTexturesLoadingManager";
 import { lazyLoadPlayerCompanionTexture } from "../Companion/CompanionTexturesLoadingManager";
+import type { WokaTextureDescriptionInterface } from "../Entity/PlayerTextures";
 import { iframeListener } from "../../Api/IframeListener";
 import { coWebsiteManager, coWebsites } from "../../Stores/CoWebsiteStore";
 import {
@@ -131,6 +132,7 @@ import { myCameraBlockedStore, myMicrophoneBlockedStore } from "../../Stores/MyM
 import { resolveMapScriptUrls } from "./MapScriptUrlUtils";
 import type { GameStateEvent } from "../../Api/Events/GameStateEvent";
 import { currentPlayerWokaStore } from "../../Stores/CurrentPlayerWokaStore";
+import type { WokaData, WokaTexture } from "../../Components/Woka/WokaTypes";
 import {
     mapEditorModeStore,
     mapEditorRestrictedPropertiesStore,
@@ -774,8 +776,8 @@ export class GameScene extends DirtyScene {
 
         if (this._room.isDisconnected()) {
             // "alone=true" mode intentionally skips websocket connection.
-            // Rejecting here triggers the existing local fallback textures in Character.
-            this.currentPlayerTexturesReject(new Error("Disconnected mode: websocket is disabled"));
+            // Resolve current player textures from local selection to keep Woka choice consistent.
+            this.resolveCurrentPlayerTexturesInDisconnectedMode();
             if (gameManager.getCompanionTextureId() != undefined) {
                 this.currentCompanionTextureReject(new Error("Disconnected mode: websocket is disabled"));
             }
@@ -1708,6 +1710,63 @@ export class GameScene extends DirtyScene {
             );
             this.entityPermissionsDeferred.resolve(this.entityPermissions);
         }
+    }
+
+    private resolveCurrentPlayerTexturesInDisconnectedMode(): void {
+        const selectedTextureIds = gameManager.getCharacterTextureIds();
+        if (!selectedTextureIds || selectedTextureIds.length === 0) {
+            this.currentPlayerTexturesReject(new Error("Disconnected mode: no selected texture IDs found"));
+            return;
+        }
+
+        gameManager
+            .loadWokaData()
+            .then((wokaData) => {
+                const selectedTextures = this.mapTextureIdsToTextureDescriptions(wokaData, selectedTextureIds);
+                if (selectedTextures.length !== selectedTextureIds.length) {
+                    throw new Error("Disconnected mode: could not resolve all selected texture IDs");
+                }
+                return lazyLoadPlayerCharacterTextures(this.superLoad, selectedTextures);
+            })
+            .then((resolvedTextureIds) => {
+                this.currentPlayerTexturesResolve(resolvedTextureIds);
+            })
+            .catch((e) => {
+                console.warn("Disconnected mode: failed to load selected textures, falling back to default textures", e);
+                this.currentPlayerTexturesReject(e);
+            });
+    }
+
+    private mapTextureIdsToTextureDescriptions(
+        wokaData: WokaData,
+        selectedTextureIds: string[]
+    ): WokaTextureDescriptionInterface[] {
+        const layerKeys: Array<keyof WokaData> = ["body", "eyes", "hair", "clothes", "hat", "accessory", "woka"];
+        const textureIndex = new Map<string, WokaTextureDescriptionInterface>();
+
+        for (const layerKey of layerKeys) {
+            const layer = wokaData[layerKey];
+            if (!layer?.collections) {
+                continue;
+            }
+
+            for (const collection of layer.collections) {
+                for (const texture of collection.textures) {
+                    textureIndex.set(texture.id, this.toTextureDescription(texture));
+                }
+            }
+        }
+
+        return selectedTextureIds
+            .map((textureId) => textureIndex.get(textureId))
+            .filter((texture): texture is WokaTextureDescriptionInterface => texture !== undefined);
+    }
+
+    private toTextureDescription(texture: WokaTexture): WokaTextureDescriptionInterface {
+        return {
+            id: texture.id,
+            url: texture.url,
+        };
     }
 
     private initializeAreaManager() {

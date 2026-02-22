@@ -3,6 +3,23 @@
         return;
     }
 
+    // Frontend-only mock mode must run disconnected from websocket by default.
+    const roomUrl = new URL(window.location.href);
+    if (!roomUrl.searchParams.has("alone")) {
+        roomUrl.searchParams.set("alone", "true");
+        const search = roomUrl.search ? roomUrl.search : "";
+        window.history.replaceState({}, "", roomUrl.pathname + search + roomUrl.hash);
+    }
+
+    const roomUrlString = roomUrl.toString();
+    window.localStorage?.setItem("lastRoomUrl", roomUrlString);
+    if ("caches" in window) {
+        window.caches
+            .open("workavdenture-cache")
+            .then((cache) => cache.put("/lastRoomUrl", new Response(JSON.stringify({ roomUrl: roomUrlString }))))
+            .catch((e) => console.warn("Unable to seed lastRoomUrl in cache storage", e));
+    }
+
     // Start onboarding from a clean user state in frontend-only mock mode.
     const localUserKeysToReset = ["playerName", "characterTextures", "companion", "authToken", "localUser"];
     for (const key of localUserKeysToReset) {

@@ -249,9 +249,9 @@
                                 >
                                     {#each collection.textures || [] as texture (texture.id)}
                                         <button
-                                            class="rounded border border-solid box-border p-0 h-fit {selectedWokaTextureId?.woka ===
+                                            class="rounded border border-solid box-border p-0 h-fit transition-colors {selectedWokaTextureId?.woka ===
                                             texture.id
-                                                ? 'bg-white/50 border-white'
+                                                ? 'bg-secondary/30 border-secondary ring-2 ring-secondary shadow-lg'
                                                 : 'bg-white/10 hover:bg-white/20 border-transparent'}"
                                             id="woka-{texture.id}"
                                             on:click={() => selectTexture(collectionIndex, texture.id)}
