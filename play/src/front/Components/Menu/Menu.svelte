@@ -29,7 +29,8 @@
     import ChatSubMenu from "./ChatSubMenu.svelte";
     import ShortcutSubMenu from "./ShortcutSubMenu.svelte";
 
-    let activeSubMenu: MenuItem = $state($subMenusStore[$activeSubMenuStore]);
+    // Keep the exact store object identity: this value is compared with === against subMenusStore entries.
+    let activeSubMenu: MenuItem = $state.raw($subMenusStore[$activeSubMenuStore]);
     let activeComponent: ComponentType = $state(ProfileSubMenu);
     let props: { url: string; allowApi: boolean; allow: string | undefined } = $state();
     let unsubscriberSubMenuStore: Unsubscriber;

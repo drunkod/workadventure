@@ -1,7 +1,7 @@
 import type { AvailabilityStatus, ExternalModuleMessage, OauthRefreshToken } from "@workadventure/messages";
 import type { Readable, Updater, Writable } from "svelte/store";
 import type { CalendarEventInterface, TodoListInterface } from "@workadventure/shared-utils";
-import type { ComponentProps, ComponentType, SvelteComponentTyped } from "svelte";
+import type { Component, ComponentProps, ComponentType } from "svelte";
 import type { AreaData, AreaDataProperties } from "@workadventure/map-editor";
 import type { Observable } from "rxjs";
 import { z } from "zod";
@@ -11,11 +11,11 @@ import type { ExternalComponentZones } from "../Stores/Utils/externalSvelteCompo
 import type { HasPlayerMovedInterface } from "../Api/Events/HasPlayerMovedInterface";
 
 export interface ExternalSvelteComponentServiceInterface {
-    addComponentToZone<Component extends SvelteComponentTyped>(
+    addComponentToZone<T extends Component<any>>(
         zone: ExternalComponentZones,
         key: string,
-        componentType: ComponentType<Component>,
-        props?: ComponentProps<Component>
+        componentType: T,
+        props?: ComponentProps<T>
     ): void;
     removeComponentFromZone(zone: ExternalComponentZones, key: string): void;
 }

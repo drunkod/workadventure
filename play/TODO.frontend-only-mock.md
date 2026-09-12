@@ -1,6 +1,8 @@
 # TODO: Migrate `play` to Full Local Mock Mode (No Backend/Pusher)
 
-Last verified: February 17, 2026
+Last verified: September 12, 2026
+
+For the current run instructions, use [`../LOCAL_FRONTEND_ONLY.md`](../LOCAL_FRONTEND_ONLY.md). This file now serves mainly as implementation history and a record of remaining gaps.
 
 ## Research summary (DeepWiki vs this branch)
 
@@ -158,16 +160,20 @@ Verified on February 17, 2026.
 
 ## Definition of done (full local mock mode)
 
-- [ ] Frontend boots with `npm run dev-front-mock` and no pusher/back process.
-- [ ] Room loads and avatar can move with `alone=true`.
-- [ ] Woka and companion selection screens load without backend.
-- [ ] Save-name/save-texture flows do not error in UI.
-- [ ] No fatal runtime errors from missing backend endpoints.
+- [x] Frontend boots with `npm run dev-front-mock` and no pusher/back process.
+- [x] Room loads and avatar can move in disconnected single-user mode.
+- [x] Woka selection loads without backend; companion data is provided by the local mock endpoint.
+- [x] Save-name/save-texture/save-companion flows have deterministic local no-op endpoints.
+- [x] No fatal runtime errors from missing backend endpoints in the verified UI path.
+
+Verified in Helium on September 12, 2026: onboarding, starter world, Profile, Settings, submenu switching, RangeSliders, Calendar, Todo, and strict-local Chat all rendered with zero HTTP errors, failed requests, page exceptions, or console errors and no external app HTTP/WebSocket traffic.
 
 ---
 
 ## Notes
 
 - Browser warnings like AudioContext autoplay are expected until user gesture.
-- `alone=true` is still required for disconnected single-user mode behavior.
-- If behavior looks stale, clear local storage for `localhost:8080`.
+- `frontend-only-env.js` now adds `alone=true` automatically; adding it manually remains harmless.
+- `dev-front-mock` now regenerates protobuf, typesafe-i18n, and `iframe_api.js` before Vite starts.
+- Keep Jazz disabled for strict-local testing unless an explicit local Jazz sync peer is configured; the Jazz runtime still has a cloud fallback when enabled without one.
+- If behavior looks stale, reload the page. Frontend-only mode intentionally resets the main onboarding identity keys on reload.

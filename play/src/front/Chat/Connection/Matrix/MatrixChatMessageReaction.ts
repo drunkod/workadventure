@@ -3,7 +3,7 @@ import { EventType, RelationType } from "matrix-js-sdk";
 import { MapStore } from "@workadventure/store-utils";
 import type { Writable } from "svelte/store";
 import { get, writable } from "svelte/store";
-import type { ComponentType, SvelteComponent } from "svelte";
+import type { Component } from "svelte";
 import type { ChatMessageReaction, ChatUser } from "../ChatConnection";
 import ReactionIcon from "../../Components/Room/ReactionIcon.svelte";
 import { chatUserFactory } from "./MatrixChatUser";
@@ -89,7 +89,7 @@ export class MatrixChatMessageReaction implements ChatMessageReaction {
         }
     }
 
-    public get component(): { component: ComponentType<SvelteComponent>; props: Record<string, unknown> } {
+    public get component(): { component: Component<Record<string, any>>; props: Record<string, unknown> } {
         return {
             component: ReactionIcon,
             props: {

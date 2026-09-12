@@ -1,4 +1,4 @@
-import type { ComponentProps, ComponentType, SvelteComponentTyped } from "svelte";
+import type { Component, ComponentProps } from "svelte";
 import { writable } from "svelte/store";
 import type { ExternalSvelteComponentServiceInterface } from "../../ExternalModule/ExtensionModule";
 
@@ -6,62 +6,62 @@ const externalComponentsByZone = {
     actionBarAppsMenu: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     availabilityStatus: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     popup: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     // Components displayed at the top of the menu when the menu is open
     menuTop: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     chatBand: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     centeredPopup: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     calendarImage: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     todoListImage: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     calendarButton: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
     todoListButton: writable(
         new Map<
             string,
-            { componentType: ComponentType<SvelteComponentTyped>; props?: ComponentProps<SvelteComponentTyped> }
+            { componentType: Component<Record<string, any>>; props?: Record<string, any> }
         >()
     ),
 };
@@ -73,11 +73,11 @@ class ExternalSvelteComponentService implements ExternalSvelteComponentServiceIn
         return externalComponentsByZone[zone];
     }
 
-    public addComponentToZone<Component extends SvelteComponentTyped>(
+    public addComponentToZone<T extends Component<any>>(
         zone: ExternalComponentZones,
         key: string,
-        componentType: ComponentType<Component>,
-        props?: ComponentProps<Component>
+        componentType: T,
+        props?: ComponentProps<T>
     ) {
         externalComponentsByZone[zone].update((map) => {
             map.set(key, { componentType, props });

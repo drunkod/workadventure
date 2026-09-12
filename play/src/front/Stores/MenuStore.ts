@@ -1,6 +1,6 @@
 import type { Readable, Writable } from "svelte/store";
 import { derived, get, writable } from "svelte/store";
-import type { ComponentProps, ComponentType, SvelteComponentTyped } from "svelte";
+import type { Component } from "svelte";
 import type { Translation } from "../../i18n/i18n-types";
 import { connectionManager } from "../Connection/ConnectionManager";
 import { localUserStore } from "../Connection/LocalUserStore";
@@ -283,7 +283,7 @@ export interface CustomButtonActionBarDescriptor {
 }
 
 export const additionalRightButtonsMenu = derived(getAdditionalMenuItemStore("top"), ($additionalTopMenuItems) => {
-    const menuItems: RightMenuItem<CustomActionBarButton>[] = [];
+    const menuItems: RightMenuItem[] = [];
     $additionalTopMenuItems.forEach((props, id) => {
         menuItems.push({
             id: id,
@@ -298,21 +298,21 @@ export const additionalRightButtonsMenu = derived(getAdditionalMenuItemStore("to
     return menuItems;
 });
 
-export interface RightMenuItem<T extends SvelteComponentTyped> {
+export interface RightMenuItem {
     id: string;
     fallsInBurgerMenuStore: Writable<boolean>;
-    component: ComponentType<T>;
-    props: ComponentProps<T>;
+    component: Component<Record<string, any>>;
+    props: Record<string, any>;
 }
 
-const mapsMenuItem: RightMenuItem<MapSubMenu> = {
+const mapsMenuItem: RightMenuItem = {
     id: "maps",
     fallsInBurgerMenuStore: writable(false),
     component: MapSubMenu,
     props: {},
 };
 
-const loginMenuItem: RightMenuItem<LoginMenuItem> = {
+const loginMenuItem: RightMenuItem = {
     id: "login",
     fallsInBurgerMenuStore: writable(true),
     component: LoginMenuItem,
@@ -321,7 +321,7 @@ const loginMenuItem: RightMenuItem<LoginMenuItem> = {
     },
 };
 
-const inviteMenuItem: RightMenuItem<InviteMenuItem> = {
+const inviteMenuItem: RightMenuItem = {
     id: "invite",
     fallsInBurgerMenuStore: writable(false),
     component: InviteMenuItem,
@@ -330,10 +330,10 @@ const inviteMenuItem: RightMenuItem<InviteMenuItem> = {
     },
 };
 
-export const rightActionBarMenuItems: Readable<RightMenuItem<SvelteComponentTyped>[]> = derived(
+export const rightActionBarMenuItems: Readable<RightMenuItem[]> = derived(
     [additionalRightButtonsMenu, userIsConnected, inviteUserActivated],
     ([$additionalButtonsMenu, $userIsConnected, $inviteUserActivated]) => {
-        const menuItems: RightMenuItem<SvelteComponentTyped>[] = [...$additionalButtonsMenu.values()];
+        const menuItems: RightMenuItem[] = [...$additionalButtonsMenu.values()];
         if ($inviteUserActivated) {
             menuItems.push(inviteMenuItem);
         }

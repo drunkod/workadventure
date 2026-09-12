@@ -1,4 +1,4 @@
-import type { ComponentProps, ComponentType, SvelteComponentTyped } from "svelte";
+import type { Component, ComponentProps } from "svelte";
 import type { ComputePositionConfig } from "@floating-ui/dom";
 import { arrow, autoUpdate, computePosition, flip, limitShift, offset, shift } from "@floating-ui/dom";
 import { writable } from "svelte/store";
@@ -9,8 +9,8 @@ export const floatingUiComponents = writable(
     new Map<
         string,
         {
-            componentType: ComponentType<SvelteComponentTyped>;
-            props?: ComponentProps<SvelteComponentTyped>;
+            componentType: Component<Record<string, any>>;
+            props?: Record<string, any>;
             action: ContentAction;
             arrowAction: ArrowAction | undefined;
         }
@@ -22,10 +22,10 @@ export const floatingUiComponents = writable(
  * is passed the popup in parameter and will display it at the right position. The element in the DOM will be close to the root element.
  * As a result, you don't have to worry about the popup being clipped by the parent element because of "overflow: hidden".
  */
-export function showFloatingUi<Component extends SvelteComponentTyped>(
+export function showFloatingUi<T extends Component<any>>(
     referenceNode: Element,
-    component: ComponentType<Component>,
-    props: ComponentProps<Component>,
+    component: T,
+    props: ComponentProps<T>,
     options?: Partial<ComputePositionConfig>,
     offsetMainAxis = 0,
     withArrow = true

@@ -2,7 +2,7 @@ import type { Readable, Writable } from "svelte/store";
 import type { AvailabilityStatus } from "@workadventure/messages";
 import type { MapStore } from "@workadventure/store-utils";
 import type { StateEvents } from "matrix-js-sdk";
-import type { ComponentType, SvelteComponent } from "svelte";
+import type { Component } from "svelte";
 import type { RoomConnection } from "../../Connection/RoomConnection";
 import type { PictureStore } from "../../Stores/PictureStore";
 
@@ -131,7 +131,7 @@ export interface ChatMessageReaction {
     readonly users: MapStore<string, ChatUser>;
     readonly react: () => void;
     readonly reacted: Readable<boolean>;
-    readonly component: { component: ComponentType<SvelteComponent>; props: Record<string, unknown> };
+    readonly component: { component: Component<Record<string, any>>; props: Record<string, unknown> };
 }
 
 export type ChatMessageType = "proximity" | "text" | "incoming" | "outcoming" | "image" | "file" | "audio" | "video";

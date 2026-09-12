@@ -20,7 +20,7 @@
     }
 
     function formatHour(date: Date) {
-        return date.toLocaleString("en-GB", {
+        return date.toLocaleString(undefined, {
             hour: "2-digit",
             minute: "2-digit",
         });
@@ -72,7 +72,7 @@
                             <img draggable="false" src={calendarPng} class="w-8" alt={$LL.menu.icon.open.calendar()} />
                         {/if}
                         <h3 class="text-xl text-left leading-none">
-                            {new Date().toLocaleString("en-EN", {
+                            {new Date().toLocaleString(undefined, {
                                 month: "long",
                                 day: "2-digit",
                                 year: "numeric",
@@ -137,7 +137,7 @@
                                                 }
                                             }}
                                             class="text-xs text-right text-secondary-500"
-                                            target="_blank">${$LL.externalModule.calendar.joinMeeting()}</a
+                                            target="_blank">{$LL.externalModule.calendar.joinMeeting()}</a
                                         >
                                     {/if}
                                 </div>

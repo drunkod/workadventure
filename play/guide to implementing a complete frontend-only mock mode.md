@@ -1,4 +1,8 @@
 
+# Historical implementation guide
+
+> **Current users:** this document describes the original implementation plan and contains stale setup examples. For the verified way to run the frontend-only local version today, use [`../LOCAL_FRONTEND_ONLY.md`](../LOCAL_FRONTEND_ONLY.md).
+
 Based on my analysis of the WorkAdventure codebase, here's a comprehensive guide to implementing a complete frontend-only mock mode for the play service:
 
 ## Files to Create/Modify

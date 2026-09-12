@@ -3,8 +3,9 @@
 import { describe, expect, it, vi } from "vitest";
 import { once } from "events";
 import { Writable } from "stream";
-import fs from "fs";
-import path from "path";
+import * as fs from "node:fs";
+import path from "node:path";
+// @ts-expect-error Vitest can import the Vite .mts config directly; tsc disallows the extension without allowImportingTsExtensions.
 import { frontendOnlyMockPlugin } from "../../../vite.config.mts";
 
 type Middleware = (req: any, res: any, next: () => void) => void;
@@ -61,13 +62,14 @@ async function runMiddleware(middleware: Middleware, url: string, method = "GET"
     res.setHeader = (name, value) => {
         headers.set(name.toLowerCase(), String(value));
     };
-    res.end = (chunk?: unknown) => {
+    res.end = ((chunk?: unknown) => {
         if (chunk !== undefined) {
             body += Buffer.isBuffer(chunk) ? chunk.toString("utf8") : String(chunk);
         }
         ended = true;
         res.emit("finish");
-    };
+        return res;
+    }) as typeof res.end;
 
     middleware(req, res, () => {
         nextCalled = true;

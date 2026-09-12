@@ -32,6 +32,9 @@
     }: Props = $props();
     let optionAdvancedActivated = $state(false);
 
+    // Match the runtime default and keep RangeSlider bindable for older maps with no stored width.
+    property.width ??= 50;
+
     const dispatch = createEventDispatcher<{
         change: undefined;
         close: undefined;

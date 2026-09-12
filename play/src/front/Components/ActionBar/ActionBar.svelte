@@ -2,7 +2,6 @@
     import { preventDefault, stopPropagation } from 'svelte/legacy';
 
     import { get } from "svelte/store";
-    import type { SvelteComponentTyped } from "svelte";
     import { silentStore } from "../../Stores/MediaStore";
 
     import { gameManager } from "../../Phaser/Game/GameManager";
@@ -19,6 +18,7 @@
     import { hideActionBarStoreBecauseOfChatBar } from "../../Chat/ChatSidebarWidthStore";
     import { screenSharingAvailableStore } from "../../Stores/ScreenSharingStore";
     import { isInRemoteConversation } from "../../Stores/StreamableCollectionStore";
+    import { pictureInPictureSupportedStore } from "../../Stores/PeerStore";
     import MediaSettingsList from "./MediaSettingsList/MediaSettingsList.svelte";
     import CameraMenuItem from "./MenuIcons/CameraMenuItem.svelte";
     import MicrophoneMenuItem from "./MenuIcons/MicrophoneMenuItem.svelte";
@@ -46,7 +46,7 @@
 
     let firstVisibleItemIndex = $state(0);
 
-    function onMenuItemVisibilityChange(isVisible: boolean, button: RightMenuItem<SvelteComponentTyped>) {
+    function onMenuItemVisibilityChange(isVisible: boolean, button: RightMenuItem) {
         button.fallsInBurgerMenuStore.set(!isVisible);
 
         // Let's recompute the first visible item index
@@ -129,7 +129,7 @@
                             {#if $screenSharingAvailableStore}
                                 <ScreenSharingMenuItem />
                             {/if}
-                            {#if $isInRemoteConversation}
+                            {#if $isInRemoteConversation && $pictureInPictureSupportedStore}
                                 <PictureInPictureMenuItem />
                             {/if}
                             <!-- NAV : SCREENSHARING END -->

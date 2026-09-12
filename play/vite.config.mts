@@ -1,5 +1,5 @@
 import { basename, extname, normalize, resolve } from "path";
-import fs from "fs";
+import * as fs from "node:fs";
 import { createLogger, defineConfig, loadEnv } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { sveltePreprocess } from "svelte-preprocess";
@@ -8,6 +8,7 @@ import { sentryVitePlugin } from "@sentry/vite-plugin";
 import Icons from "unplugin-icons/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import type { LoggingFunction, RollupLog } from "rollup";
 
 const originalConsoleWarn = console.warn;
 console.warn = (...args: unknown[]) => {
@@ -50,7 +51,7 @@ export default defineConfig(({ mode }) => {
             outDir: "./dist/public",
             rollupOptions: {
                 plugins: [mediapipe_workaround()],
-                onwarn(warning, warn) {
+                onwarn(warning: RollupLog, warn: LoggingFunction) {
                     if (warning.code === "EVAL" && warning.id?.includes("/node_modules/vm-browserify/index.js")) {
                         return;
                     }
@@ -73,6 +74,8 @@ export default defineConfig(({ mode }) => {
         },
         plugins: [
             nodePolyfills({
+                // Keep explicit node: imports native in Node/Vitest. Browser-facing bare imports are still polyfilled.
+                protocolImports: false,
                 globals: {
                     Buffer: true,
                 },

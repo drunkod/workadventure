@@ -1,5 +1,5 @@
 import { derived, get, writable } from "svelte/store";
-import type { ComponentType, SvelteComponent } from "svelte";
+import type { Component } from "svelte";
 import { v4 } from "uuid";
 
 export const bannerVisible = writable(true);
@@ -9,7 +9,7 @@ export const showPopup = writable(false);
 type Props = Record<string, unknown>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SvelteComponentType = ComponentType<SvelteComponent<any, any, any>>;
+type SvelteComponentType = Component<Record<string, any>>;
 
 interface Popup {
     uuid: string;

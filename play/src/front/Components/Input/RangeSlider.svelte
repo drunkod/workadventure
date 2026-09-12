@@ -25,7 +25,7 @@
         label = undefined,
         placeholder = "",
         min = 0,
-        value = $bindable(min),
+        value = $bindable(),
         max = 100,
         step = 0,
         onChange = () => {},
@@ -37,11 +37,18 @@
         children
     }: Props = $props();
 
+    // Bound values can be unset in older maps. Render safely from min before the binding is normalised.
+    let displayValue = $derived(value ?? min);
+
+    $effect(() => {
+        if (value === undefined) value = min;
+    });
+
     let uniqueId = id || `input-${Math.random().toString(36).substring(2, 9)} `;
 </script>
 
 {#if label}
-    <label for={uniqueId} class="px-3"> {label} {@render children?.()}: {valueFormatter(value)} {unit}</label>
+    <label for={uniqueId} class="px-3"> {label} {@render children?.()}: {valueFormatter(displayValue)} {unit}</label>
 {/if}
 
 <div class={wrapperMargins ? "mx-2.5" : "w-full"}>
@@ -52,7 +59,7 @@
         class:input-range-square={buttonShape === "square"}
     >
         <!-- remove the -10px so that the slider does not extend out of the bar -->
-        <div class="input-range-slider" style="width: calc({((value - min) / (max - min)) * 100}% - 10px);">
+        <div class="input-range-slider" style="width: calc({((displayValue - min) / (max - min)) * 100}% - 10px);">
             <div class="input-range-btn group/range -end-5">
                 {#if buttonShape === "square"}
                     <svg

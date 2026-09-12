@@ -51,6 +51,11 @@ Please check the [Setting up a production environment](docs/others/self-hosting/
 
 ## Setting up a development environment
 
+For this fork's frontend-only local mode (no Pusher/Back/Matrix servers), see [`LOCAL_FRONTEND_ONLY.md`](LOCAL_FRONTEND_ONLY.md). That is the recommended path for local UI work on `d/local_jazz_chat`.
+
+> [!NOTE]
+> The instructions below describe the upstream-style full local stack. They are separate from the frontend-only mode above.
+
 > [!NOTE]
 > These installation instructions are for local development only. They will not work on
 > remote servers as local environments do not have HTTPS certificates.

@@ -5,7 +5,6 @@
     import { clickOutside } from "svelte-outside";
     import { AvailabilityStatus } from "@workadventure/messages";
     import { setContext } from "svelte";
-    import type { SvelteComponentTyped } from "svelte";
     import type { Readable } from "svelte/store";
     import { derived, get } from "svelte/store";
     import { availabilityStatusStore, enableCameraSceneVisibilityStore } from "../../../Stores/MediaStore";
@@ -138,7 +137,7 @@
         8
     );
 
-    let rightActionBarMenuItemsInBurgerMenu: Readable<RightMenuItem<SvelteComponentTyped>[]> = derived(
+    let rightActionBarMenuItemsInBurgerMenu: Readable<RightMenuItem[]> = derived(
         rightActionBarMenuItems,
         ($rightActionBarMenuItems, set) => {
             const theDerived = derived(

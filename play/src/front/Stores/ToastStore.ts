@@ -1,11 +1,11 @@
-import type { ComponentType, SvelteComponent } from "svelte";
+import type { Component } from "svelte";
 import { v4 } from "uuid";
 import { MapStore } from "@workadventure/store-utils";
 
 type Props = Record<string, unknown>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SvelteComponentType = ComponentType<SvelteComponent<any, any, any>>;
+type SvelteComponentType = Component<Record<string, any>>;
 
 interface Toast {
     component: SvelteComponentType;
