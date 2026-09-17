@@ -1,6 +1,6 @@
 # Task Contract: jazz-subpath-typescript-resolution
 
-> **Status**: Active
+> **Status**: Fulfilled
 > **Plan**: plans/plan-20260917-1438-jazz-subpath-typescript-resolution.md
 > **Task Profile**: code-change
 > <!-- legal values: code-change | docs-only | ledger-closeout | migration | eval-only | delegated-run | bugfix (omit for legacy passthrough); see docs/reference-configs/sprint-contracts.md -->
@@ -151,7 +151,7 @@ exit_criteria:
       "command": "node -e \"Promise.all([import('jazz-tools'),import('jazz-tools/browser'),import('jazz-tools/media')]).then(([a,b,c])=>{for(const [name,value] of Object.entries({co:a.co,z:a.z,Group:a.Group,CoPlainText:a.CoPlainText,JazzBrowserContextManager:b.JazzBrowserContextManager,createImage:c.createImage,loadImageBySize:c.loadImageBySize})){if(!value) throw new Error('missing '+name)}})\"",
       "cwd": "play",
       "phase": "verification",
-      "cost": "cheap",
+      "cost": "normal",
       "evidence_policy": "current_exact",
       "necessity": "Confirms the runtime entrypoints and exports that motivated the resolver change remain present.",
       "inputs": { "env": [] }
