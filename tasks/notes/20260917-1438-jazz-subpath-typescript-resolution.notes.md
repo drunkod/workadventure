@@ -13,7 +13,7 @@
 
 ## Deviations From Plan Or Spec
 
-- None recorded.
+- `repo-harness run verify-sprint --prepare-acceptance --contract tasks/contracts/20260917-1438-jazz-subpath-typescript-resolution.contract.md` could not complete because Git was denied permission to create its temporary index and stage `.ai/context/capabilities.json`; the contract verification report was therefore unavailable. The direct Verification Plan commands and `git diff --check` passed.
 
 ## Tradeoffs Considered
 
