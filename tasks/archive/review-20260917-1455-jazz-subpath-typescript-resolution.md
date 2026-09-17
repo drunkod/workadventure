@@ -1,9 +1,19 @@
+> **Archived**: 2026-09-17 14:55
+> **Related Plan**: plans/archive/plan-20260917-1438-jazz-subpath-typescript-resolution.md
+> **Outcome**: Completed
+> **Lifecycle**: review
+> **Parent Run ID**: run-20260917-1455
+> **Archive Projection V1**: `plans/plan-20260917-1438-jazz-subpath-typescript-resolution.md` => `plans/archive/plan-20260917-1438-jazz-subpath-typescript-resolution.md`
+> **Archive Projection V1**: `tasks/notes/20260917-1438-jazz-subpath-typescript-resolution.notes.md` => `tasks/archive/notes-20260917-1455-jazz-subpath-typescript-resolution.md`
+> **Archive Projection V1**: `tasks/contracts/20260917-1438-jazz-subpath-typescript-resolution.contract.md` => `tasks/archive/contract-20260917-1455-jazz-subpath-typescript-resolution.md`
+> **Archive Projection V1**: `tasks/reviews/20260917-1438-jazz-subpath-typescript-resolution.review.md` => `tasks/archive/review-20260917-1455-jazz-subpath-typescript-resolution.md`
+
 # Task Review: jazz-subpath-typescript-resolution
 
 > **Status**: Accepted
-> **Plan**: plans/plan-20260917-1438-jazz-subpath-typescript-resolution.md
-> **Contract**: tasks/contracts/20260917-1438-jazz-subpath-typescript-resolution.contract.md
-> **Notes File**: tasks/notes/20260917-1438-jazz-subpath-typescript-resolution.notes.md
+> **Plan**: plans/archive/plan-20260917-1438-jazz-subpath-typescript-resolution.md
+> **Contract**: tasks/archive/contract-20260917-1455-jazz-subpath-typescript-resolution.md
+> **Notes File**: tasks/archive/notes-20260917-1455-jazz-subpath-typescript-resolution.md
 > **Checks File**: .ai/harness/checks/latest.json
 > **Last Updated**: 2026-09-17 14:39
 > **Recommendation**: pass

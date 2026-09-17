@@ -3,7 +3,7 @@
 > **Status**: Approved
 > **Slug**: jazz-runtime-compatibility
 > **Created**: 2026-09-17 14:35
-> **Updated**: 2026-09-17 14:35
+> **Updated**: 2026-09-17 14:55
 > **Source PRD**: `plans/prds/20260917-1435-jazz-runtime-compatibility.prd.md`
 > **Source Spec**: `docs/spec.md`
 > **Backlog Schema**: 2
@@ -56,9 +56,10 @@ Repair the current TypeScript/Jazz package-boundary blocker without changing cha
 
 | # | ID | Status | Task | Mode | Acceptance | Plan |
 |---|----|--------|------|------|------------|------|
-| 1 | 4daa2d4568af1a5dcde92ba33029691b6fcf70c69da59829539d3cbfdeacc3d0 | [ ] | repair Jazz subpath TypeScript resolution | contract | `cd play && npm run typecheck` exits 0; required Jazz browser/media exports remain runtime-importable; only `play/tsconfig.json` plus task artifacts change | (pending) |
+| 1 | 4daa2d4568af1a5dcde92ba33029691b6fcf70c69da59829539d3cbfdeacc3d0 | [x] | repair Jazz subpath TypeScript resolution | contract | `cd play && npm run typecheck` exits 0; required Jazz browser/media exports remain runtime-importable; only `play/tsconfig.json` plus task artifacts change | `plans/archive/plan-20260917-1438-jazz-subpath-typescript-resolution.md` |
 
 ## Execution Log
 
 | When | Task | Plan | Result |
 |------|------|------|--------|
+| 2026-09-17 14:55 | repair Jazz subpath TypeScript resolution | `plans/archive/plan-20260917-1438-jazz-subpath-typescript-resolution.md` | done |
