@@ -9,7 +9,14 @@
   "scripts": {
     "prepare": "husky install || echo 'Husky not found. Maybe you are installing only a subproject.'",
     "generate-env-docs": "npm run generate --workspace=contrib/tools/generate-env-docs",
-    "check-env-docs": "npm run check --workspace=contrib/tools/generate-env-docs"
+    "check-env-docs": "npm run check --workspace=contrib/tools/generate-env-docs",
+    "check:brain-manifest": "repo-harness run check-brain-manifest",
+    "check:context-files": "repo-harness run check-context-files",
+    "check:deploy-sql": "repo-harness run check-deploy-sql-order",
+    "check:architecture-sync": "repo-harness run check-architecture-sync",
+    "check:task-sync": "repo-harness run check-task-sync",
+    "check:task-workflow": "repo-harness run check-task-workflow --strict",
+    "sync:brain-docs": "repo-harness run sync-brain-docs --all"
   },
   "workspaces": [
     "play",
