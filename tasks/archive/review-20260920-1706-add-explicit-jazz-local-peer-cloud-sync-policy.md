@@ -1,9 +1,19 @@
+> **Archived**: 2026-09-20 17:06
+> **Related Plan**: plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
+> **Outcome**: Completed
+> **Lifecycle**: review
+> **Parent Run ID**: run-20260920-1706
+> **Archive Projection V1**: `plans/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md` => `plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md` => `tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.contract.md` => `tasks/archive/contract-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.review.md` => `tasks/archive/review-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+
 # Task Review: add-explicit-jazz-local-peer-cloud-sync-policy
 
 > **Status**: Accepted
-> **Plan**: plans/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
-> **Contract**: tasks/contracts/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.contract.md
-> **Notes File**: tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md
+> **Plan**: plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
+> **Contract**: tasks/archive/contract-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md
+> **Notes File**: tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md
 > **Checks File**: .ai/harness/checks/latest.json
 > **Last Updated**: 2026-09-20 16:43
 > **Recommendation**: pass

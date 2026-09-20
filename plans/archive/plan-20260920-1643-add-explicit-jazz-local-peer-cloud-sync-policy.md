@@ -1,6 +1,16 @@
+> **Archived**: 2026-09-20 17:06
+> **Related Plan**: plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
+> **Outcome**: Completed
+> **Lifecycle**: plan
+> **Parent Run ID**: run-20260920-1706
+> **Archive Projection V1**: `plans/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md` => `plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md` => `tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.contract.md` => `tasks/archive/contract-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.review.md` => `tasks/archive/review-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+
 # Plan: Add explicit Jazz local/peer/cloud sync policy
 
-> **Status**: Approved
+> **Status**: Archived
 > **Created**: 20260920-1643
 > **Slug**: add-explicit-jazz-local-peer-cloud-sync-policy
 > **Planning Source**: repo-harness-plan
@@ -12,9 +22,9 @@
 > **Rollback Surface**: revert the reviewed task publication
 > **Spec**: `docs/spec.md`
 > **Research**: `docs/researches/20260920-local-first-jazz-audit.md`
-> **Task Contract**: `tasks/contracts/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.contract.md`
-> **Task Review**: `tasks/reviews/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.review.md`
-> **Implementation Notes**: `tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md`
+> **Task Contract**: `tasks/archive/contract-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Task Review**: `tasks/archive/review-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Implementation Notes**: `tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
 
 ## Agentic Routing
 - Selected route: mechanical implementation after frozen Sprint decisions.
@@ -23,9 +33,9 @@
 
 ## Workflow Inventory
 - Active plan: this file.
-- Contract: `tasks/contracts/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.contract.md`.
-- Review: `tasks/reviews/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.review.md`.
-- Notes: `tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md`.
+- Contract: `tasks/archive/contract-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`.
+- Review: `tasks/archive/review-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`.
+- Notes: `tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`.
 - Sprint: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`.
 - Execution isolation: one `codex/add-explicit-jazz-local-peer-cloud-sync-policy` worktree.
 ## Decisions

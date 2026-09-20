@@ -1,13 +1,23 @@
+> **Archived**: 2026-09-20 17:06
+> **Related Plan**: plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
+> **Outcome**: Completed
+> **Lifecycle**: contract
+> **Parent Run ID**: run-20260920-1706
+> **Archive Projection V1**: `plans/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md` => `plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md` => `tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.contract.md` => `tasks/archive/contract-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.review.md` => `tasks/archive/review-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+
 # Task Contract: add-explicit-jazz-local-peer-cloud-sync-policy
 
 > **Status**: Fulfilled
-> **Plan**: plans/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
+> **Plan**: plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
 > **Task Profile**: code-change
 > **Owner**: test
 > **Capability ID**: root
 > **Last Updated**: 2026-09-20 16:52
-> **Review File**: `tasks/reviews/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.review.md`
-> **Notes File**: `tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md`
+> **Review File**: `tasks/archive/review-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+> **Notes File**: `tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
 
 ## Why
 The current Jazz path implicitly creates a Jazz Cloud peer when no peer is configured and can fall through to Matrix after Jazz initialization failure. That violates the first Local First release boundary and makes later standalone deployment acceptance meaningless.
@@ -32,11 +42,11 @@ The direction is wrong if invalid Jazz mode/peer/key cannot surface as Jazz `ON_
 Not applicable; this is a planned feature/policy slice rather than `bugfix` profile.
 
 ## Workflow Inventory
-- Source plan: `plans/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+- Source plan: `plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md`
 - Sprint: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`
 - Deferred ledger: `tasks/todos.md`
-- Review: `tasks/reviews/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.review.md`
-- Notes: `tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md`
+- Review: `tasks/archive/review-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
+- Notes: `tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md`
 - Checks: `.ai/harness/checks/latest.json`
 - Runs: `.ai/harness/runs/`
 
@@ -64,10 +74,10 @@ allowed_paths:
   - play/tests/setup/vitest.setup.ts
   - play/tests/front/Chat/Connection/Jazz/JazzSyncPolicy.test.ts
   - play/tests/front/Phaser/Game/GameManagerJazzPolicy.test.ts
-  - plans/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
-  - tasks/contracts/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.contract.md
-  - tasks/reviews/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.review.md
-  - tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md
+  - plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
+  - tasks/archive/contract-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md
+  - tasks/archive/review-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md
+  - tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md
 ```
 
 ## Evidence Requirements
@@ -115,7 +125,7 @@ exit_criteria:
     - play/tests/front/Chat/Connection/Jazz/JazzSyncPolicy.test.ts
     - play/tests/front/Phaser/Game/GameManagerJazzPolicy.test.ts
   artifacts_exist:
-    - tasks/notes/20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.notes.md
+    - tasks/archive/notes-20260920-1706-add-explicit-jazz-local-peer-cloud-sync-policy.md
 ```
 
 ## Verification Plan
