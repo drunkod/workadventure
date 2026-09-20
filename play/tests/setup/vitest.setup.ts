@@ -77,6 +77,7 @@ if (typeof window !== "undefined" && window.env === undefined) {
         MATRIX_ADMIN_USER: undefined,
         MATRIX_DOMAIN: undefined,
         JAZZ_CHAT_ENABLED: false,
+        JAZZ_SYNC_MODE: undefined,
         JAZZ_SYNC_PEER: undefined,
         JAZZ_API_KEY: undefined,
         JAZZ_GLOBAL_ROOM_ID: undefined,

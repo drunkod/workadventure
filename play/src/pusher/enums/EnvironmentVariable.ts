@@ -157,6 +157,7 @@ export const MATRIX_ADMIN_USER: string | undefined = env.MATRIX_ADMIN_USER;
 export const MATRIX_ADMIN_PASSWORD: string | undefined = env.MATRIX_ADMIN_PASSWORD;
 export const MATRIX_DOMAIN: string | undefined = env.MATRIX_DOMAIN;
 export const JAZZ_CHAT_ENABLED: boolean = env.JAZZ_CHAT_ENABLED;
+export const JAZZ_SYNC_MODE: string | undefined = env.JAZZ_SYNC_MODE;
 export const JAZZ_SYNC_PEER: string | undefined = env.JAZZ_SYNC_PEER;
 export const JAZZ_API_KEY: string | undefined = env.JAZZ_API_KEY;
 export const JAZZ_GLOBAL_ROOM_ID: string | undefined = env.JAZZ_GLOBAL_ROOM_ID;
@@ -224,6 +225,7 @@ export const FRONT_ENVIRONMENT_VARIABLES: FrontConfigurationInterface = {
     EMBEDLY_KEY: env.EMBEDLY_KEY,
     MATRIX_PUBLIC_URI,
     JAZZ_CHAT_ENABLED,
+    JAZZ_SYNC_MODE,
     JAZZ_SYNC_PEER,
     JAZZ_API_KEY,
     JAZZ_GLOBAL_ROOM_ID,

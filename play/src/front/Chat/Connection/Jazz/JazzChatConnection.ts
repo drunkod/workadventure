@@ -15,10 +15,12 @@ import type {
 } from "../ChatConnection";
 import { JazzChatRoom } from "./JazzChatRoom";
 import { JazzRuntime } from "./JazzRuntime";
+import { resolveJazzSyncPolicy } from "./JazzSyncPolicy";
 
 export interface JazzChatConnectionOptions {
     roomStorageKey: string;
     defaultRoomName: string;
+    syncMode?: string;
     syncPeer?: string;
     apiKey?: string;
     globalRoomId?: string;
@@ -76,8 +78,7 @@ export class JazzChatConnection implements ChatConnectionInterface {
         this.connectionStatus.set("CONNECTING");
         try {
             await this.runtime.init({
-                syncPeer: this.options.syncPeer,
-                apiKey: this.options.apiKey,
+                policy: resolveJazzSyncPolicy({ mode: this.options.syncMode, peer: this.options.syncPeer, apiKey: this.options.apiKey }),
             });
 
             const mainRoomId = await this.runtime.resolveRoomId(

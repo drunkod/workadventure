@@ -431,6 +431,7 @@ export const EnvironmentVariables = z.object({
     JAZZ_CHAT_ENABLED: BoolAsString.optional()
         .transform((val) => toBool(val, false))
         .describe("Enable Jazz chat provider on the frontend. Defaults to false"),
+    JAZZ_SYNC_MODE: z.string().optional().describe("Raw Jazz sync mode"),
     JAZZ_SYNC_PEER: z.string().optional().describe("Jazz sync peer URL (for example wss://cloud.jazz.tools/?key=...)"),
     JAZZ_API_KEY: z.string().optional().describe("Jazz API key used to build default cloud peer URL"),
     JAZZ_GLOBAL_ROOM_ID: z

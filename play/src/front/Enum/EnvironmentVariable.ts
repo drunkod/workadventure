@@ -69,6 +69,7 @@ export const MATRIX_PUBLIC_URI = env.MATRIX_PUBLIC_URI;
 export const MATRIX_ADMIN_USER = env.MATRIX_ADMIN_USER;
 export const MATRIX_DOMAIN = env.MATRIX_DOMAIN;
 export const JAZZ_CHAT_ENABLED = env.JAZZ_CHAT_ENABLED;
+export const JAZZ_SYNC_MODE = env.JAZZ_SYNC_MODE;
 export const JAZZ_SYNC_PEER = env.JAZZ_SYNC_PEER;
 export const JAZZ_API_KEY = env.JAZZ_API_KEY;
 export const JAZZ_GLOBAL_ROOM_ID = env.JAZZ_GLOBAL_ROOM_ID;

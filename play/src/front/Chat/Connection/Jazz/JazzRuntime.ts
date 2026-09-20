@@ -1,4 +1,6 @@
 import { createJazzSchemas, type JazzLoadedItem, type JazzLoadedList, type JazzSchema } from "./schema";
+import type { JazzSyncPolicy } from "./JazzSyncPolicy";
+import { jazzContextSync } from "./JazzSyncPolicy";
 
 type JazzModuleBundle = {
     co: {
@@ -25,7 +27,7 @@ type JazzModuleBundle = {
     JazzBrowserContextManager: new () => {
         createContext: (options: {
             sync: {
-                peer: string;
+                peer?: string;
                 when: "always" | "never" | "signedUp";
             };
         }) => Promise<void>;
@@ -52,8 +54,7 @@ type RoomSubscriptionState = {
 };
 
 export interface JazzRuntimeConfig {
-    syncPeer?: string;
-    apiKey?: string;
+    policy: JazzSyncPolicy;
 }
 
 export interface JazzMessagePayload {
@@ -112,13 +113,11 @@ export class JazzRuntime {
 
         const globalJazzState = globalThis as { __WA_JAZZ_CONTEXT_READY?: boolean };
         if (!globalJazzState.__WA_JAZZ_CONTEXT_READY) {
-            const peer = config.syncPeer ?? this.buildCloudPeer(config.apiKey);
             const manager = new this.modules.JazzBrowserContextManager();
             try {
                 await manager.createContext({
                     sync: {
-                        peer,
-                        when: "always",
+                        ...jazzContextSync(config.policy),
                     },
                 });
             } catch (error) {
@@ -265,10 +264,6 @@ export class JazzRuntime {
         this.roomSubscriptions.clear();
     }
 
-    private buildCloudPeer(apiKey?: string): string {
-        const safeApiKey = apiKey && apiKey.trim() !== "" ? apiKey : "workadventure-chat@example.com";
-        return `wss://cloud.jazz.tools/?key=${encodeURIComponent(safeApiKey)}`;
-    }
 
     private createRoom(): JazzLoadedList {
         const roomSchema = this.ensureRoomSchema();

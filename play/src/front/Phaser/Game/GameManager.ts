@@ -26,6 +26,7 @@ import type { ChatConnectionInterface } from "../../Chat/Connection/ChatConnecti
 import {
     JAZZ_API_KEY,
     JAZZ_CHAT_ENABLED,
+    JAZZ_SYNC_MODE,
     JAZZ_GLOBAL_ROOM_ID,
     JAZZ_SYNC_PEER,
     MATRIX_PUBLIC_URI,
@@ -354,6 +355,7 @@ export class GameManager {
             const jazzChatConnection = new JazzChatConnection({
                 roomStorageKey: this.startRoom?.key ?? "default",
                 defaultRoomName: this.startRoom?.roomName ?? "Jazz chat",
+                syncMode: JAZZ_SYNC_MODE,
                 syncPeer: JAZZ_SYNC_PEER && JAZZ_SYNC_PEER.trim() !== "" ? JAZZ_SYNC_PEER : undefined,
                 apiKey: JAZZ_API_KEY && JAZZ_API_KEY.trim() !== "" ? JAZZ_API_KEY : undefined,
                 globalRoomId: JAZZ_GLOBAL_ROOM_ID && JAZZ_GLOBAL_ROOM_ID.trim() !== "" ? JAZZ_GLOBAL_ROOM_ID : undefined,
@@ -384,14 +386,11 @@ export class GameManager {
                 this.chatConnectionPromise = undefined;
                 return new VoidChatConnection();
             } catch (error) {
-                console.error("Failed to initialize Jazz chat connection, fallback to Matrix", error);
+                console.error("Failed to initialize Jazz chat connection", error);
                 Sentry.captureException(error);
-                jazzChatConnection.destroy().catch((destroyError) => {
-                    console.error(destroyError);
-                    Sentry.captureException(destroyError);
-                });
-                this._chatConnection = undefined;
-                this.chatConnectionPromise = undefined;
+                this._chatConnection = jazzChatConnection;
+                this.chatConnectionPromise = Promise.resolve(jazzChatConnection);
+                return jazzChatConnection;
             }
         }
 
