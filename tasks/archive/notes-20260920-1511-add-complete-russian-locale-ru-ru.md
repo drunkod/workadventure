@@ -1,9 +1,19 @@
+> **Archived**: 2026-09-20 15:11
+> **Related Plan**: plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
+> **Outcome**: Completed
+> **Lifecycle**: notes
+> **Parent Run ID**: run-20260920-1511
+> **Archive Projection V1**: `plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md` => `plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1357-add-complete-russian-locale-ru-ru.notes.md` => `tasks/archive/notes-20260920-1511-add-complete-russian-locale-ru-ru.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1357-add-complete-russian-locale-ru-ru.contract.md` => `tasks/archive/contract-20260920-1511-add-complete-russian-locale-ru-ru.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1357-add-complete-russian-locale-ru-ru.review.md` => `tasks/archive/review-20260920-1511-add-complete-russian-locale-ru-ru.md`
+
 # Implementation Notes: add-complete-russian-locale-ru-ru
 
 > **Status**: Active
-> **Plan**: plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
-> **Contract**: tasks/contracts/20260920-1357-add-complete-russian-locale-ru-ru.contract.md
-> **Review**: tasks/reviews/20260920-1357-add-complete-russian-locale-ru-ru.review.md
+> **Plan**: plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
+> **Contract**: tasks/archive/contract-20260920-1511-add-complete-russian-locale-ru-ru.md
+> **Review**: tasks/archive/review-20260920-1511-add-complete-russian-locale-ru-ru.md
 > **Last Updated**: 2026-09-20 13:59
 > **Lifecycle**: notes
 

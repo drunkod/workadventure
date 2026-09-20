@@ -1,13 +1,23 @@
+> **Archived**: 2026-09-20 15:11
+> **Related Plan**: plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
+> **Outcome**: Completed
+> **Lifecycle**: contract
+> **Parent Run ID**: run-20260920-1511
+> **Archive Projection V1**: `plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md` => `plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1357-add-complete-russian-locale-ru-ru.notes.md` => `tasks/archive/notes-20260920-1511-add-complete-russian-locale-ru-ru.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1357-add-complete-russian-locale-ru-ru.contract.md` => `tasks/archive/contract-20260920-1511-add-complete-russian-locale-ru-ru.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1357-add-complete-russian-locale-ru-ru.review.md` => `tasks/archive/review-20260920-1511-add-complete-russian-locale-ru-ru.md`
+
 # Task Contract: add-complete-russian-locale-ru-ru
 
 > **Status**: Fulfilled
-> **Plan**: plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
+> **Plan**: plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
 > **Task Profile**: code-change
 > **Owner**: test
 > **Capability ID**: root
 > **Last Updated**: 2026-09-20 13:59
-> **Review File**: `tasks/reviews/20260920-1357-add-complete-russian-locale-ru-ru.review.md`
-> **Notes File**: `tasks/notes/20260920-1357-add-complete-russian-locale-ru-ru.notes.md`
+> **Review File**: `tasks/archive/review-20260920-1511-add-complete-russian-locale-ru-ru.md`
+> **Notes File**: `tasks/archive/notes-20260920-1511-add-complete-russian-locale-ru-ru.md`
 
 ## Why
 Russian is absent from `play/src/i18n`, so Russian-speaking users cannot select or auto-detect a first-class locale. The next production acceptance row must validate the built application in Russian, so locale parity is a dependency, not optional polish.
@@ -33,10 +43,10 @@ The direction is wrong if a complete `ru-RU` overlay cannot make `npm run i18n:d
 Not applicable: this is a localisation feature slice, not a bugfix profile.
 
 ## Workflow Inventory
-- Source plan: `plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md`
+- Source plan: `plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md`
 - Deferred-goal ledger: `tasks/todos.md`
-- Review file: `tasks/reviews/20260920-1357-add-complete-russian-locale-ru-ru.review.md`
-- Notes file: `tasks/notes/20260920-1357-add-complete-russian-locale-ru-ru.notes.md`
+- Review file: `tasks/archive/review-20260920-1511-add-complete-russian-locale-ru-ru.md`
+- Notes file: `tasks/archive/notes-20260920-1511-add-complete-russian-locale-ru-ru.md`
 - Checks file: `.ai/harness/checks/latest.json`
 - Run snapshots: `.ai/harness/runs/`
 - Scope gate: edit only paths listed under `allowed_paths`.
@@ -57,10 +67,10 @@ Not applicable: this is a localisation feature slice, not a bugfix profile.
 allowed_paths:
   - play/src/i18n/ru-RU/
   - play/tests/front/Utils/locales.test.ts
-  - plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
-  - tasks/contracts/20260920-1357-add-complete-russian-locale-ru-ru.contract.md
-  - tasks/reviews/20260920-1357-add-complete-russian-locale-ru-ru.review.md
-  - tasks/notes/20260920-1357-add-complete-russian-locale-ru-ru.notes.md
+  - plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
+  - tasks/archive/contract-20260920-1511-add-complete-russian-locale-ru-ru.md
+  - tasks/archive/review-20260920-1511-add-complete-russian-locale-ru-ru.md
+  - tasks/archive/notes-20260920-1511-add-complete-russian-locale-ru-ru.md
 ```
 
 ## Evidence Requirements
@@ -108,7 +118,7 @@ exit_criteria:
     - play/src/i18n/ru-RU/chat.ts
     - play/src/i18n/ru-RU/menu.ts
   artifacts_exist:
-    - tasks/notes/20260920-1357-add-complete-russian-locale-ru-ru.notes.md
+    - tasks/archive/notes-20260920-1511-add-complete-russian-locale-ru-ru.md
 ```
 
 ## Verification Plan

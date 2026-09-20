@@ -3,7 +3,7 @@
 > **Status**: Approved
 > **Slug**: jazz-runtime-compatibility
 > **Created**: 2026-09-17 14:35
-> **Updated**: 2026-09-20 13:53
+> **Updated**: 2026-09-20 15:11
 > **Source PRD**: `plans/prds/20260917-1435-jazz-runtime-compatibility.prd.md`
 > **Source Spec**: `docs/spec.md`
 > **Backlog Schema**: 2
@@ -67,7 +67,7 @@ Complete the Jazz release canary in dependency order: compiler compatibility, fi
 | # | ID | Status | Task | Mode | Acceptance | Plan |
 |---|----|--------|------|------|------------|------|
 | 1 | 4daa2d4568af1a5dcde92ba33029691b6fcf70c69da59829539d3cbfdeacc3d0 | [x] | repair Jazz subpath TypeScript resolution | contract | `cd play && npm run typecheck` exits 0; required Jazz browser/media exports remain runtime-importable; only `play/tsconfig.json` plus task artifacts change | `plans/archive/plan-20260917-1438-jazz-subpath-typescript-resolution.md` |
-| 2 | 9485c1770980ab8f42d0e1da4e7e7f691f3b0e708a574c0a24127b7c06dee6f6 | [ ] | add complete Russian locale (`ru-RU`) | contract | `cd play && npm run i18n:diff -- ru-RU` reports 0 missing files/keys; `npm run typesafe-i18n && npm run typecheck` pass; `ru-RU` is detected/loadable; semantic review finds no unintended English fallback in translated product strings | (pending) |
+| 2 | 9485c1770980ab8f42d0e1da4e7e7f691f3b0e708a574c0a24127b7c06dee6f6 | [x] | add complete Russian locale (`ru-RU`) | contract | `cd play && npm run i18n:diff -- ru-RU` reports 0 missing files/keys; `npm run typesafe-i18n && npm run typecheck` pass; `ru-RU` is detected/loadable; semantic review finds no unintended English fallback in translated product strings | `plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md` |
 | 3 | ce90b98647a611814b239216e9ce0210f628ae8b68031a8bb43c666d623e049a | [ ] | build and production-test full WorkAdventure on MacBook | contract | documented production-like Docker Compose build starts required services; `tests` production-like Playwright suite passes or any environment blocker is explicitly classified; browser smoke verifies built app, `ru-RU`, and Jazz chat normal/error paths with no blocking console/network errors | (pending) |
 
 ## Execution Log
@@ -75,3 +75,4 @@ Complete the Jazz release canary in dependency order: compiler compatibility, fi
 | When | Task | Plan | Result |
 |------|------|------|--------|
 | 2026-09-17 14:55 | repair Jazz subpath TypeScript resolution | `plans/archive/plan-20260917-1438-jazz-subpath-typescript-resolution.md` | done |
+| 2026-09-20 15:11 | add complete Russian locale (`ru-RU`) | `plans/archive/plan-20260920-1357-add-complete-russian-locale-ru-ru.md` | done |
