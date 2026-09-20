@@ -1,16 +1,16 @@
 # Task Review: add-complete-russian-locale-ru-ru
 
-> **Status**: Pending
+> **Status**: Accepted
 > **Plan**: plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
 > **Contract**: tasks/contracts/20260920-1357-add-complete-russian-locale-ru-ru.contract.md
 > **Notes File**: tasks/notes/20260920-1357-add-complete-russian-locale-ru-ru.notes.md
 > **Checks File**: .ai/harness/checks/latest.json
-> **Last Updated**: 2026-09-20 13:57
-> **Recommendation**: fail
+> **Last Updated**: 2026-09-20 13:59
+> **Recommendation**: pass
 > **Review Rubric Version**: 2
-> **Reviewed Subject SHA256**: pending
+> **Reviewed Subject SHA256**: sha256:3d53edc4a970a186216a42b597113804764afc3c1558a5b7cb092b3bd780443a
 > **Reviewed Subject Scope**: normalized-final-content
-> **Reviewed Target Revision**: pending
+> **Reviewed Target Revision**: 27246480c99892342397130c05a951a360647b0d
 
 ## Human Review Card
 
@@ -49,17 +49,17 @@ screenshot/artifact path, or reviewer observation.
 
 ## Acceptance Receipt Projection
 
-> **Disposition**: unavailable
-> **Reviewer**: unavailable
-> **Source**: unavailable
+> **Disposition**: external_pass
+> **Reviewer**: Codex
+> **Source**: codex-review
 > **Actor**: not-applicable
-> **Reviewed Subject SHA256**: pending
+> **Reviewed Subject SHA256**: sha256:3d53edc4a970a186216a42b597113804764afc3c1558a5b7cb092b3bd780443a
 > **Reviewed Subject Scope**: normalized-final-content
-> **Reviewed Target Revision**: pending
-> **Verification Evidence SHA256**: pending
-> **Issued At**: pending
+> **Reviewed Target Revision**: 27246480c99892342397130c05a951a360647b0d
+> **Verification Evidence SHA256**: sha256:e442fca12f994690cae848de13d65e57cc31ee539059609f09e587ef5232925e
+> **Issued At**: 2026-09-20T10:11:06.675Z
 
-- Summary: No AcceptanceReceipt has been recorded.
+- Summary: Luna-low read-only review PASS: ru-RU is complete and idiomatic, placeholders/technical tokens are preserved, no unintended user-visible English remains, generic ru maps to ru-RU, and scope is clean.
 - Findings: none
 
 ## Behavior Diff Notes

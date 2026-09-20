@@ -47,6 +47,7 @@ describe("Locale Detection", () => {
                         "en-US",
                         "es-ES",
                         "fr-FR",
+                        "ru-RU",
                         "hsb-DE",
                         "it-IT",
                         "ja-JP",
@@ -62,6 +63,7 @@ describe("Locale Detection", () => {
                     "en-US",
                     "es-ES",
                     "fr-FR",
+                    "ru-RU",
                     "hsb-DE",
                     "it-IT",
                     "ja-JP",
@@ -94,6 +96,7 @@ describe("Locale Detection", () => {
                 "en-US",
                 "es-ES",
                 "fr-FR",
+                "ru-RU",
                 "hsb-DE",
                 "it-IT",
                 "ja-JP",
@@ -142,6 +145,7 @@ describe("Locale Detection", () => {
                 "en-US",
                 "es-ES",
                 "fr-FR",
+                "ru-RU",
                 "hsb-DE",
                 "it-IT",
                 "ja-JP",
@@ -208,6 +212,7 @@ describe("Locale Detection", () => {
                         "en-US",
                         "es-ES",
                         "fr-FR",
+                        "ru-RU",
                         "hsb-DE",
                         "it-IT",
                         "ja-JP",
@@ -223,6 +228,7 @@ describe("Locale Detection", () => {
                     "en-US",
                     "es-ES",
                     "fr-FR",
+                    "ru-RU",
                     "hsb-DE",
                     "it-IT",
                     "ja-JP",
@@ -327,6 +333,28 @@ describe("Locale Detection", () => {
             const [, , detectorFunction] = (detectLocale as any).mock.calls[0];
             const result = detectorFunction();
             expect(result).toEqual(["de-DE"]);
+        });
+
+        it('should handle generic Russian correctly (ru -> ru-RU)', async () => {
+            Object.defineProperty(window, "navigator", {
+                value: {
+                    language: "ru",
+                    languages: ["ru"],
+                },
+                configurable: true,
+            });
+
+            localStorageMock.getItem.mockReturnValue(null);
+
+            const { localeDetector } = await import("../../../src/front/Utils/locales");
+            const { detectLocale } = await import("typesafe-i18n/detectors");
+
+            await localeDetector();
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const [, , detectorFunction] = (detectLocale as any).mock.calls[0];
+            const result = detectorFunction();
+            expect(result).toEqual(["ru-RU"]);
         });
 
         it("should handle unsupported languages gracefully", async () => {

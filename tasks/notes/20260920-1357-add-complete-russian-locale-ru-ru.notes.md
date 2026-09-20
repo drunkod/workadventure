@@ -4,26 +4,28 @@
 > **Plan**: plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
 > **Contract**: tasks/contracts/20260920-1357-add-complete-russian-locale-ru-ru.contract.md
 > **Review**: tasks/reviews/20260920-1357-add-complete-russian-locale-ru-ru.review.md
-> **Last Updated**: 2026-09-20 13:57
+> **Last Updated**: 2026-09-20 13:59
 > **Lifecycle**: notes
 
 ## Design Decisions
 
-- ...
+- First whole-locale Luna-low pass created the full 29-file ru-RU structure and detector coverage; all structural verification checks passed, but semantic review correctly rejected it because all translated modules still contained the English source values.
 
 ## Deviations From Plan Or Spec
 
-- None recorded.
+- Execution batching only: keep the same frozen scope/acceptance, but split translation across disjoint locale-file batches because the one-pass locale exceeded the useful context budget for Luna-low. No product scope is widened.
 
 ## Tradeoffs Considered
 
 | Option | Decision | Reason |
 |--------|----------|--------|
-| ... | ... | ... |
+| One whole-locale Luna invocation vs smaller disjoint batches | Use smaller Luna-low batches | Keeps the cheap mechanical model while giving each translation slice enough context to produce actual Russian instead of structural English copies. |
 
 ## Open Questions
 
 - None.
+
+- A single-file Luna-low pass on mapEditor.ts translated only the opening section before failing closed. The remaining translation is split by object sections; scope and acceptance remain unchanged.
 
 ## Evidence Links
 
