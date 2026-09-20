@@ -1,6 +1,6 @@
 # Task Contract: make-jazz-local-persistence-lifecycle-fail-closed
 
-> **Status**: Active
+> **Status**: Fulfilled
 > **Plan**: plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
 > **Task Profile**: code-change
 > **Owner**: test
