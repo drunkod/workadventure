@@ -1,6 +1,6 @@
 # Task Contract: add-explicit-jazz-local-peer-cloud-sync-policy
 
-> **Status**: Active
+> **Status**: Fulfilled
 > **Plan**: plans/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md
 > **Task Profile**: code-change
 > **Owner**: test
