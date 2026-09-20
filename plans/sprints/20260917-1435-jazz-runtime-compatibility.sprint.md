@@ -1,13 +1,15 @@
 # Sprint: Jazz compatibility, Russian localisation, and local-first production validation
 
-> **Status**: Approved
+> **Status**: Archived
 > **Slug**: jazz-runtime-compatibility
 > **Created**: 2026-09-17 14:35
-> **Updated**: 2026-09-20 15:40
+> **Updated**: 2026-09-20 16:29
 > **Source PRD**: `plans/prds/20260917-1435-jazz-runtime-compatibility.prd.md`
 > **Source Spec**: `docs/spec.md`
 > **Backlog Schema**: 2
 > **Goal Mode**: incremental
+> **Archive Outcome**: Superseded after rows 1–2; remaining Local First work moved to a dedicated Luna-low Sprint.
+> **Superseded By**: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`
 
 ## PRD
 

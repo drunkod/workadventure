@@ -1,9 +1,19 @@
+> **Archived**: 2026-09-20 16:28
+> **Related Plan**: plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
+> **Outcome**: Superseded
+> **Lifecycle**: review
+> **Parent Run ID**: run-20260920-1628
+> **Archive Projection V1**: `plans/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md` => `plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md` => `tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1516-build-and-production-test-full-workadventure-on-macbook.contract.md` => `tasks/archive/contract-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1516-build-and-production-test-full-workadventure-on-macbook.review.md` => `tasks/archive/review-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+
 # Task Review: build-and-production-test-full-workadventure-on-macbook
 
 > **Status**: Pending
-> **Plan**: plans/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
-> **Contract**: tasks/contracts/20260920-1516-build-and-production-test-full-workadventure-on-macbook.contract.md
-> **Notes File**: tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md
+> **Plan**: plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
+> **Contract**: tasks/archive/contract-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md
+> **Notes File**: tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md
 > **Checks File**: .ai/harness/checks/latest.json
 > **Last Updated**: 2026-09-20 15:16
 > **Recommendation**: fail

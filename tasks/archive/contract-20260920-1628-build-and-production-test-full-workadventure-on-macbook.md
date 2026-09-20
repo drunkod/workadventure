@@ -1,13 +1,23 @@
+> **Archived**: 2026-09-20 16:28
+> **Related Plan**: plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
+> **Outcome**: Superseded
+> **Lifecycle**: contract
+> **Parent Run ID**: run-20260920-1628
+> **Archive Projection V1**: `plans/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md` => `plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md` => `tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1516-build-and-production-test-full-workadventure-on-macbook.contract.md` => `tasks/archive/contract-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1516-build-and-production-test-full-workadventure-on-macbook.review.md` => `tasks/archive/review-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+
 # Task Contract: build-and-production-test-full-workadventure-on-macbook
 
 > **Status**: Active
-> **Plan**: plans/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
+> **Plan**: plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
 > **Task Profile**: eval-only
 > **Owner**: test
 > **Capability ID**: root
 > **Last Updated**: 2026-09-20 15:18
-> **Review File**: `tasks/reviews/20260920-1516-build-and-production-test-full-workadventure-on-macbook.review.md`
-> **Notes File**: `tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md`
+> **Review File**: `tasks/archive/review-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Notes File**: `tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
 
 ## Why
 Rows 1–2 establish compiler and localisation correctness, but the fork still lacks release evidence from its documented production-like multi-service topology on the target MacBook. Frontend-only development mode is not sufficient acceptance.
@@ -33,10 +43,10 @@ A reproducible product-caused failure in Compose build/start, required service r
 Not applicable unless verification uncovers a bug; any such bug gets a new bugfix contract.
 
 ## Workflow Inventory
-- Source plan: `plans/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md`
+- Source plan: `plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md`
 - Sprint: `plans/sprints/20260917-1435-jazz-runtime-compatibility.sprint.md`
-- Review: `tasks/reviews/20260920-1516-build-and-production-test-full-workadventure-on-macbook.review.md`
-- Notes: `tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md`
+- Review: `tasks/archive/review-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+- Notes: `tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
 - Checks: `.ai/harness/checks/latest.json`
 - Runtime evidence: Docker/Playwright outputs plus ignored `.ai/harness/runs/` records.
 
@@ -53,10 +63,10 @@ Not applicable unless verification uncovers a bug; any such bug gets a new bugfi
 ## Allowed Paths
 ```yaml
 allowed_paths:
-  - plans/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
-  - tasks/contracts/20260920-1516-build-and-production-test-full-workadventure-on-macbook.contract.md
-  - tasks/reviews/20260920-1516-build-and-production-test-full-workadventure-on-macbook.review.md
-  - tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md
+  - plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
+  - tasks/archive/contract-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md
+  - tasks/archive/review-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md
+  - tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md
 ```
 
 ## Evidence Requirements
@@ -100,7 +110,7 @@ delegation:
 ```yaml
 exit_criteria:
   artifacts_exist:
-    - tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md
+    - tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md
 ```
 
 ## Verification Plan

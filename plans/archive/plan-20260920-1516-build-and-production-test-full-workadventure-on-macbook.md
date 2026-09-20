@@ -1,6 +1,16 @@
+> **Archived**: 2026-09-20 16:28
+> **Related Plan**: plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md
+> **Outcome**: Superseded
+> **Lifecycle**: plan
+> **Parent Run ID**: run-20260920-1628
+> **Archive Projection V1**: `plans/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md` => `plans/archive/plan-20260920-1516-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md` => `tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1516-build-and-production-test-full-workadventure-on-macbook.contract.md` => `tasks/archive/contract-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1516-build-and-production-test-full-workadventure-on-macbook.review.md` => `tasks/archive/review-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+
 # Plan: Production-test full WorkAdventure on MacBook
 
-> **Status**: Approved
+> **Status**: Archived
 > **Created**: 20260920-1516
 > **Slug**: build-and-production-test-full-workadventure-on-macbook
 > **Planning Source**: repo-harness-plan
@@ -12,9 +22,9 @@
 > **Rollback Surface**: no product mutation; stop/remove the local Compose stack and archive the eval task
 > **Spec**: `docs/spec.md`
 > **Research**: `README.md`, `docs/others/self-hosting/install.md`, `tests/README.md`
-> **Task Contract**: `tasks/contracts/20260920-1516-build-and-production-test-full-workadventure-on-macbook.contract.md`
-> **Task Review**: `tasks/reviews/20260920-1516-build-and-production-test-full-workadventure-on-macbook.review.md`
-> **Implementation Notes**: `tasks/notes/20260920-1516-build-and-production-test-full-workadventure-on-macbook.notes.md`
+> **Task Contract**: `tasks/archive/contract-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Task Review**: `tasks/archive/review-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
+> **Implementation Notes**: `tasks/archive/notes-20260920-1628-build-and-production-test-full-workadventure-on-macbook.md`
 
 ## Agentic Routing
 - Selected route: deterministic production evaluation; no implementation worker unless a concrete product regression is discovered.
