@@ -1,23 +1,23 @@
-# PRD: Jazz compatibility, Russian localisation, and production validation
+# PRD: Jazz compatibility, Russian localisation, and local-first production validation
 
 > **Status**: Approved
 > **Slug**: jazz-runtime-compatibility
 > **Created**: 2026-09-17 14:35
-> **Updated**: 2026-09-20 13:53
+> **Updated**: 2026-09-20 15:40
 > **Source Spec**: `docs/spec.md`
 > **Tier**: compact
 
 ## AI Quick-Read Card
 
-- Problem: the Jazz migration needs a green TypeScript baseline, first-class Russian localisation, and proof that the complete production-like stack works on the target MacBook.
+- Problem: the Jazz migration needs a green TypeScript baseline, first-class Russian localisation, an explicit cloud-free local-first runtime mode, and proof that both the upstream-compatible and local-first production stacks work on the target MacBook.
 - Users: WorkAdventure maintainers and Russian-speaking WorkAdventure users.
 - Platform: WorkAdventure `play` TypeScript/Vite/Svelte application plus the repository Docker production-like stack.
-- P0 surface: compiler compatibility, `ru-RU` locale parity, production build/runtime acceptance.
+- P0 surface: compiler compatibility, `ru-RU` locale parity, explicit local-only Jazz persistence, local-first container topology, optional LAN sync, and production build/runtime acceptance.
 - Core metric: all three ordered Sprint slices close with exact verification evidence.
-- Hard constraint: preserve current Jazz/Matrix runtime semantics while adding localisation and validating the real built stack.
+- Hard constraint: preserve existing cloud/Matrix compatibility paths while making local-first a fail-closed explicit mode with no hidden cloud dependency.
 - Key risks: incomplete Russian coverage; environment-only Docker failures hiding product failures; production-only Jazz regressions.
 - Unknowns: exact production resource/runtime constraints on this MacBook are resolved by the final production-like acceptance row.
-- Acceptance scenarios: typecheck/export probe green; Russian diff has zero missing files/keys; production-like stack builds, starts, and passes automated plus browser smoke acceptance.
+- Acceptance scenarios: typecheck/export probe green; Russian diff has zero missing files/keys; upstream production-like baseline passes; local-only Jazz works from IndexedDB with no cloud peer; local-first Compose builds/runs; optional LAN sync uses a local peer; local-first browser/E2E acceptance passes.
 - Suggested next step: execute the Russian locale row, then run production-like acceptance.
 
 ## Problem
@@ -112,3 +112,7 @@ The final release gap is runtime evidence. The fork has been exercised in fronte
 - Do not reinterpret: localisation must not redesign Jazz/Matrix behavior.
 - Verify localisation with: `i18n:diff`, typesafe generation, typecheck, focused locale load/detection checks, semantic review.
 - Then: execute production-like Docker build/run and test the full application on this MacBook, including Russian locale and Jazz chat smoke coverage.
+
+## Local-first Architecture Addendum
+
+See `docs/researches/20260920-local-first-container-architecture.md`. The decided direction is to reuse existing app Dockerfiles, add a local-first Compose overlay, make Jazz local-only mode explicit (`sync.when = "never"`), and isolate any new Dockerfile to a supported local Jazz LAN sync service if needed.
