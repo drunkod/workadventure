@@ -3,7 +3,7 @@
 > **Status**: Approved
 > **Slug**: local-first-single-device-luna-low
 > **Created**: 2026-09-20 16:28
-> **Updated**: 2026-09-20 16:41
+> **Updated**: 2026-09-20 16:48
 > **Source PRD**: `plans/prds/20260917-1435-jazz-runtime-compatibility.prd.md`
 > **Source Spec**: `docs/spec.md`
 > **Source Research**: `docs/researches/20260920-local-first-jazz-audit.md`; `docs/researches/20260920-local-first-container-architecture.md`
@@ -64,14 +64,14 @@ Every expanded row contract must cite and preserve this precedence. A worker mus
 | `cloud` + key missing/blank | Configuration error. |
 | `cloud` + non-empty key and no peer | Explicit compatibility mode; synthesize the Jazz Cloud URL from that key only. |
 
-Peer validation proves URL syntax/scheme only. Browser reachability belongs to runtime/deployment verification, not the configuration parser.
+Peer validation proves URL syntax/scheme only. Browser reachability belongs to runtime/deployment verification, not the configuration parser. Blank/whitespace-only optional Jazz values are normalized to absent before this table is applied. Configuration validation must be placed so invalid Jazz configuration makes the selected Jazz chat provider unavailable without preventing pusher/core gameplay startup. When Jazz is disabled, unused Jazz settings are ignored and do not block startup.
 
 ### Frozen Jazz Lifecycle Rules
 
 - Equivalent concurrent initialization requests share one initialization operation.
 - Reinitialization with the same effective mode/configuration is idempotent.
 - Reinitialization with incompatible effective configuration rejects without replacing the active context.
-- Row 2 uses a **5,000 ms main-room readiness timeout**. Readiness is reached only after the selected main room is loaded and usable.
+- Row 2 uses a **5,000 ms main-room readiness timeout** starting immediately before the main-room load/initialization await begins. Readiness is reached only after the selected main room is loaded and usable. Timeout/error cancels or fences the pending attempt so a late callback/completion cannot change `ON_ERROR` back to `ONLINE`.
 - Initialization failure or readiness timeout leaves Jazz chat in `ON_ERROR`/unavailable state, never `ONLINE`.
 - Preserve stale/unavailable room pointers and fail clearly; do not silently allocate a replacement room that strands old data.
 - A failed partial initialization must be retryable after teardown/reset of only the failed local attempt; it must not poison a later equivalent retry.
@@ -87,9 +87,9 @@ Peer validation proves URL syntax/scheme only. Browser reachability belongs to r
 
 ### Frozen Server Durability Policy
 
-- Redis uses AOF with `appendonly yes`, `appendfsync everysec`, and `maxmemory-policy noeviction`; the documented abrupt-crash loss window is up to approximately one second for Redis-backed acknowledged writes.
+- Redis uses AOF with `appendonly yes`, `appendfsync everysec`, and `maxmemory-policy noeviction`; under normal operation `everysec` typically limits recent-write loss to roughly one second, but this is not a hard guarantee under storage, kernel, VM, or operating-system failure.
 - Map storage uses its local disk path on a named volume. Redis data uses a separate named volume.
-- Backup is a **maintenance-window backup**, not an online distributed snapshot: stop/quiesce write-producing application services, force/confirm Redis persistence, then capture the Redis and map-storage volumes.
+- Backup is a **maintenance-window backup**, not an online distributed snapshot: stop/quiesce write-producing application services, gracefully stop Redis and verify successful clean shutdown, then capture the complete Redis data volume and map-storage volume. Abort the backup if clean Redis shutdown cannot be established.
 - Restore never overwrites the active user deployment by default. Restore smoke targets a separate Compose project with fresh destination volumes.
 - Verify restored representative map content, one persistent shared/player variable, and one non-expired uploader object through application-facing interfaces, not only filesystem existence.
 - Temporary/expired data is excluded from persistence assertions.
@@ -136,7 +136,7 @@ Peer validation proves URL syntax/scheme only. Browser reachability belongs to r
 - The first release is a **hybrid local-hosted application**: Jazz owns single-browser chat persistence; WorkAdventure local services continue to own login, room sockets, simulation, map editing, maps, and server-side variable persistence.
 - `local` means no Jazz network peer, not “the whole game runs without local HTTP/WebSocket services.”
 - Jazz selection is provider-exclusive. In Local First mode a Jazz error never falls through to Matrix; chat fails closed while the game may continue.
-- Deployment ownership is `deploy/local-first/`. It is self-contained rather than an overlay on the upstream development/E2E Compose stack.
+- Deployment ownership is `deploy/local-first/`. It is self-contained rather than an overlay on the upstream development/E2E Compose stack. The single-device profile binds exposed application HTTP/HTTPS entrypoints to loopback only; Redis, gRPC/internal service ports are not published to the host/LAN unless a later LAN Sprint explicitly authorizes them.
 - Existing `play/Dockerfile`, `back/Dockerfile`, `map-storage/Dockerfile`, `maps/Dockerfile`, and `uploader/Dockerfile` are upstream-owned read-only build recipes. **No new or modified Dockerfile is authorized in this Sprint.** If an approved recipe cannot build the fork, return `BLOCKED` with failing command, source revision, logs, and affected recipe; a new recipe requires a separately approved contract amendment.
 - `maps` keeps its `maps/` build context; the other inspected production build recipes use the repository root context.
 - No Jazz LAN sync service is part of this Sprint. The installed `cojson-transport-ws@0.20.10` server artifact under test sources is forbidden as production infrastructure.
@@ -175,7 +175,7 @@ Each row expansion must contain all of these before implementation:
 
 ### Dependency Order
 
-- Row 1 implements the complete sync-policy truth table that every later Local First path depends on.
+- Row 1 implements the complete sync-policy truth table that every later Local First path depends on, including the minimal provider-selection guard proving configuration-validation failures cannot fall through to Matrix or another provider. Row 2 extends provider-exclusive failure coverage to storage, room loading, timeout, retry, and lifecycle failures.
 - Row 2 makes provider selection, local lifecycle, supported-surface gating, and persistence failure modes deterministic before packaging.
 - Row 3 packages only those accepted semantics in the standalone deployment namespace using upstream Dockerfiles read-only.
 - Row 4 implements the frozen maintenance-window durability/restore procedure before release testing.
@@ -194,10 +194,10 @@ Each row expansion must contain all of these before implementation:
 
 | # | ID | Status | Task | Mode | Acceptance | Plan |
 |---|----|--------|------|------|------------|------|
-| 1 | 9a7bcb4332f28a96f8c87d954be2cdeabc936567c5e1e99b2685568ac197765d | [ ] | add explicit Jazz local/peer/cloud sync policy | contract | implement the frozen configuration table end-to-end pusher → front config → `GameManager` → Jazz adapter/runtime; local passes exactly `sync: { when: "never" }` and ignores stale peer/key without creating a peer; peer requires `ws:`/`wss:`; cloud rejects peer and requires key; blank/invalid Jazz mode errors; focused tests plus normal `play` typecheck pass | (pending) |
+| 1 | 9a7bcb4332f28a96f8c87d954be2cdeabc936567c5e1e99b2685568ac197765d | [ ] | add explicit Jazz local/peer/cloud sync policy | contract | implement the frozen configuration table end-to-end pusher → front config → `GameManager` → Jazz adapter/runtime; blank/whitespace optional values normalize before policy; invalid Jazz config leaves pusher/core gameplay running but Jazz chat unavailable; row 1 adds the minimal guard proving config-validation failures cannot initialize Matrix/another provider; local passes exactly `sync: { when: "never" }`; peer requires `ws:`/`wss:`; cloud rejects peer and requires key; focused tests plus normal `play` typecheck pass | (pending) |
 | 2 | badb3c676d5ac5c8b856cd547ef6c9b9b9b7055301f35a7235a3eeb9813b24d3 | [ ] | make Jazz local persistence lifecycle fail closed | contract | implement frozen lifecycle/provider-exclusive rules: equivalent concurrent init shares work; same-config retry is idempotent; incompatible config rejects; 5s main-room readiness timeout; stale pointer/storage failure remains error without replacement; Jazz failure cannot initialize Matrix; unsupported room/folder/direct/invite/moderation actions are unavailable; focused persistence/reload/error tests pass with zero Jazz peers in local mode | (pending) |
-| 3 | 00bd83d0e90e810f15bcaa68cc419c9442ac0d03580173a018d713e903b04f88 | [ ] | add standalone local-first deployment namespace | contract | new deployment files live under `deploy/local-first/`; `compose.yml` source-builds this fork by referencing existing upstream-owned Dockerfiles read-only, keeps correct `maps/` context, enables Jazz local mode, disables Matrix/OIDC/hosted core dependencies, uses a stable local origin and named Redis/map-storage volumes, and passes Compose config/build on Apple Silicon; **no new/modified Dockerfile and no existing Docker/Compose changes**; recipe incompatibility returns `BLOCKED` with evidence | (pending) |
-| 4 | 67c56e57d56919c843ee8639bfa01a057c6a75cb983d735c81cec22a4c6dad84 | [ ] | add local-first server durability and restore tooling | contract | implement frozen Redis AOF/noeviction policy plus named volumes and maintenance-window backup/restore scripts; restore refuses active-volume overwrite and targets a separate Compose project with fresh volumes; verify representative map, persistent variable, and non-expired upload through application interfaces; record revision/images/checksums/results under ignored `_ops/`; docs state browser Jazz data is outside Docker backup | (pending) |
+| 3 | 00bd83d0e90e810f15bcaa68cc419c9442ac0d03580173a018d713e903b04f88 | [ ] | add standalone local-first deployment namespace | contract | new deployment files live under `deploy/local-first/`; `compose.yml` source-builds this fork by referencing existing upstream-owned Dockerfiles read-only, keeps correct `maps/` context, enables Jazz local mode, disables Matrix/OIDC/hosted core dependencies, uses a stable local origin and named Redis/map-storage volumes, binds published app entrypoints to loopback only and does not publish Redis/gRPC/internal ports, and passes Compose config/build on Apple Silicon; **no new/modified Dockerfile and no existing Docker/Compose changes**; recipe incompatibility returns `BLOCKED` with evidence | (pending) |
+| 4 | 67c56e57d56919c843ee8639bfa01a057c6a75cb983d735c81cec22a4c6dad84 | [ ] | add local-first server durability and restore tooling | contract | implement frozen Redis AOF/noeviction policy plus named volumes and maintenance-window backup/restore scripts; maintenance backup requires application writers stopped and Redis cleanly shut down before copying volumes; restore refuses active-volume overwrite and targets a separate Compose project with fresh volumes; verify representative map, persistent variable, and non-expired upload through application interfaces; record revision/images/checksums/results under ignored `_ops/`; docs state `everysec` is not a hard loss bound and browser Jazz data is outside Docker backup | (pending) |
 | 5 | 6e07dbde63a1c95acff6276edfeb266fdda8bd1e23222386f83d5c58ddbf9ed7 | [ ] | production-test single-device local-first release on MacBook | contract | from a clean source tree build/start the Local First images, prove the public-egress block control, then run dedicated E2E/browser smoke for anonymous core flow, `ru-RU`, Jazz main-room text/image/edit/delete + reload, supported persistence, and stable local origin; both browser and containers remain public-Internet isolated; inventory every attempted external destination; any Jazz peer request or networked provider fallback fails; optional blocked requests must not stall/break core behavior | (pending) |
 
 ## Deferred Follow-up Sprints
