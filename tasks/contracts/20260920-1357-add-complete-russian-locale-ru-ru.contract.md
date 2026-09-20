@@ -1,6 +1,6 @@
 # Task Contract: add-complete-russian-locale-ru-ru
 
-> **Status**: Active
+> **Status**: Fulfilled
 > **Plan**: plans/plan-20260920-1357-add-complete-russian-locale-ru-ru.md
 > **Task Profile**: code-change
 > **Owner**: test
@@ -74,8 +74,8 @@ evidence_requirements:
 delegation:
   budget:
     tokens: null
-    runner_invocations: 2
-    wall_time_minutes: 35
+    runner_invocations: 12
+    wall_time_minutes: 90
   permission_scope:
     mode: inherit_allowed_paths
     writable_paths: []
