@@ -1,7 +1,13 @@
+> **Archived**: 2026-09-21 13:47
+> **Related Plan**: plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
+> **Outcome**: Completed
+> **Source Plan**: (none)
+> **Parent Run ID**: run-20260921-1347
+
 # Deferred Goal Ledger
 
 > **Status**: Backlog
-> **Updated**: (archive-workflow)
+> **Updated**: 2026-09-20 17:34
 > **Scope**: Medium/long-term goals deferred from active plan execution
 
 Current plan tasks live in the active plan's `## Task Breakdown`.

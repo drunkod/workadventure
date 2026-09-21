@@ -1,9 +1,19 @@
+> **Archived**: 2026-09-21 13:47
+> **Related Plan**: plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
+> **Outcome**: Completed
+> **Lifecycle**: review
+> **Parent Run ID**: run-20260921-1347
+> **Archive Projection V1**: `plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md` => `plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md` => `tasks/archive/notes-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.contract.md` => `tasks/archive/contract-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.review.md` => `tasks/archive/review-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+
 # Task Review: make-jazz-local-persistence-lifecycle-fail-closed
 
 > **Status**: Accepted
-> **Plan**: plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
-> **Contract**: tasks/contracts/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.contract.md
-> **Notes File**: tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md
+> **Plan**: plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
+> **Contract**: tasks/archive/contract-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md
+> **Notes File**: tasks/archive/notes-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md
 > **Checks File**: .ai/harness/checks/latest.json
 > **Last Updated**: 2026-09-20 17:34
 > **Recommendation**: pass

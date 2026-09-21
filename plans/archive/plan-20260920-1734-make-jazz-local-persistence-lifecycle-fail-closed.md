@@ -1,6 +1,16 @@
+> **Archived**: 2026-09-21 13:47
+> **Related Plan**: plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
+> **Outcome**: Completed
+> **Lifecycle**: plan
+> **Parent Run ID**: run-20260921-1347
+> **Archive Projection V1**: `plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md` => `plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md` => `tasks/archive/notes-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.contract.md` => `tasks/archive/contract-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.review.md` => `tasks/archive/review-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+
 # Plan: Make Jazz local persistence lifecycle fail closed
 
-> **Status**: Approved
+> **Status**: Archived
 > **Created**: 20260920-1734
 > **Slug**: make-jazz-local-persistence-lifecycle-fail-closed
 > **Planning Source**: repo-harness-plan
@@ -12,9 +22,9 @@
 > **Rollback Surface**: revert the reviewed row-2 publication
 > **Spec**: `docs/spec.md`
 > **Research**: `docs/researches/20260920-local-first-jazz-audit.md`
-> **Task Contract**: `tasks/contracts/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.contract.md`
-> **Task Review**: `tasks/reviews/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.review.md`
-> **Implementation Notes**: `tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md`
+> **Task Contract**: `tasks/archive/contract-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Task Review**: `tasks/archive/review-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Implementation Notes**: `tasks/archive/notes-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
 
 ## Agentic Routing
 - Mechanical implementation only. Sprint lifecycle decisions are frozen.

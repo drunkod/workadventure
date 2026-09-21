@@ -1,13 +1,23 @@
+> **Archived**: 2026-09-21 13:47
+> **Related Plan**: plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
+> **Outcome**: Completed
+> **Lifecycle**: contract
+> **Parent Run ID**: run-20260921-1347
+> **Archive Projection V1**: `plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md` => `plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md` => `tasks/archive/notes-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/contracts/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.contract.md` => `tasks/archive/contract-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Archive Projection V1**: `tasks/reviews/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.review.md` => `tasks/archive/review-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+
 # Task Contract: make-jazz-local-persistence-lifecycle-fail-closed
 
 > **Status**: Fulfilled
-> **Plan**: plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
+> **Plan**: plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
 > **Task Profile**: code-change
 > **Owner**: test
 > **Capability ID**: root
 > **Last Updated**: 2026-09-20 17:38
-> **Review File**: `tasks/reviews/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.review.md`
-> **Notes File**: `tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md`
+> **Review File**: `tasks/archive/review-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
+> **Notes File**: `tasks/archive/notes-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md`
 
 ## Why
 Row 1 removed implicit cloud/fallback selection, but Jazz still silently tolerates storage failure, cannot prove stale pointers load, has no compatible global-context identity, has no bounded main-room readiness, and several unsupported Local First actions still report success.
@@ -29,7 +39,7 @@ Implement the frozen row-2 lifecycle so local Jazz fails closed: shared/idempote
 The direction is wrong if a stale pointer/storage error can allocate replacement state, an incompatible policy can reuse/replace an active Jazz context, or a timed-out late callback can transition chat to ONLINE.
 
 ## Workflow Inventory
-- Source plan: `plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md`
+- Source plan: `plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md`
 - Sprint: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`
 - Deferred ledger: `tasks/todos.md`
 - Review/notes/checks: canonical Repo Harness artifacts.
@@ -59,10 +69,10 @@ allowed_paths:
   - play/tests/front/Chat/Connection/Jazz/JazzChatConnectionLifecycle.test.ts
   - play/tests/front/Chat/Connection/Jazz/JazzUnsupportedSurface.test.ts
   - play/tests/front/Phaser/Game/GameManagerJazzPolicy.test.ts
-  - plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
-  - tasks/contracts/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.contract.md
-  - tasks/reviews/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.review.md
-  - tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md
+  - plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
+  - tasks/archive/contract-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md
+  - tasks/archive/review-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md
+  - tasks/archive/notes-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md
 ```
 
 ## Evidence Requirements
@@ -101,7 +111,7 @@ exit_criteria:
     - play/tests/front/Chat/Connection/Jazz/JazzChatConnectionLifecycle.test.ts
     - play/tests/front/Chat/Connection/Jazz/JazzUnsupportedSurface.test.ts
   artifacts_exist:
-    - tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md
+    - tasks/archive/notes-20260921-1347-make-jazz-local-persistence-lifecycle-fail-closed.md
 ```
 
 ## Verification Plan
