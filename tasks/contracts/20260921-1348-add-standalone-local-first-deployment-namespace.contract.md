@@ -101,10 +101,6 @@ exit_criteria:
     - deploy/local-first/images/back.Dockerfile
     - deploy/local-first/images/map-storage.Dockerfile
     - deploy/local-first/images/uploader.Dockerfile
-  - deploy/local-first/images/play.Dockerfile
-  - deploy/local-first/images/back.Dockerfile
-  - deploy/local-first/images/map-storage.Dockerfile
-  - deploy/local-first/images/uploader.Dockerfile
   artifacts_exist:
     - tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md
 ```
