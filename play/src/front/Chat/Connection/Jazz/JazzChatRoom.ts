@@ -46,7 +46,9 @@ function toSafeNumber(value: unknown, fallback = Date.now()): number {
     return typeof value === "number" ? value : fallback;
 }
 
-export class JazzChatRoom implements ChatRoom, ChatRoomMembershipManagement, ChatRoomModeration, ChatRoomNotificationControl {
+export class JazzChatRoom
+    implements ChatRoom, ChatRoomMembershipManagement, ChatRoomModeration, ChatRoomNotificationControl
+{
     readonly id: string;
     readonly name: Writable<string>;
     readonly type: "direct" | "multiple";
@@ -80,9 +82,35 @@ export class JazzChatRoom implements ChatRoom, ChatRoomMembershipManagement, Cha
         ]);
     }
 
-    async init(): Promise<void> {
-        this.unsubscribeRoom = this.runtime.subscribeRoom(this.id, (room) => {
-            void this.syncMessages(room);
+    async init(signal?: AbortSignal): Promise<void> {
+        await new Promise<void>((resolve, reject) => {
+            let settled = false;
+            const abort = () => {
+                if (settled) return;
+                settled = true;
+                this.unsubscribeRoom?.();
+                this.unsubscribeRoom = undefined;
+                reject(new Error(`Jazz room ${this.id} initialization aborted`));
+            };
+            signal?.addEventListener("abort", abort, { once: true });
+            this.unsubscribeRoom = this.runtime.subscribeRoom(this.id, (room) => {
+                if (settled || signal?.aborted || !room?.$isLoaded) return;
+                void this.syncMessages(room)
+                    .then(() => {
+                        if (settled || signal?.aborted) return abort();
+                        settled = true;
+                        signal?.removeEventListener("abort", abort);
+                        resolve();
+                    })
+                    .catch((error) => {
+                        if (!settled) {
+                            settled = true;
+                            signal?.removeEventListener("abort", abort);
+                            reject(error);
+                        }
+                    });
+            });
+            if (signal?.aborted) abort();
         });
     }
 
@@ -110,22 +138,18 @@ export class JazzChatRoom implements ChatRoom, ChatRoomMembershipManagement, Cha
     }
 
     async sendFiles(files: FileList): Promise<void> {
-        for (const file of Array.from(files)) {
-            if (file.type.startsWith("image/")) {
-                await this.runtime.sendImage(this.id, file, {
-                    text: file.name,
-                    senderId: this.connection.currentUser.chatId,
-                    senderName: this.connection.currentUser.username ?? "Anonymous",
-                    createdAt: Date.now(),
-                });
-            } else {
-                await this.runtime.sendText(this.id, {
-                    text: `[file] ${file.name} (only image sharing is enabled in Jazz phase 1)`,
-                    senderId: this.connection.currentUser.chatId,
-                    senderName: this.connection.currentUser.username ?? "Anonymous",
-                    createdAt: Date.now(),
-                });
-            }
+        const selectedFiles = Array.from(files);
+        if (selectedFiles.some((file) => !file.type.startsWith("image/"))) {
+            throw new Error("Jazz local chat supports image files only");
+        }
+
+        for (const file of selectedFiles) {
+            await this.runtime.sendImage(this.id, file, {
+                text: file.name,
+                senderId: this.connection.currentUser.chatId,
+                senderName: this.connection.currentUser.username ?? "Anonymous",
+                createdAt: Date.now(),
+            });
         }
     }
 
@@ -147,13 +171,11 @@ export class JazzChatRoom implements ChatRoom, ChatRoomMembershipManagement, Cha
     }
 
     joinRoom(): Promise<void> {
-        this.myMembership.set("join");
-        return Promise.resolve();
+        return Promise.reject(new Error("Jazz local mode does not support joining rooms"));
     }
 
     leaveRoom(): Promise<void> {
-        this.myMembership.set("leave");
-        return Promise.resolve();
+        return Promise.reject(new Error("Jazz local mode does not support leaving rooms"));
     }
 
     muteNotification(): Promise<void> {
@@ -167,7 +189,7 @@ export class JazzChatRoom implements ChatRoom, ChatRoomMembershipManagement, Cha
     }
 
     inviteUsers(_userIds: string[]): Promise<void> {
-        return Promise.resolve();
+        return Promise.reject(new Error("Jazz local mode does not support invitations"));
     }
 
     hasPermissionTo(_action: ModerationAction, _member?: ChatRoomMember): Readable<boolean> {
@@ -181,19 +203,19 @@ export class JazzChatRoom implements ChatRoom, ChatRoomMembershipManagement, Cha
     }
 
     kick(_userID: string): Promise<void> {
-        return Promise.resolve();
+        return Promise.reject(new Error("Jazz local mode does not support moderation"));
     }
 
     ban(_userID: string): Promise<void> {
-        return Promise.resolve();
+        return Promise.reject(new Error("Jazz local mode does not support moderation"));
     }
 
     unban(_userID: string): Promise<void> {
-        return Promise.resolve();
+        return Promise.reject(new Error("Jazz local mode does not support moderation"));
     }
 
     changePermissionLevelFor(_member: ChatRoomMember, _permissionLevel: ChatPermissionLevel): Promise<void> {
-        return Promise.resolve();
+        return Promise.reject(new Error("Jazz local mode does not support moderation"));
     }
 
     getAllowedRolesToAssign(): ChatPermissionLevel[] {
@@ -210,7 +232,8 @@ export class JazzChatRoom implements ChatRoom, ChatRoomMembershipManagement, Cha
         }
 
         const syncVersion = ++this.syncVersion;
-        const previousLastMessageId = this.messages.length > 0 ? this.messages[this.messages.length - 1]?.id : undefined;
+        const previousLastMessageId =
+            this.messages.length > 0 ? this.messages[this.messages.length - 1]?.id : undefined;
         const isRoomVisible = get(selectedRoomStore)?.id === this.id && get(chatVisibilityStore);
 
         const nextMessages = await Promise.all(room.map((item) => this.buildMessage(item)));

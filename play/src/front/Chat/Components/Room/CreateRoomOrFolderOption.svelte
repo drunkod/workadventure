@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { preventDefault, stopPropagation } from 'svelte/legacy';
+    import { preventDefault, stopPropagation } from "svelte/legacy";
 
     import { readable } from "svelte/store";
     import { openModal } from "svelte-modals";
@@ -12,6 +12,7 @@
     import CreateRoomModal from "./CreateRoomModal.svelte";
     import RoomOption from "./RoomMenu/RoomOption.svelte";
     import { IconDots, IconFolder, IconLogout, IconMessage, IconUserEdit } from "@wa-icons";
+    import { gameManager } from "../../../Phaser/Game/GameManager";
 
     interface Props {
         parentID?: string | undefined;
@@ -20,15 +21,20 @@
     }
 
     let { parentID = undefined, parentName = "", folder }: Props = $props();
+    const isJazz = "isJazz" in gameManager.chatConnection;
     let optionButtonRef: HTMLButtonElement | undefined = $state(undefined);
     let hideFolderOptions = $state(true);
 
-    let hasPermissionToCreateRoom = $state(folder?.hasPermissionForRoomStateEvent(EventType.SpaceChild) ?? readable(false));
+    let hasPermissionToCreateRoom = $state(
+        folder?.hasPermissionForRoomStateEvent(EventType.SpaceChild) ?? readable(false)
+    );
     const hasPermissionToInvite = folder?.hasPermissionTo("invite") ?? readable(false);
     const hasPermissionToKick = folder?.hasPermissionTo("kick") ?? readable(false);
     const hasPermissionToBan = folder?.hasPermissionTo("ban") ?? readable(false);
 
-    let shouldDisplayManageParticipantButton = $derived($hasPermissionToInvite || $hasPermissionToKick || $hasPermissionToBan);
+    let shouldDisplayManageParticipantButton = $derived(
+        $hasPermissionToInvite || $hasPermissionToKick || $hasPermissionToBan
+    );
 
     function toggleSpaceOption() {
         hasPermissionToCreateRoom = folder?.hasPermissionForRoomStateEvent(EventType.SpaceChild) ?? readable(false);
@@ -65,50 +71,52 @@
     }
 </script>
 
-<button
-    data-testid={`openOptionToCreateRoomOrFolder${parentName}`}
-    class="m-0 p-1 rounded-lg hover:bg-white/10 aspect-square flex items-center justify-center {hideFolderOptions
-        ? 'bg-transparent'
-        : 'bg-secondary'}"
-    bind:this={optionButtonRef}
-    onclick={stopPropagation(preventDefault(toggleSpaceOption))}
->
-    <IconDots />
-</button>
-<div
-    class="bg-contrast/50 backdrop-blur-md rounded-md overflow-hidden z-50 w-max end-4 top-10 p-1"
-    class:absolute={optionButtonRef !== undefined}
-    class:hidden={hideFolderOptions}
->
-    {#if $hasPermissionToCreateRoom || !folder}
-        <RoomOption
-            dataTestId={`openCreateRoomModalButton${parentName}`}
-            IconComponent={IconMessage}
-            title={folder ? $LL.chat.createRoom.title() : $LL.chat.createRoom.rootTitle()}
-            on:click={closeMenuAndOpenCreateRoom}
-        />
-        <RoomOption
-            dataTestId={`openCreateFolderModalButton${parentName}`}
-            IconComponent={IconFolder}
-            title={$LL.chat.createFolder.title()}
-            on:click={openCreateSpace}
-        />
-        {#if shouldDisplayManageParticipantButton && folder}
+{#if !isJazz}
+    <button
+        data-testid={`openOptionToCreateRoomOrFolder${parentName}`}
+        class="m-0 p-1 rounded-lg hover:bg-white/10 aspect-square flex items-center justify-center {hideFolderOptions
+            ? 'bg-transparent'
+            : 'bg-secondary'}"
+        bind:this={optionButtonRef}
+        onclick={stopPropagation(preventDefault(toggleSpaceOption))}
+    >
+        <IconDots />
+    </button>
+    <div
+        class="bg-contrast/50 backdrop-blur-md rounded-md overflow-hidden z-50 w-max end-4 top-10 p-1"
+        class:absolute={optionButtonRef !== undefined}
+        class:hidden={hideFolderOptions}
+    >
+        {#if $hasPermissionToCreateRoom || !folder}
             <RoomOption
-                dataTestId="manageParticipantOption"
-                IconComponent={IconUserEdit}
-                title={$LL.chat.manageRoomUsers.roomOption()}
-                on:click={openManageParticipantsModal}
+                dataTestId={`openCreateRoomModalButton${parentName}`}
+                IconComponent={IconMessage}
+                title={folder ? $LL.chat.createRoom.title() : $LL.chat.createRoom.rootTitle()}
+                on:click={closeMenuAndOpenCreateRoom}
+            />
+            <RoomOption
+                dataTestId={`openCreateFolderModalButton${parentName}`}
+                IconComponent={IconFolder}
+                title={$LL.chat.createFolder.title()}
+                on:click={openCreateSpace}
+            />
+            {#if shouldDisplayManageParticipantButton && folder}
+                <RoomOption
+                    dataTestId="manageParticipantOption"
+                    IconComponent={IconUserEdit}
+                    title={$LL.chat.manageRoomUsers.roomOption()}
+                    on:click={openManageParticipantsModal}
+                />
+            {/if}
+        {/if}
+
+        {#if folder}
+            <RoomOption
+                IconComponent={IconLogout}
+                title={$LL.chat.folderMenu.leaveFolder.label()}
+                bg="bg-danger-900 hover:bg-danger"
+                on:click={closeMenuAndLeaveFolder}
             />
         {/if}
-    {/if}
-
-    {#if folder}
-        <RoomOption
-            IconComponent={IconLogout}
-            title={$LL.chat.folderMenu.leaveFolder.label()}
-            bg="bg-danger-900 hover:bg-danger"
-            on:click={closeMenuAndLeaveFolder}
-        />
-    {/if}
-</div>
+    </div>
+{/if}

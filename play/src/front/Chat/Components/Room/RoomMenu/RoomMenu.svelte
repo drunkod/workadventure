@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { preventDefault, stopPropagation } from 'svelte/legacy';
+    import { preventDefault, stopPropagation } from "svelte/legacy";
 
     import { onDestroy, onMount } from "svelte";
     import { openModal } from "svelte-modals";
@@ -30,6 +30,7 @@
 
     let { room }: Props = $props();
     const areNotificationsMuted = room.areNotificationsMuted;
+    const isJazz = "isJazz" in gameManager.chatConnection;
     let optionButtonRef: HTMLButtonElement | undefined = $state(undefined);
     let hideOptions = $state(true);
     let usersByRoomStore:
@@ -41,7 +42,6 @@
     const hasPermissionToBan = room.hasPermissionTo("ban");
 
     const { connection } = gameManager.getCurrentGameScene();
-
 
     onMount(() => {
         document.addEventListener("click", closeRoomOptionsOnClickOutside);
@@ -102,10 +102,6 @@
         });
     }
 
-
-
-
-
     function locateUser() {
         if (chatUser == undefined || chatUser.uuid == undefined) return;
         // Track the open woka menu action
@@ -142,33 +138,39 @@
         }
         toggleRoomOptions();
     }
-    let shouldDisplayManageParticipantButton = $derived($hasPermissionToInvite || $hasPermissionToKick || $hasPermissionToBan);
+    let shouldDisplayManageParticipantButton = $derived(
+        !isJazz && ($hasPermissionToInvite || $hasPermissionToKick || $hasPermissionToBan)
+    );
     let members = $derived(get(room.members));
     let usersByRoomMap = $derived(usersByRoomStore && $usersByRoomStore ? $usersByRoomStore : new Map());
     // Flatten usersByRoomMap into a list of users with playUri from their room
-    let usersWithRoomPlayUri = $derived((() => {
-        const usersList: (ChatUser & { playUri: string })[] = [];
-        for (const [playUri, roomData] of usersByRoomMap.entries()) {
-            for (const user of roomData.users) {
-                usersList.push({
-                    ...user,
-                    playUri: playUri ?? user.playUri ?? "",
-                });
+    let usersWithRoomPlayUri = $derived(
+        (() => {
+            const usersList: (ChatUser & { playUri: string })[] = [];
+            for (const [playUri, roomData] of usersByRoomMap.entries()) {
+                for (const user of roomData.users) {
+                    usersList.push({
+                        ...user,
+                        playUri: playUri ?? user.playUri ?? "",
+                    });
+                }
             }
-        }
-        return usersList;
-    })());
+            return usersList;
+        })()
+    );
     // Get the matrix chat user from the room
-    let matrixChatUser = $derived((() => {
-        if (room.type !== "direct") return undefined;
-        // get the user from the room
-        const users = members;
+    let matrixChatUser = $derived(
+        (() => {
+            if (room.type !== "direct") return undefined;
+            // get the user from the room
+            const users = members;
 
-        // Get user id from local user store
-        const localUserChatId = localUserStore.getChatId();
-        // Find the user that no match with my chat id
-        return users.find((u) => u.id !== localUserChatId);
-    })());
+            // Get user id from local user store
+            const localUserChatId = localUserStore.getChatId();
+            // Find the user that no match with my chat id
+            return users.find((u) => u.id !== localUserChatId);
+        })()
+    );
     let chatUser = $derived(usersWithRoomPlayUri.find((u) => u.chatId === matrixChatUser?.id));
     let isInTheSameMap = $derived(chatUser?.playUri === gameManager.getCurrentGameScene().roomUrl);
 </script>
@@ -219,10 +221,10 @@
         on:click={closeMenuAndSetMuteStatus}
     />
 
-    <RoomOption
-        IconComponent={IconLogout}
-        title={$LL.chat.roomMenu.leaveRoom.label()}
-        bg="bg-danger-900 hover:bg-danger"
-        on:click={closeMenuAndLeaveRoom}
-    />
+    {#if !isJazz}<RoomOption
+            IconComponent={IconLogout}
+            title={$LL.chat.roomMenu.leaveRoom.label()}
+            bg="bg-danger-900 hover:bg-danger"
+            on:click={closeMenuAndLeaveRoom}
+        />{/if}
 </div>

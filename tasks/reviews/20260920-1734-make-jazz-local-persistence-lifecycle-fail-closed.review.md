@@ -1,16 +1,16 @@
 # Task Review: make-jazz-local-persistence-lifecycle-fail-closed
 
-> **Status**: Pending
+> **Status**: Accepted
 > **Plan**: plans/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md
 > **Contract**: tasks/contracts/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.contract.md
 > **Notes File**: tasks/notes/20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.notes.md
 > **Checks File**: .ai/harness/checks/latest.json
 > **Last Updated**: 2026-09-20 17:34
-> **Recommendation**: fail
+> **Recommendation**: pass
 > **Review Rubric Version**: 2
-> **Reviewed Subject SHA256**: pending
+> **Reviewed Subject SHA256**: sha256:87a635a946d5e1890fb60c28fdd54682c8a1b37fb90ce1949e1ce04edeb2a18c
 > **Reviewed Subject Scope**: normalized-final-content
-> **Reviewed Target Revision**: pending
+> **Reviewed Target Revision**: 95ac6d485eedc06dbcd33dd1ee8cf11857925aae
 
 ## Human Review Card
 
@@ -49,17 +49,17 @@ screenshot/artifact path, or reviewer observation.
 
 ## Acceptance Receipt Projection
 
-> **Disposition**: unavailable
-> **Reviewer**: unavailable
-> **Source**: unavailable
+> **Disposition**: external_pass
+> **Reviewer**: Codex
+> **Source**: codex-review
 > **Actor**: not-applicable
-> **Reviewed Subject SHA256**: pending
+> **Reviewed Subject SHA256**: sha256:87a635a946d5e1890fb60c28fdd54682c8a1b37fb90ce1949e1ce04edeb2a18c
 > **Reviewed Subject Scope**: normalized-final-content
-> **Reviewed Target Revision**: pending
-> **Verification Evidence SHA256**: pending
-> **Issued At**: pending
+> **Reviewed Target Revision**: 95ac6d485eedc06dbcd33dd1ee8cf11857925aae
+> **Verification Evidence SHA256**: sha256:40cbedefe7addd2770333ba67980218a3008712ddda482cee90be16be373d340
+> **Issued At**: 2026-09-21T08:46:25.139Z
 
-- Summary: No AcceptanceReceipt has been recorded.
+- Summary: Luna-low read-only review PASS: fail-closed Jazz lifecycle, storage/pointer errors, 5s readiness fencing, provider exclusivity, supported-surface gating, explicit unsupported search/file behavior, and current exact checks all pass.
 - Findings: none
 
 ## Behavior Diff Notes

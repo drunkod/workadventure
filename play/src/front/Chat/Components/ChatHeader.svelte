@@ -16,6 +16,7 @@
 
     const gameScene = gameManager.getCurrentGameScene();
     const chat = gameManager.chatConnection;
+    const isJazz = "isJazz" in chat;
     const showChatButton = gameScene.room.isChatEnabled;
     const showUserListButton = gameScene.room.isChatOnlineListEnabled;
     const showNavBar = gameScene.room.isChatOnlineListEnabled || gameScene.room.isChatDisconnectedListEnabled;
@@ -50,7 +51,7 @@
         clearTimeout(typingTimer);
         typingTimer = setTimeout(() => {
             searchLoader = true;
-            if ($navChat.key === "chat" && $chatSearchBarValue.trim() !== "") {
+            if (!isJazz && $navChat.key === "chat" && $chatSearchBarValue.trim() !== "") {
                 searchAccessibleRooms();
             }
 
@@ -123,15 +124,15 @@
         <ChatActionMenu
             {searchActive}
             hasCloseChat={$hideActionBarStoreBecauseOfChatBar}
-            hasSearch={$chatStatusStore !== "OFFLINE" && !isInSpecificDiscussion}
+            hasSearch={!isJazz && $chatStatusStore !== "OFFLINE" && !isInSpecificDiscussion}
             on:toggleSearch={handleToggleSearch}
         />
         <!-- Ici j'ai le bouton qui s'affiche pour chercher des utilisateurs ou des chats -->
     </div>
     <!-- searchbar -->
-    {#if searchActive && $chatStatusStore !== "OFFLINE"}
+    {#if !isJazz && searchActive && $chatStatusStore !== "OFFLINE"}
         {#await userProviderMergerPromise}
-            <div></div>
+            <div />
         {:then userProviderMerger}
             <div class="absolute w-full h-full z-40 right-0 top-0 bg-contrast/30">
                 <input

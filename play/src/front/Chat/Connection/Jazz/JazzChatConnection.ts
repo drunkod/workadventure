@@ -31,6 +31,7 @@ function normalizeStorageKey(raw: string): string {
 }
 
 export class JazzChatConnection implements ChatConnectionInterface {
+    readonly isJazz = true;
     private readonly runtime = new JazzRuntime();
     private readonly roomList = new MapStore<string, JazzChatRoom>();
     private readonly usersById = new Map<string, ChatUser>();
@@ -38,6 +39,7 @@ export class JazzChatConnection implements ChatConnectionInterface {
     private readonly roomsStore = writable<JazzChatRoom[]>([]);
     private readonly directRoomsStore = writable<JazzChatRoom[]>([]);
     private readonly invitationStore = writable<JazzChatRoom[]>([]);
+    private initAttempt: Promise<void> | undefined;
 
     readonly currentUser: ChatUser;
     connectionStatus: Writable<ConnectionStatus> = writable("CONNECTING");
@@ -75,70 +77,75 @@ export class JazzChatConnection implements ChatConnectionInterface {
     }
 
     async init(): Promise<void> {
+        if (this.initAttempt) return this.initAttempt;
+        this.initAttempt = this.initialize();
+        try {
+            await this.initAttempt;
+        } catch (error) {
+            this.initAttempt = undefined;
+            throw error;
+        }
+    }
+
+    private async initialize(): Promise<void> {
         this.connectionStatus.set("CONNECTING");
+        let room: JazzChatRoom | undefined;
+        const abortController = new AbortController();
         try {
             await this.runtime.init({
-                policy: resolveJazzSyncPolicy({ mode: this.options.syncMode, peer: this.options.syncPeer, apiKey: this.options.apiKey }),
+                policy: resolveJazzSyncPolicy({
+                    mode: this.options.syncMode,
+                    peer: this.options.syncPeer,
+                    apiKey: this.options.apiKey,
+                }),
             });
 
             const mainRoomId = await this.runtime.resolveRoomId(
                 `wa:jazz:main:${normalizeStorageKey(this.options.roomStorageKey)}`,
                 this.options.globalRoomId
             );
-            const room = new JazzChatRoom(this, this.runtime, mainRoomId, this.options.defaultRoomName, "multiple");
-            await room.init();
+            room = new JazzChatRoom(this, this.runtime, mainRoomId, this.options.defaultRoomName, "multiple");
+            let timeoutId: ReturnType<typeof setTimeout> | undefined;
+            const timeout = new Promise<never>((_, reject) => {
+                timeoutId = setTimeout(() => {
+                    reject(new Error("Jazz main room readiness timed out after 5000 ms"));
+                    abortController.abort();
+                }, 5000);
+            });
+            try {
+                await Promise.race([room.init(abortController.signal), timeout]);
+            } finally {
+                if (timeoutId !== undefined) clearTimeout(timeoutId);
+            }
             this.roomList.set(room.id, room);
             this.roomsStore.set([room]);
 
             this.connectionStatus.set("ONLINE");
         } catch (error) {
+            abortController.abort();
             this.connectionStatus.set("ON_ERROR");
+            try {
+                await room?.destroy();
+            } catch {
+                // Preserve the original initialization error; chat is already terminally unavailable.
+            }
             throw error;
         }
     }
 
     async createRoom(roomOptions: CreateRoomOptions): Promise<{ room_id: string }> {
-        this.roomCreationInProgress.set(true);
-        try {
-            const roomId = await this.runtime.createRoomId();
-            const roomName = roomOptions.name ?? `Jazz room ${this.roomList.size + 1}`;
-            const room = new JazzChatRoom(this, this.runtime, roomId, roomName, "multiple");
-            await room.init();
-            this.roomList.set(room.id, room);
-            this.roomsStore.update((rooms) => [...rooms, room]);
-            return { room_id: roomId };
-        } finally {
-            this.roomCreationInProgress.set(false);
-        }
+        void roomOptions;
+        throw new Error("Jazz local mode does not support creating rooms");
     }
 
     async createFolder(roomOptions: CreateRoomOptions): Promise<{ room_id: string }> {
-        return this.createRoom(roomOptions);
+        void roomOptions;
+        throw new Error("Jazz local mode does not support creating folders");
     }
 
     async createDirectRoom(userChatId: string): Promise<(ChatRoom & ChatRoomMembershipManagement) | undefined> {
-        const existing = this.getDirectRoomFor(userChatId);
-        if (existing) {
-            return existing;
-        }
-
-        this.roomCreationInProgress.set(true);
-        try {
-            const keyParts = [this.currentUser.chatId, userChatId].sort().join(":");
-            const roomId = await this.runtime.resolveRoomId(
-                `wa:jazz:direct:${normalizeStorageKey(this.options.roomStorageKey)}:${normalizeStorageKey(keyParts)}`
-            );
-            const roomName = this.getOrCreateUser(userChatId, userChatId).username ?? userChatId;
-            const room = new JazzChatRoom(this, this.runtime, roomId, roomName, "direct");
-            await room.init();
-            this.directRoomsByUserId.set(userChatId, room);
-            this.roomList.set(room.id, room);
-            this.directRoomsStore.update((rooms) => [...rooms, room]);
-            this.updateDirectRoomsUsers();
-            return room;
-        } finally {
-            this.roomCreationInProgress.set(false);
-        }
+        void userChatId;
+        throw new Error("Jazz local mode does not support direct rooms");
     }
 
     getDirectRoomFor(userChatId: string): (ChatRoom & ChatRoomMembershipManagement) | undefined {
@@ -146,17 +153,14 @@ export class JazzChatConnection implements ChatConnectionInterface {
     }
 
     async searchAccessibleRooms(searchText: string): Promise<{ id: string; name: string | undefined }[]> {
-        const normalized = searchText.toLowerCase();
-        const allRooms = [...get(this.roomsStore), ...get(this.directRoomsStore)];
-        return allRooms
-            .filter((room) => get(room.name).toLowerCase().includes(normalized))
-            .map((room) => ({ id: room.id, name: get(room.name) }));
+        void searchText;
+        throw new Error("Jazz local mode does not support shared room discovery");
     }
 
     async joinRoom(roomId: string): Promise<ChatRoom | undefined> {
         const room = this.roomList.get(roomId);
         if (!room) {
-            return undefined;
+            throw new Error("Jazz local mode does not support joining rooms");
         }
         await room.joinRoom();
         return room;
@@ -177,7 +181,7 @@ export class JazzChatConnection implements ChatConnectionInterface {
     }
 
     async searchChatUsers(_searchText: string): Promise<{ id: string; name: string | undefined }[] | undefined> {
-        return [];
+        throw new Error("Jazz local chat does not support user discovery");
     }
 
     initEndToEndEncryption(): Promise<void> {

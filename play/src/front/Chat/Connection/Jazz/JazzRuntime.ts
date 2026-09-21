@@ -41,7 +41,11 @@ type JazzModuleBundle = {
             progressive?: boolean;
         }
     ) => Promise<unknown>;
-    loadImageBySize: (imageDefinitionOrId: unknown, width: number, height: number) => Promise<{
+    loadImageBySize: (
+        imageDefinitionOrId: unknown,
+        width: number,
+        height: number
+    ) => Promise<{
         image?: { toBlob: () => Blob | null | undefined };
     } | null>;
 };
@@ -52,6 +56,14 @@ type RoomSubscriptionState = {
     room: JazzLoadedList | undefined;
     unsubscribe: () => void;
 };
+
+type GlobalJazzState = {
+    identity?: string;
+    initialization?: Promise<void>;
+    ready?: boolean;
+};
+
+const globalJazzState = globalThis as typeof globalThis & { __WA_JAZZ_STATE?: GlobalJazzState };
 
 export interface JazzRuntimeConfig {
     policy: JazzSyncPolicy;
@@ -70,15 +82,45 @@ export interface JazzMessagePayload {
 export class JazzRuntime {
     private modules: JazzModuleBundle | undefined;
     private initialized = false;
+    private initializedIdentity: string | undefined;
+    private initialization: Promise<void> | undefined;
+    private initializationIdentity: string | undefined;
     private messageSchema: JazzSchema | undefined;
     private roomSchema: JazzSchema | undefined;
     private roomSubscriptions = new Map<string, RoomSubscriptionState>();
 
     async init(config: JazzRuntimeConfig): Promise<void> {
+        const identity = JSON.stringify(config.policy);
         if (this.initialized) {
+            if (this.initializedIdentity !== identity) {
+                throw new Error("Jazz runtime is already initialized with an incompatible configuration");
+            }
             return;
         }
+        if (this.initialization) {
+            if (this.initializationIdentity !== identity) {
+                throw new Error(
+                    "Jazz runtime initialization is already in progress with an incompatible configuration"
+                );
+            }
+            return this.initialization;
+        }
 
+        this.initializationIdentity = identity;
+        this.initialization = this.initialize(config, identity);
+        try {
+            await this.initialization;
+            this.initialized = true;
+            this.initializedIdentity = identity;
+        } finally {
+            this.initialization = undefined;
+            if (!this.initialized) {
+                this.initializationIdentity = undefined;
+            }
+        }
+    }
+
+    private async initialize(config: JazzRuntimeConfig, identity: string): Promise<void> {
         const [toolsModule, browserModule, mediaModule] = (await Promise.all([
             import("jazz-tools"),
             import("jazz-tools/browser"),
@@ -86,7 +128,7 @@ export class JazzRuntime {
         ])) as [
             Partial<Pick<JazzModuleBundle, "co" | "z" | "Group" | "CoPlainText">>,
             Partial<Pick<JazzModuleBundle, "JazzBrowserContextManager">>,
-            Partial<Pick<JazzModuleBundle, "createImage" | "loadImageBySize">>,
+            Partial<Pick<JazzModuleBundle, "createImage" | "loadImageBySize">>
         ];
 
         const missingExports: string[] = [];
@@ -98,7 +140,9 @@ export class JazzRuntime {
         if (!mediaModule.createImage) missingExports.push("createImage");
         if (!mediaModule.loadImageBySize) missingExports.push("loadImageBySize");
         if (missingExports.length > 0) {
-            throw new Error(`[Jazz Chat] Incompatible jazz-tools package. Missing exports: ${missingExports.join(", ")}.`);
+            throw new Error(
+                `[Jazz Chat] Incompatible jazz-tools package. Missing exports: ${missingExports.join(", ")}.`
+            );
         }
 
         this.modules = {
@@ -106,33 +150,35 @@ export class JazzRuntime {
             z: toolsModule.z as JazzModuleBundle["z"],
             Group: toolsModule.Group as JazzModuleBundle["Group"],
             CoPlainText: toolsModule.CoPlainText as JazzModuleBundle["CoPlainText"],
-            JazzBrowserContextManager: browserModule.JazzBrowserContextManager as JazzModuleBundle["JazzBrowserContextManager"],
+            JazzBrowserContextManager:
+                browserModule.JazzBrowserContextManager as JazzModuleBundle["JazzBrowserContextManager"],
             createImage: mediaModule.createImage as JazzModuleBundle["createImage"],
             loadImageBySize: mediaModule.loadImageBySize as JazzModuleBundle["loadImageBySize"],
         };
 
-        const globalJazzState = globalThis as { __WA_JAZZ_CONTEXT_READY?: boolean };
-        if (!globalJazzState.__WA_JAZZ_CONTEXT_READY) {
-            const manager = new this.modules.JazzBrowserContextManager();
-            try {
-                await manager.createContext({
-                    sync: {
-                        ...jazzContextSync(config.policy),
-                    },
-                });
-            } catch (error) {
-                const message = error instanceof Error ? error.message : String(error);
-                if (!/already|existing|initialized/i.test(message)) {
-                    throw error;
+        const state = globalJazzState.__WA_JAZZ_STATE ?? (globalJazzState.__WA_JAZZ_STATE = {});
+        if (state.identity && state.identity !== identity) {
+            throw new Error("Jazz context is already initialized with an incompatible configuration");
+        }
+        if (!state.ready) {
+            state.identity ??= identity;
+            state.initialization ??= (async () => {
+                const manager = new this.modules!.JazzBrowserContextManager();
+                await manager.createContext({ sync: { ...jazzContextSync(config.policy) } });
+                state.ready = true;
+            })().catch((error) => {
+                state.initialization = undefined;
+                if (!state.ready && state.identity === identity) {
+                    state.identity = undefined;
                 }
-            }
-            globalJazzState.__WA_JAZZ_CONTEXT_READY = true;
+                throw error;
+            });
+            await state.initialization;
         }
 
         const { messageSchema, roomSchema } = createJazzSchemas(this.modules.co, this.modules.z);
         this.messageSchema = messageSchema;
         this.roomSchema = roomSchema;
-        this.initialized = true;
     }
 
     async resolveRoomId(storageKey: string, explicitRoomId?: string): Promise<string> {
@@ -142,14 +188,14 @@ export class JazzRuntime {
         }
 
         const room = this.createRoom();
-        await room.$jazz.waitForSync?.();
+        await this.confirmRoomPersistence(room);
         this.setItem(storageKey, room.$jazz.id);
         return room.$jazz.id;
     }
 
     async createRoomId(): Promise<string> {
         const room = this.createRoom();
-        await room.$jazz.waitForSync?.();
+        await this.confirmRoomPersistence(room);
         return room.$jazz.id;
     }
 
@@ -204,7 +250,11 @@ export class JazzRuntime {
         room.$jazz.push(message);
     }
 
-    async sendImage(roomId: string, file: File, payload: Omit<JazzMessagePayload, "kind" | "image" | "fileName">): Promise<void> {
+    async sendImage(
+        roomId: string,
+        file: File,
+        payload: Omit<JazzMessagePayload, "kind" | "image" | "fileName">
+    ): Promise<void> {
         const room = this.ensureLoadedRoom(roomId);
         const modules = this.ensureModules();
 
@@ -264,6 +314,13 @@ export class JazzRuntime {
         this.roomSubscriptions.clear();
     }
 
+    private async confirmRoomPersistence(room: JazzLoadedList): Promise<void> {
+        const waitForSync = room.$jazz.waitForSync;
+        if (typeof waitForSync !== "function") {
+            throw new Error("Jazz room persistence confirmation is unavailable");
+        }
+        await waitForSync.call(room.$jazz);
+    }
 
     private createRoom(): JazzLoadedList {
         const roomSchema = this.ensureRoomSchema();
@@ -322,17 +379,20 @@ export class JazzRuntime {
 
     private getItem(key: string): string | null {
         try {
-            return globalThis.localStorage?.getItem(key) ?? null;
-        } catch {
-            return null;
+            const storage = globalThis.localStorage;
+            if (!storage) throw new Error("localStorage is unavailable");
+            return storage.getItem(key);
+        } catch (error) {
+            throw new Error(`Unable to read Jazz room pointer ${key}: ${String(error)}`);
         }
     }
 
     private setItem(key: string, value: string): void {
         try {
-            globalThis.localStorage?.setItem(key, value);
-        } catch {
-            // Ignore storage errors in private mode / restricted environments.
+            if (!globalThis.localStorage) throw new Error("localStorage is unavailable");
+            globalThis.localStorage.setItem(key, value);
+        } catch (error) {
+            throw new Error(`Unable to persist Jazz room pointer ${key}: ${String(error)}`);
         }
     }
 }

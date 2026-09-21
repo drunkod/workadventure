@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { stopPropagation } from 'svelte/legacy';
+    import { stopPropagation } from "svelte/legacy";
 
     import { AskPositionMessage_AskType, AvailabilityStatus } from "@workadventure/messages";
     import * as Sentry from "@sentry/svelte";
@@ -18,26 +18,30 @@
     import ImageWithFallback from "./ImageWithFallback.svelte";
     import { IconLoader, IconSend } from "@wa-icons";
 
-
     interface Props {
         user: ChatUser;
         isMatrixChatEnabled?: boolean;
     }
 
     let { user, isMatrixChatEnabled = true }: Props = $props();
+    const isJazz = "isJazz" in gameManager.chatConnection;
 
     let showRoomCreationInProgress = false;
 
     let { chatId, availabilityStatus, username = "", color, isAdmin, pictureStore } = $derived(user);
 
-    let isMe = $derived(user.chatId === localUserStore.getChatId() || user.uuid === localUserStore.getLocalUser()?.uuid);
+    let isMe = $derived(
+        user.chatId === localUserStore.getChatId() || user.uuid === localUserStore.getLocalUser()?.uuid
+    );
 
     let userStatus = $derived(isMe ? availabilityStatusStore : availabilityStatus);
 
-    let chunks = $derived(highlightWords({
-        text: username.match(/\[\d*]/) ? username.substring(0, username.search(/\[\d*]/)) : username,
-        query: $chatSearchBarValue,
-    }));
+    let chunks = $derived(
+        highlightWords({
+            text: username.match(/\[\d*]/) ? username.substring(0, username.search(/\[\d*]/)) : username,
+            query: $chatSearchBarValue,
+        })
+    );
 
     const roomCreationInProgress = gameManager.chatConnection.roomCreationInProgress;
 
@@ -161,7 +165,7 @@
                                 <div
                                     class="rounded-full me-1 h-1.5 w-1.5"
                                     style="background:{getColorHexOfStatus($userStatus)}"
-></div>
+                                />
                             {/if}
                             {getNameOfAvailabilityStatus($userStatus ?? 0)}
                         </div>
@@ -176,7 +180,7 @@
                         <UserActionButton {user} />
                     {/if}
                 </div>
-                {#if !isMe && !showRoomCreationInProgress && isMatrixChatEnabled}
+                {#if !isMe && !showRoomCreationInProgress && isMatrixChatEnabled && !isJazz}
                     <div class="relative group">
                         <div
                             class="bg-contrast/90 backdrop-blur-xl text-white tooltip absolute text-nowrap p-2 opacity-0 transition-all group-hover:opacity-100 rounded top-1/2 -translate-y-1/2 start-[130%]"
