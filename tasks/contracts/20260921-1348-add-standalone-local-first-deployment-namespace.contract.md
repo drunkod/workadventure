@@ -17,17 +17,17 @@ Add a standalone `deploy/local-first/` Compose namespace that keeps existing ups
 ## Scope
 - In scope: deployment-owned files under `deploy/local-first/`, exact eight-service topology, four explicit compatibility Dockerfiles, source-build references, localhost routing, named Redis/map-storage volumes, local-only env defaults, deterministic config/drift verifier, runbook, Apple Silicon image build.
 - Out of scope: starting/production-smoke testing the stack (row 5), Redis AOF/backup tooling (row 4), LAN sync, HTTPS/ACME, air-gapped image bundle, modifying any existing upstream Dockerfile/Compose file.
-- Taste constraints: standalone Compose, fixed `.localhost` origins, no host ports except 127.0.0.1:80; compatibility Dockerfiles may differ from upstream only by the frozen Debian Snapshot apt-source injection.
+- Taste constraints: standalone Compose, fixed `.localhost` origins, no host ports except 127.0.0.1:80; back/map-storage/uploader compatibility Dockerfiles may differ from upstream only by the frozen Debian Snapshot apt-source injection; play may additionally set `ENV GENERATE_SOURCEMAP=false` immediately before its existing production Vite build RUN.
 
 ## Stop Conditions
 - Stop if any existing upstream Dockerfile or existing `docker-compose*.yml/yaml` must change.
-- Stop if any compatibility Dockerfile differs from the mechanical snapshot-source injection of its current upstream recipe.
+- Stop if any compatibility Dockerfile differs from its approved mechanical transform: Snapshot-source injection for all four, plus exactly one `GENERATE_SOURCEMAP=false` insertion in play before its existing production Vite build.
 - Stop if the snapshot-pinned compatibility recipes still cannot build on Apple Silicon; return BLOCKED with exact target/log rather than widening the recipe changes.
 - Stop if the service set must grow beyond the frozen eight services.
 - Stop rather than adding Matrix/OIDC/Jazz sync/cloud dependencies.
 
 ## Falsifier
-The design is wrong if `docker-compose config` requires upstream Compose files, an internal service is host-published, compatibility Dockerfiles drift beyond the frozen source injection, or one of the five source images cannot build from the amended frozen recipe/context on Apple Silicon.
+The design is wrong if `docker-compose config` requires upstream Compose files, an internal service is host-published, compatibility Dockerfiles drift beyond the frozen transforms, or one of the five source images cannot build from the amended frozen recipe/context on Apple Silicon.
 ## Workflow Inventory
 - Source plan: `plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md`
 - Sprint: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`
@@ -117,7 +117,7 @@ exit_criteria:
       "phase": "verification",
       "cost": "normal",
       "evidence_policy": "current_exact",
-      "necessity": "Proves the exact eight-service standalone topology, loopback-only host exposure, amended build contexts, mechanical Dockerfile drift guard, Local First env, and durable volume mounts.",
+      "necessity": "Proves the exact eight-service standalone topology, loopback-only host exposure, amended build contexts, mechanical Snapshot/source-map Dockerfile drift guard, Local First env, and durable volume mounts.",
       "inputs": { "env": [] }
     },
     {
@@ -149,7 +149,7 @@ exit_criteria:
 ## Acceptance Notes (Human Review)
 - Functional: standalone new namespace, exact service set, explicit Jazz local mode, no Matrix/OIDC/Jazz network peer defaults.
 - Exposure: only Traefik publishes `127.0.0.1:80:80`; no Redis/gRPC/internal service host ports.
-- Upstream safety: no existing Dockerfile/Compose edit; the four fork-owned compatibility recipes must byte-match the deterministic snapshot-pin transform of their current upstream source recipes.
+- Upstream safety: no existing Dockerfile/Compose edit; back/map-storage/uploader must byte-match the deterministic Snapshot transform, and play must byte-match that transform plus exactly one pre-build `GENERATE_SOURCEMAP=false` insertion.
 - Build: all five source images build from the accepted fork on this Mac.
 
 ## Rollback Point

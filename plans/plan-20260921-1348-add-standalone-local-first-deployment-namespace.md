@@ -56,8 +56,9 @@ Source-build these images:
 
 The four fork-owned Dockerfiles are mechanically derived from `play/Dockerfile`, `back/Dockerfile`, `map-storage/Dockerfile`, and `uploader/Dockerfile`. Before every upstream `RUN apt-get update && apt-get install ...` line, inject an apt-source pin to:
 - `http://snapshot.debian.org/archive/debian/20260418T120000Z bullseye main`
+- `http://snapshot.debian.org/archive/debian/20260418T120000Z bullseye-updates main`
 - `http://snapshot.debian.org/archive/debian-security/20260418T120000Z bullseye-security main`
-with `[check-valid-until=no]`. No other upstream recipe line may differ. `verify.mjs` must mechanically derive the expected compatibility file from the current upstream source and compare bytes, so future upstream recipe drift fails verification.
+with `[check-valid-until=no]`. In `play.Dockerfile` only, also insert `ENV GENERATE_SOURCEMAP=false` immediately before the existing Sentry-secret/Vite production build RUN. This is the sole additional divergence: the upstream play build hard-caps V8 at 6144 MB and reproducibly hit that limit; Local First has Sentry disabled, so production source maps are unnecessary. `verify.mjs` must mechanically derive the expected compatibility files from current upstream sources and compare bytes, so future upstream recipe drift fails verification.
 
 Reuse images `traefik:v3.6.1`, `redis:6`, and `matthiasluedtke/iconserver:v3.21.0`.
 
@@ -90,7 +91,7 @@ Uploader stores through Redis (`redis:6379`, DB 1), has no AWS config, and uses 
 `deploy/local-first/verify.mjs` must execute `docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml config --format json` and fail unless:
 - service set is exactly the eight frozen services;
 - only reverse-proxy publishes a port and HostIp is `127.0.0.1`;
-- build contexts/dockerfiles match the amended frozen build decisions and the four compatibility Dockerfiles byte-match the mechanical snapshot-pin transform of their current upstream recipes;
+- build contexts/dockerfiles match the amended frozen build decisions; back/map-storage/uploader byte-match the mechanical Snapshot transform, while play byte-matches Snapshot transform plus the single `GENERATE_SOURCEMAP=false` insertion before its existing production Vite build;
 - no service name contains synapse/matrix/oidc/redisinsight/messages/everything_started;
 - play resolved env contains Jazz enabled + local mode and blank Matrix/Jazz peer/key;
 - named Redis and map-storage volumes are mounted;
