@@ -3,7 +3,7 @@
 > **Status**: Approved
 > **Slug**: local-first-single-device-luna-low
 > **Created**: 2026-09-20 16:28
-> **Updated**: 2026-09-21 13:47
+> **Updated**: 2026-09-21 15:55
 > **Source PRD**: `plans/prds/20260917-1435-jazz-runtime-compatibility.prd.md`
 > **Source Spec**: `docs/spec.md`
 > **Source Research**: `docs/researches/20260920-local-first-jazz-audit.md`; `docs/researches/20260920-local-first-container-architecture.md`
@@ -13,7 +13,7 @@
 
 ## PRD
 
-Ship the first honest Local First release boundary for this fork: one browser profile uses Jazz as local durable chat storage with no Jazz network peer, while the normal WorkAdventure game remains served by a local source-built stack on the MacBook. The deployment is fork-owned and standalone under `deploy/local-first/`; existing upstream Dockerfiles are read-only build inputs and existing upstream Compose files are not modified by this Sprint.
+Ship the first honest Local First release boundary for this fork: one browser profile uses Jazz as local durable chat storage with no Jazz network peer, while the normal WorkAdventure game remains served by a local source-built stack on the MacBook. The deployment is fork-owned and standalone under `deploy/local-first/`; existing upstream Dockerfiles remain read-only and existing upstream Compose files are not modified. Where a live upstream bullseye package repository is not reproducible, row 3 may use fork-owned compatibility Dockerfiles under `deploy/local-first/images/` that are mechanically derived from the upstream recipes and pinned to a Debian Snapshot.
 
 This Sprint is intentionally smaller than the full Local First roadmap. TypeScript compatibility and `ru-RU` localisation are accepted prerequisites from the superseded Sprint. LAN/multi-device sync, private/direct-room authorization, broad durable-domain migration, browser-only offline gameplay, and air-gapped distribution belong to later Sprints after this single-device release gate is green.
 
@@ -45,7 +45,7 @@ Every expanded row contract must cite and preserve this precedence. A worker mus
 - When Jazz is selected, Jazz initialization/persistence failure leaves chat explicitly unavailable and never initializes Matrix or another chat provider; gameplay may continue.
 - Local Jazz initialization fails clearly on incompatible context reuse, unavailable room pointers, timeout, or browser storage failure rather than pretending persistence succeeded.
 - The supported Local First chat surface is the automatically selected main room with text/image/edit/delete only; unsupported room/folder/direct/invite/moderation operations are unavailable and cannot report success.
-- A standalone `deploy/local-first/` production namespace builds this fork using existing upstream-owned Dockerfiles without modifying or replacing any existing Dockerfile or Compose file.
+- A standalone `deploy/local-first/` production namespace builds this fork without modifying any existing Dockerfile or Compose file; fork-owned compatibility recipes, when required by demonstrated upstream repository failure, live only under `deploy/local-first/images/` and are mechanically checked against their upstream source recipes.
 - The default Local First stack keeps local `play`, `back`, `map-storage`, `maps`, `redis`, `uploader`, `icon`, and routing as required by enabled features while Matrix/OIDC/hosted integrations are not core dependencies.
 - Map storage and server-side persistent variables/uploads have the frozen local durability/restore policy below and tested volumes.
 - A production-built single-device flow passes `ru-RU`, anonymous core gameplay, Jazz local text/image/edit/delete + reload persistence, server restart persistence, and the measurable runtime network-isolation gate below.
@@ -126,7 +126,7 @@ Peer validation proves URL syntax/scheme only. Browser reachability belongs to r
 - Browser-only static/PWA gameplay with no local WorkAdventure services.
 - A production Jazz sync server or packaging package test code as a server.
 - Air-gapped image bundles or fresh-machine installation without a container runtime.
-- Creating, copying, replacing, or modifying any Dockerfile in this Sprint.
+- Modifying any existing upstream Dockerfile. Fork-owned row-3 compatibility Dockerfiles under `deploy/local-first/images/` are allowed only for the demonstrated reproducible bullseye repository failure and must remain mechanically synchronized with the corresponding upstream recipe.
 - Modifying existing upstream `docker-compose*.yml` / `docker-compose*.yaml` files for Local First deployment.
 
 ## Architecture Notes
@@ -137,7 +137,7 @@ Peer validation proves URL syntax/scheme only. Browser reachability belongs to r
 - `local` means no Jazz network peer, not “the whole game runs without local HTTP/WebSocket services.”
 - Jazz selection is provider-exclusive. In Local First mode a Jazz error never falls through to Matrix; chat fails closed while the game may continue.
 - Deployment ownership is `deploy/local-first/`. It is self-contained rather than an overlay on the upstream development/E2E Compose stack. The single-device profile binds exposed application HTTP/HTTPS entrypoints to loopback only; Redis, gRPC/internal service ports are not published to the host/LAN unless a later LAN Sprint explicitly authorizes them.
-- Existing `play/Dockerfile`, `back/Dockerfile`, `map-storage/Dockerfile`, `maps/Dockerfile`, and `uploader/Dockerfile` are upstream-owned read-only build recipes. **No new or modified Dockerfile is authorized in this Sprint.** If an approved recipe cannot build the fork, return `BLOCKED` with failing command, source revision, logs, and affected recipe; a new recipe requires a separately approved contract amendment.
+- Existing `play/Dockerfile`, `back/Dockerfile`, `map-storage/Dockerfile`, `maps/Dockerfile`, and `uploader/Dockerfile` are upstream-owned and remain read-only. Row 3 has a separately approved compatibility amendment after repeated live Debian bullseye-security 404 failures: `deploy/local-first/images/{play,back,map-storage,uploader}.Dockerfile` may be exact mechanically-derived copies that differ only by pinning apt sources to Debian Snapshot `20260418T120000Z` before each apt install. The row verifier must fail if these copies drift from the current upstream recipes beyond that injection. `maps/Dockerfile` remains referenced directly.
 - `maps` keeps its `maps/` build context; the other inspected production build recipes use the repository root context.
 - No Jazz LAN sync service is part of this Sprint. The installed `cojson-transport-ws@0.20.10` server artifact under test sources is forbidden as production infrastructure.
 - Redis/map-storage container volumes do not include browser IndexedDB/account state. Browser-profile recovery remains a separately stated boundary.
@@ -177,7 +177,7 @@ Each row expansion must contain all of these before implementation:
 
 - Row 1 implements the complete sync-policy truth table that every later Local First path depends on, including the minimal provider-selection guard proving configuration-validation failures cannot fall through to Matrix or another provider. Row 2 extends provider-exclusive failure coverage to storage, room loading, timeout, retry, and lifecycle failures.
 - Row 2 makes provider selection, local lifecycle, supported-surface gating, and persistence failure modes deterministic before packaging.
-- Row 3 packages only those accepted semantics in the standalone deployment namespace using upstream Dockerfiles read-only.
+- Row 3 packages only those accepted semantics in the standalone deployment namespace, keeping upstream Dockerfiles read-only and using the approved mechanically-derived snapshot-pinned compatibility recipes only for the four bullseye Node images that execute apt installs.
 - Row 4 implements the frozen maintenance-window durability/restore procedure before release testing.
 - Row 5 is the release boundary and runs only after rows 1–4 are accepted.
 
@@ -196,7 +196,7 @@ Each row expansion must contain all of these before implementation:
 |---|----|--------|------|------|------------|------|
 | 1 | 9a7bcb4332f28a96f8c87d954be2cdeabc936567c5e1e99b2685568ac197765d | [x] | add explicit Jazz local/peer/cloud sync policy | contract | implement the frozen configuration table end-to-end pusher → front config → `GameManager` → Jazz adapter/runtime; blank/whitespace optional values normalize before policy; invalid Jazz config leaves pusher/core gameplay running but Jazz chat unavailable; row 1 adds the minimal guard proving config-validation failures cannot initialize Matrix/another provider; local passes exactly `sync: { when: "never" }`; peer requires `ws:`/`wss:`; cloud rejects peer and requires key; focused tests plus normal `play` typecheck pass | `plans/archive/plan-20260920-1643-add-explicit-jazz-local-peer-cloud-sync-policy.md` |
 | 2 | badb3c676d5ac5c8b856cd547ef6c9b9b9b7055301f35a7235a3eeb9813b24d3 | [x] | make Jazz local persistence lifecycle fail closed | contract | implement frozen lifecycle/provider-exclusive rules: equivalent concurrent init shares work; same-config retry is idempotent; incompatible config rejects; 5s main-room readiness timeout; stale pointer/storage failure remains error without replacement; Jazz failure cannot initialize Matrix; unsupported room/folder/direct/invite/moderation actions are unavailable; focused persistence/reload/error tests pass with zero Jazz peers in local mode | `plans/archive/plan-20260920-1734-make-jazz-local-persistence-lifecycle-fail-closed.md` |
-| 3 | 00bd83d0e90e810f15bcaa68cc419c9442ac0d03580173a018d713e903b04f88 | [ ] | add standalone local-first deployment namespace | contract | new deployment files live under `deploy/local-first/`; `compose.yml` source-builds this fork by referencing existing upstream-owned Dockerfiles read-only, keeps correct `maps/` context, enables Jazz local mode, disables Matrix/OIDC/hosted core dependencies, uses a stable local origin and named Redis/map-storage volumes, binds published app entrypoints to loopback only and does not publish Redis/gRPC/internal ports, and passes Compose config/build on Apple Silicon; **no new/modified Dockerfile and no existing Docker/Compose changes**; recipe incompatibility returns `BLOCKED` with evidence | (pending) |
+| 3 | 00bd83d0e90e810f15bcaa68cc419c9442ac0d03580173a018d713e903b04f88 | [ ] | add standalone local-first deployment namespace | contract | new deployment files live under `deploy/local-first/`; existing upstream Dockerfiles/Compose files remain unmodified; `play`, `back`, `map-storage`, and `uploader` use fork-owned mechanically-derived Dockerfiles under `deploy/local-first/images/` pinned to Debian Snapshot `20260418T120000Z` and verified against their upstream recipes, while `maps` keeps the upstream `maps/Dockerfile`/context; Jazz local mode, no Matrix/OIDC core dependency, stable local origin, named Redis/map-storage volumes, loopback-only published app entrypoint, no Redis/gRPC/internal host ports, and Apple Silicon Compose config/build all pass | (pending) |
 | 4 | 67c56e57d56919c843ee8639bfa01a057c6a75cb983d735c81cec22a4c6dad84 | [ ] | add local-first server durability and restore tooling | contract | implement frozen Redis AOF/noeviction policy plus named volumes and maintenance-window backup/restore scripts; maintenance backup requires application writers stopped and Redis cleanly shut down before copying volumes; restore refuses active-volume overwrite and targets a separate Compose project with fresh volumes; verify representative map, persistent variable, and non-expired upload through application interfaces; record revision/images/checksums/results under ignored `_ops/`; docs state `everysec` is not a hard loss bound and browser Jazz data is outside Docker backup | (pending) |
 | 5 | 6e07dbde63a1c95acff6276edfeb266fdda8bd1e23222386f83d5c58ddbf9ed7 | [ ] | production-test single-device local-first release on MacBook | contract | from a clean source tree build/start the Local First images, prove the public-egress block control, then run dedicated E2E/browser smoke for anonymous core flow, `ru-RU`, Jazz main-room text/image/edit/delete + reload, supported persistence, and stable local origin; both browser and containers remain public-Internet isolated; inventory every attempted external destination; any Jazz peer request or networked provider fallback fails; optional blocked requests must not stall/break core behavior | (pending) |
 

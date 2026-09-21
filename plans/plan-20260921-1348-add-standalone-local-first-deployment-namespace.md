@@ -19,15 +19,19 @@
 ## Agentic Routing
 - Mechanical deployment implementation only; Sprint topology decisions supersede the older overlay recommendation in research.
 - GPT-5.6 Luna / low worker; no web/design/redesign.
-- Existing Dockerfiles and every existing Compose file are read-only inputs.
+- Existing Dockerfiles and every existing Compose file are read-only. Fork-owned compatibility Dockerfiles are allowed only at the four explicit `deploy/local-first/images/` paths frozen below.
 ## Frozen topology
 
-Create only:
-- `deploy/local-first/compose.yml`
-- `deploy/local-first/.env.example`
-- `deploy/local-first/README.md`
-- `deploy/local-first/verify.mjs`
-- `deploy/local-first/build-secrets/empty`
+Create only deployment-owned files under `deploy/local-first/`:
+- `compose.yml`
+- `.env.example`
+- `README.md`
+- `verify.mjs`
+- `build-secrets/empty`
+- `images/play.Dockerfile`
+- `images/back.Dockerfile`
+- `images/map-storage.Dockerfile`
+- `images/uploader.Dockerfile`
 
 Compose project name: `workadventure-local-first`.
 
@@ -44,15 +48,20 @@ Stable browser origins use special-use localhost hosts:
 ## Build decisions
 
 Source-build these images:
-- play: context `../..`, dockerfile `play/Dockerfile`, `FAST_BUILD=true`
-- back: context `../..`, dockerfile `back/Dockerfile`
-- map-storage: context `../..`, dockerfile `map-storage/Dockerfile`
-- uploader: context `../..`, dockerfile `uploader/Dockerfile`
-- maps: context `../../maps`, default `maps/Dockerfile`
+- play: context `../..`, dockerfile `deploy/local-first/images/play.Dockerfile`, `FAST_BUILD=true`
+- back: context `../..`, dockerfile `deploy/local-first/images/back.Dockerfile`
+- map-storage: context `../..`, dockerfile `deploy/local-first/images/map-storage.Dockerfile`
+- uploader: context `../..`, dockerfile `deploy/local-first/images/uploader.Dockerfile`
+- maps: context `../../maps`, unchanged upstream `maps/Dockerfile`
+
+The four fork-owned Dockerfiles are mechanically derived from `play/Dockerfile`, `back/Dockerfile`, `map-storage/Dockerfile`, and `uploader/Dockerfile`. Before every upstream `RUN apt-get update && apt-get install ...` line, inject an apt-source pin to:
+- `http://snapshot.debian.org/archive/debian/20260418T120000Z bullseye main`
+- `http://snapshot.debian.org/archive/debian-security/20260418T120000Z bullseye-security main`
+with `[check-valid-until=no]`. No other upstream recipe line may differ. `verify.mjs` must mechanically derive the expected compatibility file from the current upstream source and compare bytes, so future upstream recipe drift fails verification.
 
 Reuse images `traefik:v3.6.1`, `redis:6`, and `matthiasluedtke/iconserver:v3.21.0`.
 
-The existing play Dockerfile requires six BuildKit Sentry secret mounts even when Sentry is disabled. Define six Compose build secrets targeting `SENTRY_RELEASE`, `SENTRY_URL`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`, and `SENTRY_ENVIRONMENT`, all sourced from tracked `build-secrets/empty`. Do not change the Dockerfile.
+The play recipe requires six BuildKit Sentry secret mounts even when Sentry is disabled. Define six Compose build secrets targeting `SENTRY_RELEASE`, `SENTRY_URL`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`, and `SENTRY_ENVIRONMENT`, all sourced from tracked `build-secrets/empty`. The upstream Dockerfile remains unchanged; its fork-owned compatibility copy preserves the same mounts.
 
 Named volumes: `redis-data:/data` and `map-storage-data:/maps`.
 ## Runtime decisions
@@ -81,7 +90,7 @@ Uploader stores through Redis (`redis:6379`, DB 1), has no AWS config, and uses 
 `deploy/local-first/verify.mjs` must execute `docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml config --format json` and fail unless:
 - service set is exactly the eight frozen services;
 - only reverse-proxy publishes a port and HostIp is `127.0.0.1`;
-- build contexts/dockerfiles match the frozen build decisions;
+- build contexts/dockerfiles match the amended frozen build decisions and the four compatibility Dockerfiles byte-match the mechanical snapshot-pin transform of their current upstream recipes;
 - no service name contains synapse/matrix/oidc/redisinsight/messages/everything_started;
 - play resolved env contains Jazz enabled + local mode and blank Matrix/Jazz peer/key;
 - named Redis and map-storage volumes are mounted;
@@ -93,7 +102,7 @@ Uploader stores through Redis (`redis:6379`, DB 1), has no AWS config, and uses 
 3. `docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml build play back map-storage maps uploader`
 4. `git diff --check`
 
-The build is the row's long deterministic gate. If an upstream Dockerfile itself is incompatible, return BLOCKED with the failing recipe/log; do not create or modify a Dockerfile.
+The build is the row's long deterministic gate. Existing upstream Dockerfiles remain immutable. The approved snapshot-pinned compatibility Dockerfiles are the only row-3 recipe divergence.
 ## Promotion Gate
 - **Merge/PR unit**: new standalone `deploy/local-first/` namespace only.
 - **Rollback surface**: delete/revert that namespace.
@@ -111,7 +120,7 @@ The build is the row's long deterministic gate. If an upstream Dockerfile itself
 
 ## Task Breakdown
 - [ ] Create standalone Compose and local env example.
-- [ ] Add build-secret placeholders required by unchanged upstream play Dockerfile.
+- [ ] Add mechanically-derived snapshot-pinned compatibility Dockerfiles and build-secret placeholders while keeping upstream recipes untouched.
 - [ ] Add deterministic Compose verifier and runbook.
 - [ ] Pass Apple Silicon source-image build.
 - [ ] Pass semantic acceptance.

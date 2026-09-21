@@ -13,20 +13,21 @@
 The Local First release needs a fork-owned production deployment that survives upstream WorkAdventure updates. Extending upstream Docker/Compose files would recreate the merge-conflict surface this Sprint is designed to avoid.
 
 ## Goal
-Add a standalone `deploy/local-first/` Compose namespace that source-builds the accepted fork using existing upstream Dockerfiles read-only, exposes only one loopback HTTP entrypoint, enables Jazz local mode, excludes Matrix/OIDC/cloud dependencies, and builds successfully on this Apple Silicon Mac.
+Add a standalone `deploy/local-first/` Compose namespace that keeps existing upstream Dockerfiles read-only, uses four mechanically-derived snapshot-pinned compatibility recipes for the bullseye Node images, exposes only one loopback HTTP entrypoint, enables Jazz local mode, excludes Matrix/OIDC/cloud dependencies, and builds successfully on this Apple Silicon Mac.
 ## Scope
-- In scope: five new files under `deploy/local-first/`, exact eight-service topology, source-build references, localhost routing, named Redis/map-storage volumes, local-only env defaults, deterministic config verifier, runbook, Apple Silicon image build.
-- Out of scope: starting/production-smoke testing the stack (row 5), Redis AOF/backup tooling (row 4), LAN sync, HTTPS/ACME, air-gapped image bundle, modifying any existing Dockerfile/Compose file.
-- Taste constraints: standalone file, no YAML overlay/inheritance from upstream Compose; no copied Dockerfile; fixed `.localhost` origins; no host ports except 127.0.0.1:80.
+- In scope: deployment-owned files under `deploy/local-first/`, exact eight-service topology, four explicit compatibility Dockerfiles, source-build references, localhost routing, named Redis/map-storage volumes, local-only env defaults, deterministic config/drift verifier, runbook, Apple Silicon image build.
+- Out of scope: starting/production-smoke testing the stack (row 5), Redis AOF/backup tooling (row 4), LAN sync, HTTPS/ACME, air-gapped image bundle, modifying any existing upstream Dockerfile/Compose file.
+- Taste constraints: standalone Compose, fixed `.localhost` origins, no host ports except 127.0.0.1:80; compatibility Dockerfiles may differ from upstream only by the frozen Debian Snapshot apt-source injection.
 
 ## Stop Conditions
-- Stop if any existing Dockerfile or existing `docker-compose*.yml/yaml` must change.
-- Stop if an upstream build recipe fails because of recipe/platform incompatibility; return BLOCKED with exact build target/log rather than creating a new Dockerfile.
+- Stop if any existing upstream Dockerfile or existing `docker-compose*.yml/yaml` must change.
+- Stop if any compatibility Dockerfile differs from the mechanical snapshot-source injection of its current upstream recipe.
+- Stop if the snapshot-pinned compatibility recipes still cannot build on Apple Silicon; return BLOCKED with exact target/log rather than widening the recipe changes.
 - Stop if the service set must grow beyond the frozen eight services.
 - Stop rather than adding Matrix/OIDC/Jazz sync/cloud dependencies.
 
 ## Falsifier
-The design is wrong if `docker-compose config` requires upstream Compose files, an internal service is host-published, or one of the five source images cannot build from the frozen upstream Dockerfile/context on Apple Silicon.
+The design is wrong if `docker-compose config` requires upstream Compose files, an internal service is host-published, compatibility Dockerfiles drift beyond the frozen source injection, or one of the five source images cannot build from the amended frozen recipe/context on Apple Silicon.
 ## Workflow Inventory
 - Source plan: `plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md`
 - Sprint: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`
@@ -50,6 +51,10 @@ allowed_paths:
   - deploy/local-first/README.md
   - deploy/local-first/verify.mjs
   - deploy/local-first/build-secrets/empty
+  - deploy/local-first/images/play.Dockerfile
+  - deploy/local-first/images/back.Dockerfile
+  - deploy/local-first/images/map-storage.Dockerfile
+  - deploy/local-first/images/uploader.Dockerfile
   - plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
   - tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md
   - tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md
@@ -92,6 +97,14 @@ exit_criteria:
     - deploy/local-first/README.md
     - deploy/local-first/verify.mjs
     - deploy/local-first/build-secrets/empty
+    - deploy/local-first/images/play.Dockerfile
+    - deploy/local-first/images/back.Dockerfile
+    - deploy/local-first/images/map-storage.Dockerfile
+    - deploy/local-first/images/uploader.Dockerfile
+  - deploy/local-first/images/play.Dockerfile
+  - deploy/local-first/images/back.Dockerfile
+  - deploy/local-first/images/map-storage.Dockerfile
+  - deploy/local-first/images/uploader.Dockerfile
   artifacts_exist:
     - tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md
 ```
@@ -108,7 +121,7 @@ exit_criteria:
       "phase": "verification",
       "cost": "normal",
       "evidence_policy": "current_exact",
-      "necessity": "Proves the exact eight-service standalone topology, loopback-only host exposure, build contexts, Local First env, and durable volume mounts.",
+      "necessity": "Proves the exact eight-service standalone topology, loopback-only host exposure, amended build contexts, mechanical Dockerfile drift guard, Local First env, and durable volume mounts.",
       "inputs": { "env": [] }
     },
     {
@@ -130,7 +143,7 @@ exit_criteria:
       "phase": "verification",
       "cost": "expensive",
       "evidence_policy": "current_exact",
-      "necessity": "Builds every fork source image using the unchanged upstream Dockerfile/context on the target Apple Silicon Docker runtime.",
+      "necessity": "Builds every fork source image on Apple Silicon using the approved snapshot-pinned compatibility recipes for bullseye Node images and unchanged upstream maps recipe.",
       "inputs": { "env": [] }
     }
   ]
@@ -140,7 +153,7 @@ exit_criteria:
 ## Acceptance Notes (Human Review)
 - Functional: standalone new namespace, exact service set, explicit Jazz local mode, no Matrix/OIDC/Jazz network peer defaults.
 - Exposure: only Traefik publishes `127.0.0.1:80:80`; no Redis/gRPC/internal service host ports.
-- Upstream safety: no existing Dockerfile/Compose edit and no copied Docker recipe.
+- Upstream safety: no existing Dockerfile/Compose edit; the four fork-owned compatibility recipes must byte-match the deterministic snapshot-pin transform of their current upstream source recipes.
 - Build: all five source images build from the accepted fork on this Mac.
 
 ## Rollback Point
