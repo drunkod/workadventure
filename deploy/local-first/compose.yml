@@ -1,0 +1,289 @@
+name: workadventure-local-first
+
+services:
+  reverse-proxy:
+    image: traefik:v3.6.1
+    command:
+      - --providers.docker
+      - --providers.docker.exposedbydefault=false
+      - --entryPoints.web.address=:80
+    ports:
+      - "127.0.0.1:80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      default:
+        aliases:
+          - play.workadventure.localhost
+          - maps.workadventure.localhost
+          - map-storage.workadventure.localhost
+          - uploader.workadventure.localhost
+          - icon.workadventure.localhost
+    restart: unless-stopped
+
+  play:
+    image: workadventure-local-first-play
+    build:
+      context: ../..
+      dockerfile: deploy/local-first/images/play.Dockerfile
+      args:
+        FAST_BUILD: "true"
+      secrets:
+        - source: sentry_release
+          target: SENTRY_RELEASE
+        - source: sentry_url
+          target: SENTRY_URL
+        - source: sentry_auth_token
+          target: SENTRY_AUTH_TOKEN
+        - source: sentry_org
+          target: SENTRY_ORG
+        - source: sentry_project
+          target: SENTRY_PROJECT
+        - source: sentry_environment
+          target: SENTRY_ENVIRONMENT
+    environment:
+      NODE_ENV: production
+      HOST: "0.0.0.0"
+      SECRET_KEY: "${SECRET_KEY}"
+      ROOM_API_SECRET_KEY: "${ROOM_API_SECRET_KEY}"
+      MAP_STORAGE_API_TOKEN: "${MAP_STORAGE_API_TOKEN}"
+      API_URL: back:50051
+      ROOM_API_PORT: "50051"
+      FRONT_URL: http://play.workadventure.localhost
+      VITE_URL: http://play.workadventure.localhost
+      PUSHER_URL: http://play.workadventure.localhost
+      ALLOWED_CORS_ORIGIN: http://play.workadventure.localhost
+      PUBLIC_MAP_STORAGE_URL: http://map-storage.workadventure.localhost
+      INTERNAL_MAP_STORAGE_URL: http://map-storage:3000
+      UPLOADER_URL: http://uploader.workadventure.localhost
+      ICON_URL: http://icon.workadventure.localhost
+      START_ROOM_URL: /_/global/maps.workadventure.localhost/starter/map.json
+      DISABLE_ANONYMOUS: "false"
+      ENABLE_CHAT: "true"
+      ENABLE_CHAT_UPLOAD: "true"
+      ENABLE_CHAT_ONLINE_LIST: "false"
+      ENABLE_CHAT_DISCONNECTED_LIST: "false"
+      JAZZ_CHAT_ENABLED: "true"
+      JAZZ_SYNC_MODE: local
+      JAZZ_SYNC_PEER: ""
+      JAZZ_API_KEY: ""
+      JAZZ_GLOBAL_ROOM_ID: ""
+      MATRIX_API_URI: ""
+      MATRIX_PUBLIC_URI: ""
+      MATRIX_ADMIN_USER: ""
+      MATRIX_ADMIN_PASSWORD: ""
+      MATRIX_DOMAIN: ""
+      OPENID_CLIENT_ID: ""
+      OPENID_CLIENT_SECRET: ""
+      OPENID_CLIENT_ISSUER: ""
+      OPENID_PROFILE_SCREEN_PROVIDER: ""
+      OPENID_SCOPE: ""
+      OPENID_PROMPT: ""
+      OPENID_USERNAME_CLAIM: ""
+      OPENID_LOCALE_CLAIM: ""
+      OPENID_LOGOUT_REDIRECT_URL: ""
+      JITSI_URL: ""
+      JITSI_PRIVATE_MODE: "false"
+      JITSI_ISS: ""
+      BBB_URL: ""
+      BBB_SECRET: ""
+      STUN_SERVER: ""
+      TURN_SERVER: ""
+      TURN_USER: ""
+      TURN_PASSWORD: ""
+      TURN_STATIC_AUTH_SECRET: ""
+      SENTRY_DSN_FRONT: ""
+      SENTRY_DSN_PUSHER: ""
+      SENTRY_ENVIRONMENT: ""
+      SENTRY_RELEASE: ""
+      SENTRY_ORG: ""
+      SENTRY_PROJECT: ""
+      ENABLE_REPORT_ISSUES_MENU: "false"
+      ACTIVE_REPORT_ISSUES_MENU: "false"
+      KLAXOON_ENABLED: "false"
+      YOUTUBE_ENABLED: "false"
+      GOOGLE_DRIVE_ENABLED: "false"
+      GOOGLE_DOCS_ENABLED: "false"
+      GOOGLE_SHEETS_ENABLED: "false"
+      GOOGLE_SLIDES_ENABLED: "false"
+      ERASER_ENABLED: "false"
+      EXCALIDRAW_ENABLED: "false"
+      CARDS_ENABLED: "false"
+      TLDRAW_ENABLED: "false"
+      ENABLE_MAP_EDITOR: "true"
+      MAP_EDITOR_ALLOW_ALL_USERS: "true"
+      ENABLE_OPENAPI_ENDPOINT: "true"
+    depends_on:
+      back:
+        condition: service_healthy
+      map-storage:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.play.rule: "Host(`play.workadventure.localhost`)"
+      traefik.http.routers.play.entryPoints: web
+      traefik.http.routers.play.service: play
+      traefik.http.services.play.loadbalancer.server.port: "3000"
+      traefik.http.routers.play-ws.rule: "Host(`play.workadventure.localhost`) && PathPrefix(`/ws/`)"
+      traefik.http.routers.play-ws.entryPoints: web
+      traefik.http.routers.play-ws.service: play-ws
+      traefik.http.services.play-ws.loadbalancer.server.port: "3001"
+    restart: unless-stopped
+
+  back:
+    image: workadventure-local-first-back
+    build:
+      context: ../..
+      dockerfile: deploy/local-first/images/back.Dockerfile
+    environment:
+      NODE_ENV: production
+      PLAY_URL: http://play.workadventure.localhost
+      SECRET_KEY: "${SECRET_KEY}"
+      ENABLE_MAP_EDITOR: "true"
+      REDIS_HOST: redis
+      STORE_VARIABLES_FOR_LOCAL_MAPS: "true"
+      MAP_STORAGE_URL: map-storage:50053
+      PUBLIC_MAP_STORAGE_URL: http://map-storage.workadventure.localhost
+      INTERNAL_MAP_STORAGE_URL: http://map-storage:3000
+      ENABLE_CHAT: "true"
+      ENABLE_CHAT_UPLOAD: "true"
+      JITSI_URL: ""
+      JITSI_ISS: ""
+      SECRET_JITSI_KEY: ""
+      BBB_URL: ""
+      BBB_SECRET: ""
+      STUN_SERVER: ""
+      TURN_SERVER: ""
+      TURN_USER: ""
+      TURN_PASSWORD: ""
+      SENTRY_DSN: ""
+      SENTRY_ENVIRONMENT: ""
+      SENTRY_RELEASE: ""
+      ADMIN_API_URL: ""
+      ADMIN_API_TOKEN: ""
+    depends_on:
+      redis:
+        condition: service_started
+      map-storage:
+        condition: service_healthy
+    restart: unless-stopped
+
+  map-storage:
+    image: workadventure-local-first-map-storage
+    build:
+      context: ../..
+      dockerfile: deploy/local-first/images/map-storage.Dockerfile
+    environment:
+      NODE_ENV: production
+      API_URL: back:50051
+      STORAGE_DIRECTORY: /maps
+      PATH_PREFIX: ""
+      MAP_STORAGE_API_TOKEN: "${MAP_STORAGE_API_TOKEN}"
+      SECRET_KEY: "${SECRET_KEY}"
+      PUSHER_URL: http://play.workadventure.localhost
+      WHITELISTED_RESOURCE_URLS: ""
+      ENTITY_COLLECTION_URLS: ""
+      WAM_TEMPLATE_URL: ""
+      ENABLE_BEARER_AUTHENTICATION: "false"
+      ENABLE_BASIC_AUTHENTICATION: "false"
+      ENABLE_DIGEST_AUTHENTICATION: "false"
+      SENTRY_DSN: ""
+      SENTRY_ENVIRONMENT: ""
+      SENTRY_RELEASE: ""
+    volumes:
+      - map-storage-data:/maps
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.map-storage.rule: "Host(`map-storage.workadventure.localhost`)"
+      traefik.http.routers.map-storage.entryPoints: web
+      traefik.http.routers.map-storage.service: map-storage
+      traefik.http.services.map-storage.loadbalancer.server.port: "3000"
+      traefik.http.routers.map-storage-ui.rule: "Host(`map-storage.workadventure.localhost`) && PathPrefix(`/ui/`)"
+      traefik.http.routers.map-storage-ui.entryPoints: web
+      traefik.http.routers.map-storage-ui.service: map-storage-ui
+      traefik.http.services.map-storage-ui.loadbalancer.server.port: "8080"
+    restart: unless-stopped
+
+  maps:
+    image: workadventure-local-first-maps
+    build:
+      context: ../../maps
+    environment:
+      HOST: "0.0.0.0"
+      NODE_ENV: production
+      FRONT_URL: http://play.workadventure.localhost
+      STARTUP_COMMAND_0: ""
+      STARTUP_COMMAND_1: ""
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.maps.rule: "Host(`maps.workadventure.localhost`)"
+      traefik.http.routers.maps.entryPoints: web
+      traefik.http.routers.maps.service: maps
+      traefik.http.services.maps.loadbalancer.server.port: "80"
+    restart: unless-stopped
+
+  redis:
+    image: redis:6
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  uploader:
+    image: workadventure-local-first-uploader
+    build:
+      context: ../..
+      dockerfile: deploy/local-first/images/uploader.Dockerfile
+    environment:
+      NODE_ENV: production
+      UPLOADER_URL: http://uploader.workadventure.localhost
+      PLAY_URL: http://play.workadventure.localhost
+      ALLOWED_CORS_ORIGIN: http://play.workadventure.localhost
+      ENABLE_CHAT_UPLOAD: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      REDIS_DB_NUMBER: "1"
+      AWS_ACCESS_KEY_ID: ""
+      AWS_SECRET_ACCESS_KEY: ""
+      AWS_DEFAULT_REGION: ""
+      AWS_BUCKET: ""
+      AWS_ENDPOINT: ""
+    depends_on:
+      redis:
+        condition: service_started
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.uploader.rule: "Host(`uploader.workadventure.localhost`)"
+      traefik.http.routers.uploader.entryPoints: web
+      traefik.http.routers.uploader.service: uploader
+      traefik.http.services.uploader.loadbalancer.server.port: "8080"
+    restart: unless-stopped
+
+  icon:
+    image: matthiasluedtke/iconserver:v3.21.0
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.icon.rule: "Host(`icon.workadventure.localhost`)"
+      traefik.http.routers.icon.entryPoints: web
+      traefik.http.routers.icon.service: icon
+      traefik.http.services.icon.loadbalancer.server.port: "8080"
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  map-storage-data:
+
+secrets:
+  sentry_release:
+    file: ./build-secrets/empty
+  sentry_url:
+    file: ./build-secrets/empty
+  sentry_auth_token:
+    file: ./build-secrets/empty
+  sentry_org:
+    file: ./build-secrets/empty
+  sentry_project:
+    file: ./build-secrets/empty
+  sentry_environment:
+    file: ./build-secrets/empty
