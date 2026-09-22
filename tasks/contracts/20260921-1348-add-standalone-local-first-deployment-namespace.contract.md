@@ -1,6 +1,6 @@
 # Task Contract: add-standalone-local-first-deployment-namespace
 
-> **Status**: Fulfilled
+> **Status**: Active
 > **Plan**: plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
 > **Task Profile**: code-change
 > **Owner**: test
@@ -35,7 +35,7 @@ The design is wrong if `docker-compose config` requires upstream Compose files, 
 
 ## Change Assessment
 ```json
-{"protocol":1,"oracles":[{"id":"local-first-compose-verifier","kind":"deterministic_test","paths":["deploy/local-first/*"]},{"id":"local-first-runtime-readback","kind":"runtime_readback","paths":["deploy/local-first/*"]}]}
+{"protocol":1,"oracles":[{"id":"local-first-compose-verifier","kind":"deterministic_test","paths":["*"]},{"id":"local-first-runtime-readback","kind":"runtime_readback","paths":["*"]}]}
 ```
 
 ## Acceptance Policy
