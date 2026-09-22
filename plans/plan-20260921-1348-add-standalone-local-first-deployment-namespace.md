@@ -97,24 +97,37 @@ Uploader stores through Redis (`redis:6379`, DB 1), has no AWS config, and uses 
 - named Redis and map-storage volumes are mounted;
 - internal Redis/gRPC services have no published host ports.
 
+## Runtime readback oracle
+
+`deploy/local-first/readback.sh` is a bounded deployment oracle required by strict Change Assessment. It must:
+- start the already-built eight-service Compose stack with the example env;
+- install an EXIT trap before startup that runs `docker-compose ... down --remove-orphans` without `-v`;
+- wait up to 120 seconds for `play`, `map-storage`, `uploader`, and the starter map route through Traefik;
+- require `docker-compose exec -T redis redis-cli ping` to return `PONG`;
+- require all eight declared services to be running, while preserving existing healthcheck semantics;
+- print concise PASS evidence and always tear containers down while preserving named volumes.
+
+This is not row-5 browser E2E: it does not exercise Jazz UI, `ru-RU`, browser IndexedDB, Internet isolation, or external-destination auditing.
+
 ## Focused validation
 1. `node deploy/local-first/verify.mjs`
 2. `docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml config --quiet`
 3. `docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml build play back map-storage maps uploader`
-4. `git diff --check`
+4. `bash deploy/local-first/readback.sh`
+5. `git diff --check`
 
 The build is the row's long deterministic gate. Existing upstream Dockerfiles remain immutable. The approved snapshot-pinned compatibility Dockerfiles are the only row-3 recipe divergence.
 ## Promotion Gate
 - **Merge/PR unit**: new standalone `deploy/local-first/` namespace only.
 - **Rollback surface**: delete/revert that namespace.
-- **Verification boundary**: deterministic config verifier + Compose config + source image build.
+- **Verification boundary**: deterministic config verifier + Compose config + source image build + bounded local runtime readback.
 - **Review/acceptance boundary**: read-only Luna-low inspection of frozen build/config evidence.
 - **High-risk surface**: accidental host/LAN exposure, hidden cloud/auth services, wrong build context.
 - **Why not checklist row**: establishes the release deployment boundary used by rows 4–5.
 
 ## Evidence Contract
 - **State/progress path**: this plan, contract/review/notes, Sprint row 3.
-- **Verification evidence**: current-exact Compose verifier/config/build snapshots.
+- **Verification evidence**: current-exact Compose verifier/config/build/runtime-readback snapshots.
 - **Evaluator rubric**: new files only; exact service/topology/build decisions; loopback-only host exposure; no networked Jazz/Matrix/OIDC defaults.
 - **Stop condition**: contract fulfilled, semantic PASS, final verify-sprint, closeout.
 - **Rollback surface**: revert row-3 publication.
@@ -122,6 +135,6 @@ The build is the row's long deterministic gate. Existing upstream Dockerfiles re
 ## Task Breakdown
 - [ ] Create standalone Compose and local env example.
 - [ ] Add mechanically-derived snapshot-pinned compatibility Dockerfiles and build-secret placeholders while keeping upstream recipes untouched.
-- [ ] Add deterministic Compose verifier and runbook.
+- [ ] Add deterministic Compose verifier, bounded runtime readback, and runbook.
 - [ ] Pass Apple Silicon source-image build.
 - [ ] Pass semantic acceptance.

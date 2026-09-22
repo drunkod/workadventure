@@ -1,6 +1,6 @@
 # Task Contract: add-standalone-local-first-deployment-namespace
 
-> **Status**: Fulfilled
+> **Status**: Active
 > **Plan**: plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
 > **Task Profile**: code-change
 > **Owner**: test
@@ -15,8 +15,8 @@ The Local First release needs a fork-owned production deployment that survives u
 ## Goal
 Add a standalone `deploy/local-first/` Compose namespace that keeps existing upstream Dockerfiles read-only, uses four mechanically-derived snapshot-pinned compatibility recipes for the bullseye Node images, exposes only one loopback HTTP entrypoint, enables Jazz local mode, excludes Matrix/OIDC/cloud dependencies, and builds successfully on this Apple Silicon Mac.
 ## Scope
-- In scope: deployment-owned files under `deploy/local-first/`, exact eight-service topology, four explicit compatibility Dockerfiles, source-build references, localhost routing, named Redis/map-storage volumes, local-only env defaults, deterministic config/drift verifier, runbook, Apple Silicon image build.
-- Out of scope: starting/production-smoke testing the stack (row 5), Redis AOF/backup tooling (row 4), LAN sync, HTTPS/ACME, air-gapped image bundle, modifying any existing upstream Dockerfile/Compose file.
+- In scope: deployment-owned files under `deploy/local-first/`, exact eight-service topology, four explicit compatibility Dockerfiles, source-build references, localhost routing, named Redis/map-storage volumes, local-only env defaults, deterministic config/drift verifier, runbook, Apple Silicon image build, and one bounded local runtime readback that starts the stack, probes local health/routes, verifies Redis, and always tears containers down while preserving volumes.
+- Out of scope: full browser/product production smoke, Internet-isolation/network auditing, Jazz UI persistence scenarios (row 5), Redis AOF/backup tooling (row 4), LAN sync, HTTPS/ACME, air-gapped image bundle, modifying any existing upstream Dockerfile/Compose file. The row-3 runtime readback is service-health/package validation only.
 - Taste constraints: standalone Compose, fixed `.localhost` origins, no host ports except 127.0.0.1:80; back/map-storage/uploader compatibility Dockerfiles may differ from upstream only by the frozen Debian Snapshot apt-source injection; play may additionally set `ENV GENERATE_SOURCEMAP=false` immediately before its existing production Vite build RUN.
 
 ## Stop Conditions
@@ -35,7 +35,7 @@ The design is wrong if `docker-compose config` requires upstream Compose files, 
 
 ## Change Assessment
 ```json
-{"protocol":1,"oracles":[{"id":"local-first-compose-verifier","kind":"deterministic_test","paths":["deploy/local-first/*"]}]}
+{"protocol":1,"oracles":[{"id":"local-first-compose-verifier","kind":"deterministic_test","paths":["deploy/local-first/*"]},{"id":"local-first-runtime-readback","kind":"runtime_readback","paths":["deploy/local-first/*"]}]}
 ```
 
 ## Acceptance Policy
@@ -50,6 +50,7 @@ allowed_paths:
   - deploy/local-first/.env.example
   - deploy/local-first/README.md
   - deploy/local-first/verify.mjs
+  - deploy/local-first/readback.sh
   - deploy/local-first/build-secrets/empty
   - deploy/local-first/images/play.Dockerfile
   - deploy/local-first/images/back.Dockerfile
@@ -96,6 +97,7 @@ exit_criteria:
     - deploy/local-first/.env.example
     - deploy/local-first/README.md
     - deploy/local-first/verify.mjs
+    - deploy/local-first/readback.sh
     - deploy/local-first/build-secrets/empty
     - deploy/local-first/images/play.Dockerfile
     - deploy/local-first/images/back.Dockerfile
@@ -141,6 +143,17 @@ exit_criteria:
       "evidence_policy": "current_exact",
       "necessity": "Builds every fork source image on Apple Silicon using the approved snapshot-pinned compatibility recipes for bullseye Node images and unchanged upstream maps recipe.",
       "inputs": { "env": [] }
+    },
+    {
+      "id": "local-first-runtime-readback",
+      "kind": "command",
+      "command": "bash deploy/local-first/readback.sh",
+      "cwd": ".",
+      "phase": "verification",
+      "cost": "normal",
+      "evidence_policy": "current_exact",
+      "necessity": "Runtime readback for deploy-risk selection: starts the built loopback-only stack, waits for local services, probes play/map-storage/uploader/maps plus Redis, and tears containers down while retaining named volumes.",
+      "inputs": { "env": [] }
     }
   ]
 }
@@ -151,6 +164,7 @@ exit_criteria:
 - Exposure: only Traefik publishes `127.0.0.1:80:80`; no Redis/gRPC/internal service host ports.
 - Upstream safety: no existing Dockerfile/Compose edit; back/map-storage/uploader must byte-match the deterministic Snapshot transform, and play must byte-match that transform plus exactly one pre-build `GENERATE_SOURCEMAP=false` insertion.
 - Build: all five source images build from the accepted fork on this Mac.
+- Runtime readback: the built stack starts locally, play/map-storage/uploader/maps respond through Traefik, Redis returns PONG, all eight services are running/healthy as applicable, and cleanup removes containers without deleting named volumes.
 
 ## Rollback Point
 - Commit/checkpoint: reviewed row-3 task publication.
