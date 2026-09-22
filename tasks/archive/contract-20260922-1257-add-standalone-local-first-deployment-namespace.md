@@ -1,13 +1,23 @@
+> **Archived**: 2026-09-22 12:57
+> **Related Plan**: plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+> **Outcome**: Completed
+> **Lifecycle**: contract
+> **Parent Run ID**: run-20260922-1257
+> **Archive Projection V1**: `plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md` => `plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md` => `tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md` => `tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md` => `tasks/archive/review-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+
 # Task Contract: add-standalone-local-first-deployment-namespace
 
 > **Status**: Fulfilled
-> **Plan**: plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+> **Plan**: plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
 > **Task Profile**: code-change
 > **Owner**: test
 > **Capability ID**: root
 > **Last Updated**: 2026-09-21 13:52
-> **Review File**: `tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md`
-> **Notes File**: `tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md`
+> **Review File**: `tasks/archive/review-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Notes File**: `tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md`
 
 ## Why
 The Local First release needs a fork-owned production deployment that survives upstream WorkAdventure updates. Extending upstream Docker/Compose files would recreate the merge-conflict surface this Sprint is designed to avoid.
@@ -29,7 +39,7 @@ Add a standalone `deploy/local-first/` Compose namespace that keeps existing ups
 ## Falsifier
 The design is wrong if `docker-compose config` requires upstream Compose files, an internal service is host-published, compatibility Dockerfiles drift beyond the frozen transforms, or one of the five source images cannot build from the amended frozen recipe/context on Apple Silicon.
 ## Workflow Inventory
-- Source plan: `plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md`
+- Source plan: `plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md`
 - Sprint: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`
 - Review/notes/checks: canonical Repo Harness artifacts.
 
@@ -56,10 +66,10 @@ allowed_paths:
   - deploy/local-first/images/back.Dockerfile
   - deploy/local-first/images/map-storage.Dockerfile
   - deploy/local-first/images/uploader.Dockerfile
-  - plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
-  - tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md
-  - tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md
-  - tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md
+  - plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+  - tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md
+  - tasks/archive/review-20260922-1257-add-standalone-local-first-deployment-namespace.md
+  - tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md
 ```
 ## Evidence Requirements
 ```yaml
@@ -104,7 +114,7 @@ exit_criteria:
     - deploy/local-first/images/map-storage.Dockerfile
     - deploy/local-first/images/uploader.Dockerfile
   artifacts_exist:
-    - tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md
+    - tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md
 ```
 ## Verification Plan
 ```json

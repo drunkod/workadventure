@@ -1,7 +1,13 @@
+> **Archived**: 2026-09-22 12:57
+> **Related Plan**: plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+> **Outcome**: Completed
+> **Source Plan**: (none)
+> **Parent Run ID**: run-20260922-1257
+
 # Deferred Goal Ledger
 
 > **Status**: Backlog
-> **Updated**: (archive-workflow)
+> **Updated**: 2026-09-21 13:48
 > **Scope**: Medium/long-term goals deferred from active plan execution
 
 Current plan tasks live in the active plan's `## Task Breakdown`.

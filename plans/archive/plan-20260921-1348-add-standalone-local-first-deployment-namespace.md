@@ -1,6 +1,16 @@
+> **Archived**: 2026-09-22 12:57
+> **Related Plan**: plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+> **Outcome**: Completed
+> **Lifecycle**: plan
+> **Parent Run ID**: run-20260922-1257
+> **Archive Projection V1**: `plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md` => `plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md` => `tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md` => `tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md` => `tasks/archive/review-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+
 # Plan: Add standalone Local First deployment namespace
 
-> **Status**: Approved
+> **Status**: Archived
 > **Created**: 20260921-1348
 > **Slug**: add-standalone-local-first-deployment-namespace
 > **Planning Source**: repo-harness-plan
@@ -12,9 +22,9 @@
 > **Rollback Surface**: remove the new deploy/local-first namespace
 > **Spec**: `docs/spec.md`
 > **Research**: `docs/researches/20260920-local-first-container-architecture.md`
-> **Task Contract**: `tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md`
-> **Task Review**: `tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md`
-> **Implementation Notes**: `tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md`
+> **Task Contract**: `tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Task Review**: `tasks/archive/review-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Implementation Notes**: `tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md`
 
 ## Agentic Routing
 - Mechanical deployment implementation only; Sprint topology decisions supersede the older overlay recommendation in research.

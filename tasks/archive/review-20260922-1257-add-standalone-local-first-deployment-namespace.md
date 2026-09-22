@@ -1,9 +1,19 @@
+> **Archived**: 2026-09-22 12:57
+> **Related Plan**: plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+> **Outcome**: Completed
+> **Lifecycle**: review
+> **Parent Run ID**: run-20260922-1257
+> **Archive Projection V1**: `plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md` => `plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md` => `tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md` => `tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md` => `tasks/archive/review-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+
 # Task Review: add-standalone-local-first-deployment-namespace
 
 > **Status**: Accepted
-> **Plan**: plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
-> **Contract**: tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md
-> **Notes File**: tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md
+> **Plan**: plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+> **Contract**: tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md
+> **Notes File**: tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md
 > **Checks File**: .ai/harness/checks/latest.json
 > **Last Updated**: 2026-09-21 13:48
 > **Recommendation**: pass

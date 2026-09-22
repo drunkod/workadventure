@@ -1,9 +1,19 @@
+> **Archived**: 2026-09-22 12:57
+> **Related Plan**: plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+> **Outcome**: Completed
+> **Lifecycle**: notes
+> **Parent Run ID**: run-20260922-1257
+> **Archive Projection V1**: `plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md` => `plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/notes/20260921-1348-add-standalone-local-first-deployment-namespace.notes.md` => `tasks/archive/notes-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md` => `tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+> **Archive Projection V1**: `tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md` => `tasks/archive/review-20260922-1257-add-standalone-local-first-deployment-namespace.md`
+
 # Implementation Notes: add-standalone-local-first-deployment-namespace
 
 > **Status**: Fulfilled
-> **Plan**: plans/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
-> **Contract**: tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md
-> **Review**: tasks/reviews/20260921-1348-add-standalone-local-first-deployment-namespace.review.md
+> **Plan**: plans/archive/plan-20260921-1348-add-standalone-local-first-deployment-namespace.md
+> **Contract**: tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md
+> **Review**: tasks/archive/review-20260922-1257-add-standalone-local-first-deployment-namespace.md
 > **Last Updated**: 2026-09-22 12:42
 > **Lifecycle**: notes
 
@@ -24,7 +34,7 @@
 ## Resolved Build Blockers
 
 - Original blocker authority revision: `cbb24b8e46f4e10063934bbd2c48cdc879d59848`.
-- Canonical command: `repo-harness run verify-contract --contract tasks/contracts/20260921-1348-add-standalone-local-first-deployment-namespace.contract.md --strict`.
+- Canonical command: `repo-harness run verify-contract --contract tasks/archive/contract-20260922-1257-add-standalone-local-first-deployment-namespace.md --strict`.
 - Failed verification ID: `local-first-source-build`.
 - Captured log: `.ai/harness/runs/verification-vx-5398f6ee717d472b9420.log`.
 - Affected unchanged recipe: `map-storage/Dockerfile`, `RUN apt-get update && apt-get install -y git curl` at lines 20 and 41.
