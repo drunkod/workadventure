@@ -1,13 +1,23 @@
+> **Archived**: 2026-09-26 14:34
+> **Related Plan**: plans/archive/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md
+> **Outcome**: Completed
+> **Lifecycle**: contract
+> **Parent Run ID**: run-20260926-1434
+> **Archive Projection V1**: `plans/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md` => `plans/archive/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md`
+> **Archive Projection V1**: `tasks/notes/20260922-1259-add-local-first-server-durability-and-restore-tooling.notes.md` => `tasks/archive/notes-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
+> **Archive Projection V1**: `tasks/contracts/20260922-1259-add-local-first-server-durability-and-restore-tooling.contract.md` => `tasks/archive/contract-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
+> **Archive Projection V1**: `tasks/reviews/20260922-1259-add-local-first-server-durability-and-restore-tooling.review.md` => `tasks/archive/review-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
+
 # Task Contract: add-local-first-server-durability-and-restore-tooling
 
-> **Status**: Active
-> **Plan**: plans/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md
+> **Status**: Fulfilled
+> **Plan**: plans/archive/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md
 > **Task Profile**: code-change
 > **Owner**: test
 > **Capability ID**: root
 > **Last Updated**: 2026-09-22 13:11
-> **Review File**: `tasks/reviews/20260922-1259-add-local-first-server-durability-and-restore-tooling.review.md`
-> **Notes File**: `tasks/notes/20260922-1259-add-local-first-server-durability-and-restore-tooling.notes.md`
+> **Review File**: `tasks/archive/review-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
+> **Notes File**: `tasks/archive/notes-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
 
 ## Why
 
@@ -54,10 +64,10 @@ map-storage HTTP, back variable repository, and uploader HTTP interfaces after a
 
 ## Workflow Inventory
 
-- Source plan: `plans/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md`
+- Source plan: `plans/archive/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md`
 - Sprint: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`
-- Review file: `tasks/reviews/20260922-1259-add-local-first-server-durability-and-restore-tooling.review.md`
-- Notes file: `tasks/notes/20260922-1259-add-local-first-server-durability-and-restore-tooling.notes.md`
+- Review file: `tasks/archive/review-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
+- Notes file: `tasks/archive/notes-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
 - Checks file: `.ai/harness/checks/latest.json`
 - Run snapshots: `.ai/harness/runs/`
 - Runtime evidence: ignored `_ops/local-first-durability/`
@@ -85,10 +95,10 @@ allowed_paths:
   - deploy/local-first/backup.sh
   - deploy/local-first/restore.sh
   - deploy/local-first/durability-smoke.sh
-  - plans/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md
-  - tasks/contracts/20260922-1259-add-local-first-server-durability-and-restore-tooling.contract.md
-  - tasks/reviews/20260922-1259-add-local-first-server-durability-and-restore-tooling.review.md
-  - tasks/notes/20260922-1259-add-local-first-server-durability-and-restore-tooling.notes.md
+  - plans/archive/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md
+  - tasks/archive/contract-20260926-1434-add-local-first-server-durability-and-restore-tooling.md
+  - tasks/archive/review-20260926-1434-add-local-first-server-durability-and-restore-tooling.md
+  - tasks/archive/notes-20260926-1434-add-local-first-server-durability-and-restore-tooling.md
 ```
 
 ## Evidence Requirements
@@ -133,7 +143,7 @@ exit_criteria:
     - deploy/local-first/restore.sh
     - deploy/local-first/durability-smoke.sh
   artifacts_exist:
-    - tasks/notes/20260922-1259-add-local-first-server-durability-and-restore-tooling.notes.md
+    - tasks/archive/notes-20260926-1434-add-local-first-server-durability-and-restore-tooling.md
 ```
 
 ## Verification Plan

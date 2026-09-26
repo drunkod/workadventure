@@ -43,7 +43,7 @@ It starts the eight-service stack with `--no-build`, probes play, map-storage, u
 For the local single-device profile you may run directly with the example values:
 
 ```sh
-docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml up -d
+docker-compose -p workadventure-local-first --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml up -d
 ```
 
 Open `http://play.workadventure.localhost` in the Mac browser.
@@ -53,13 +53,45 @@ For a long-lived installation, copy `.env.example` to an ignored local file and 
 ## Inspect and stop
 
 ```sh
-docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml ps
-docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml logs --tail=200
-docker-compose --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml down
+docker-compose -p workadventure-local-first --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml ps
+docker-compose -p workadventure-local-first --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml logs --tail=200
+docker-compose -p workadventure-local-first --env-file deploy/local-first/.env.example -f deploy/local-first/compose.yml down
 ```
 
 `down` keeps the Redis and map-storage named volumes. `down -v` deletes them and is destructive.
 
+## Durability backup and restore
+
+Back up during a maintenance window. This copies the complete Redis `/data` volume plus map-storage
+`/maps`; it does not back up browser IndexedDB/localStorage or Jazz identity. Redis therefore captures
+uploader keys that still exist at snapshot time. The restore guarantee covers normal non-expiring
+uploader objects; temporary/TTL uploader or audio data may already have expired and is deliberately
+not asserted. Redis uses AOF with `appendfsync everysec` and `noeviction`; `everysec` is not a hard
+one-second loss guarantee across an OS, VM, kernel, or storage failure.
+
+```sh
+# Use the same project name and env file that start the long-lived source installation.
+PROJECT=workadventure-local-first
+ENV_FILE=/absolute/path/to/local-first.env
+
+bash deploy/local-first/backup.sh --project "$PROJECT" --env-file "$ENV_FILE" --output _ops/local-first-backups/$(date -u +%Y%m%dT%H%M%SZ)
+# The source remains stopped. Restore into a separate stopped project:
+bash deploy/local-first/restore.sh --backup _ops/local-first-backups/REPLACE --project workadventure-local-first-restored --env-file "$ENV_FILE"
+# Start only the restored project while validating it; both projects bind 127.0.0.1:80.
+docker-compose -p workadventure-local-first-restored --env-file "$ENV_FILE" -f deploy/local-first/compose.yml up -d --no-build
+# After validation, stop the restored project before restarting the exact source project:
+docker-compose -p workadventure-local-first-restored --env-file "$ENV_FILE" -f deploy/local-first/compose.yml down
+docker-compose -p "$PROJECT" --env-file "$ENV_FILE" -f deploy/local-first/compose.yml up -d
+```
+
+Backup atomically reserves a new output directory and records checksums, image/source metadata,
+volume identities, policy, and the source env-file path (never its contents) under ignored `_ops/`.
+Restore verifies checksums before creating anything, uses the recorded env-file path unless
+`--env-file` overrides it, acquires an atomic host-global per-project restore claim, refuses an
+existing destination container or Redis/map-storage volume, and removes only a partial destination
+on failure. It leaves a successful destination stopped until explicitly started. A stale restore
+claim in the host temporary directory fails closed and must be inspected before an operator removes it.
+
 ## Release boundary
 
-This row proves packaging, source-image build, and a bounded service-health runtime readback only. Server durability/backup tooling is added in Sprint row 4. Full browser/product runtime, `ru-RU`, Jazz reload persistence, restart persistence, browser/container Internet isolation, and network-destination auditing are validated in Sprint row 5.
+This row proves packaging, source-image build, bounded service health, and server durability/backup/restore tooling. Full browser/product runtime, `ru-RU`, Jazz reload persistence, restart persistence, browser/container Internet isolation, and network-destination auditing are validated in Sprint row 5.

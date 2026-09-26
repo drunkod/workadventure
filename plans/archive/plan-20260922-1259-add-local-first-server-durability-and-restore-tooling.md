@@ -1,6 +1,16 @@
+> **Archived**: 2026-09-26 14:34
+> **Related Plan**: plans/archive/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md
+> **Outcome**: Completed
+> **Lifecycle**: plan
+> **Parent Run ID**: run-20260926-1434
+> **Archive Projection V1**: `plans/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md` => `plans/archive/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md`
+> **Archive Projection V1**: `tasks/notes/20260922-1259-add-local-first-server-durability-and-restore-tooling.notes.md` => `tasks/archive/notes-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
+> **Archive Projection V1**: `tasks/contracts/20260922-1259-add-local-first-server-durability-and-restore-tooling.contract.md` => `tasks/archive/contract-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
+> **Archive Projection V1**: `tasks/reviews/20260922-1259-add-local-first-server-durability-and-restore-tooling.review.md` => `tasks/archive/review-20260926-1434-add-local-first-server-durability-and-restore-tooling.md`
+
 # Plan: Sprint task: add local-first server durability and restore tooling
 
-> **Status**: Executing
+> **Status**: Archived
 > **Created**: 20260922-1259
 > **Slug**: add-local-first-server-durability-and-restore-tooling
 > **Planning Source**: repo-harness-sprint
@@ -10,9 +20,9 @@
 > **Promotion Reason**: worktree_boundary
 > **Verification Boundary**: static Local First verifier + Compose resolution + shell syntax + isolated durability restore smoke + strict Repo Harness contract verification.
 > **Rollback Surface**: revert only the row-4 deployment durability commit; user data is never modified by verification because smoke uses unique temporary Compose projects and fresh volumes.
-> **Task Contract**: tasks/contracts/20260922-1259-add-local-first-server-durability-and-restore-tooling.contract.md
-> **Task Review**: tasks/reviews/20260922-1259-add-local-first-server-durability-and-restore-tooling.review.md
-> **Implementation Notes**: tasks/notes/20260922-1259-add-local-first-server-durability-and-restore-tooling.notes.md
+> **Task Contract**: tasks/archive/contract-20260926-1434-add-local-first-server-durability-and-restore-tooling.md
+> **Task Review**: tasks/archive/review-20260926-1434-add-local-first-server-durability-and-restore-tooling.md
+> **Implementation Notes**: tasks/archive/notes-20260926-1434-add-local-first-server-durability-and-restore-tooling.md
 
 ## Goal
 
@@ -116,7 +126,7 @@ Runtime:
 - `bash deploy/local-first/durability-smoke.sh`
 
 Canonical:
-- `repo-harness run verify-contract --contract tasks/contracts/20260922-1259-add-local-first-server-durability-and-restore-tooling.contract.md --strict --force-expensive-rerun --reason "row4 durability/backup/restore runtime verification"`
+- `repo-harness run verify-contract --contract tasks/archive/contract-20260926-1434-add-local-first-server-durability-and-restore-tooling.md --strict --force-expensive-rerun --reason "row4 durability/backup/restore runtime verification"`
 
 ## Long-gate Evidence
 

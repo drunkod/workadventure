@@ -168,6 +168,11 @@ function hasVolume(serviceName, target) {
 
 if (!hasVolume("redis", "/data")) fail("redis named volume /data missing");
 if (!hasVolume("map-storage", "/maps")) fail("map-storage named volume /maps missing");
+const redisCommand = services.redis?.command;
+const expectedRedisCommand = ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec", "--maxmemory-policy", "noeviction"];
+if (JSON.stringify(redisCommand) !== JSON.stringify(expectedRedisCommand)) {
+    fail(`redis durability command mismatch: ${JSON.stringify(redisCommand)}`);
+}
 
 if (process.exitCode) process.exit(process.exitCode);
 console.log(

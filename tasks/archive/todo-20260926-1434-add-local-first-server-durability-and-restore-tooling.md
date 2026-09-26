@@ -1,7 +1,13 @@
+> **Archived**: 2026-09-26 14:34
+> **Related Plan**: plans/archive/plan-20260922-1259-add-local-first-server-durability-and-restore-tooling.md
+> **Outcome**: Completed
+> **Source Plan**: (none)
+> **Parent Run ID**: run-20260926-1434
+
 # Deferred Goal Ledger
 
 > **Status**: Backlog
-> **Updated**: (archive-workflow)
+> **Updated**: 2026-09-22 12:59
 > **Scope**: Medium/long-term goals deferred from active plan execution
 
 Current plan tasks live in the active plan's `## Task Breakdown`.
