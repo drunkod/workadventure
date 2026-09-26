@@ -1,0 +1,23 @@
+services:
+  reverse-proxy:
+    networks:
+      default:
+        aliases:
+          - play.workadventure.localhost
+          - maps.workadventure.localhost
+          - map-storage.workadventure.localhost
+          - uploader.workadventure.localhost
+          - icon.workadventure.localhost
+      ingress: {}
+  play:
+    environment:
+      JAZZ_SYNC_MODE: local
+      JAZZ_SYNC_PEER: https://stale-jazz-peer.invalid/sync
+      JAZZ_API_KEY: stale-local-first-release-key
+networks:
+  default:
+    internal: true
+  ingress:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"

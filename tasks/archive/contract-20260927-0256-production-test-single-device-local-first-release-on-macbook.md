@@ -1,13 +1,23 @@
+> **Archived**: 2026-09-27 02:56
+> **Related Plan**: plans/archive/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md
+> **Outcome**: Completed
+> **Lifecycle**: contract
+> **Parent Run ID**: run-20260927-0256
+> **Archive Projection V1**: `plans/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md` => `plans/archive/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md`
+> **Archive Projection V1**: `tasks/notes/20260926-1435-production-test-single-device-local-first-release-on-macbook.notes.md` => `tasks/archive/notes-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
+> **Archive Projection V1**: `tasks/contracts/20260926-1435-production-test-single-device-local-first-release-on-macbook.contract.md` => `tasks/archive/contract-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
+> **Archive Projection V1**: `tasks/reviews/20260926-1435-production-test-single-device-local-first-release-on-macbook.review.md` => `tasks/archive/review-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
+
 # Task Contract: production-test-single-device-local-first-release-on-macbook
 
-> **Status**: Active
-> **Plan**: plans/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md
+> **Status**: Fulfilled
+> **Plan**: plans/archive/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md
 > **Task Profile**: code-change
 > **Owner**: test
 > **Capability ID**: root
 > **Last Updated**: 2026-09-26 14:50
-> **Review File**: `tasks/reviews/20260926-1435-production-test-single-device-local-first-release-on-macbook.review.md`
-> **Notes File**: `tasks/notes/20260926-1435-production-test-single-device-local-first-release-on-macbook.notes.md`
+> **Review File**: `tasks/archive/review-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
+> **Notes File**: `tasks/archive/notes-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
 
 ## Why
 
@@ -56,10 +66,10 @@ or if anonymous gameplay, `ru-RU`, or Jazz text/image/edit/delete/reload persist
 
 ## Workflow Inventory
 
-- Source plan: `plans/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md`
+- Source plan: `plans/archive/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md`
 - Sprint: `plans/sprints/20260920-1628-local-first-single-device-luna-low.sprint.md`
-- Review file: `tasks/reviews/20260926-1435-production-test-single-device-local-first-release-on-macbook.review.md`
-- Notes file: `tasks/notes/20260926-1435-production-test-single-device-local-first-release-on-macbook.notes.md`
+- Review file: `tasks/archive/review-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
+- Notes file: `tasks/archive/notes-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
 - Checks file: `.ai/harness/checks/latest.json`
 - Run snapshots: `.ai/harness/runs/`
 - Runtime evidence: ignored `_ops/local-first-release/`
@@ -86,10 +96,10 @@ allowed_paths:
   - deploy/local-first/release-smoke.sh
   - deploy/local-first/README.md
   - tests/tests/local-first-release.spec.ts
-  - plans/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md
-  - tasks/contracts/20260926-1435-production-test-single-device-local-first-release-on-macbook.contract.md
-  - tasks/reviews/20260926-1435-production-test-single-device-local-first-release-on-macbook.review.md
-  - tasks/notes/20260926-1435-production-test-single-device-local-first-release-on-macbook.notes.md
+  - plans/archive/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md
+  - tasks/archive/contract-20260927-0256-production-test-single-device-local-first-release-on-macbook.md
+  - tasks/archive/review-20260927-0256-production-test-single-device-local-first-release-on-macbook.md
+  - tasks/archive/notes-20260927-0256-production-test-single-device-local-first-release-on-macbook.md
 ```
 
 ## Evidence Requirements
@@ -112,12 +122,21 @@ delegation:
     writable_paths: []
     network: inherited
   roles:
-    parent: { mode: narrate_and_gatekeep, purpose: own release topology, long gates, and acceptance }
-    explorer: { mode: read_only, purpose: CodeGraph discovery already frozen into this contract }
-    worker: { mode: edit_within_allowed_paths, purpose: mechanical release harness and browser spec implementation }
-    verifier: { mode: read_only, purpose: final-diff and frozen release-evidence review only }
+    parent:
+      mode: narrate_and_gatekeep
+      purpose: own release topology, long gates, and acceptance
+    explorer:
+      mode: read_only
+      purpose: CodeGraph discovery already frozen into this contract
+    worker:
+      mode: edit_within_allowed_paths
+      purpose: mechanical release harness and browser spec implementation
+    verifier:
+      mode: read_only
+      purpose: final-diff and frozen release-evidence review only
   runner:
-    preferred: [codex]
+    preferred:
+      - codex
     fallback: null
     brief_is_authoritative: true
 ```
@@ -136,7 +155,7 @@ exit_criteria:
     - tests/tests/local-first-release.spec.ts
     - deploy/local-first/README.md
   artifacts_exist:
-    - tasks/notes/20260926-1435-production-test-single-device-local-first-release-on-macbook.notes.md
+    - tasks/archive/notes-20260927-0256-production-test-single-device-local-first-release-on-macbook.md
 ```
 
 ## Verification Plan

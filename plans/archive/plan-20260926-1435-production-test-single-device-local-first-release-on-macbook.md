@@ -1,4 +1,14 @@
-> **Status**: Approved
+> **Archived**: 2026-09-27 02:56
+> **Related Plan**: plans/archive/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md
+> **Outcome**: Completed
+> **Lifecycle**: plan
+> **Parent Run ID**: run-20260927-0256
+> **Archive Projection V1**: `plans/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md` => `plans/archive/plan-20260926-1435-production-test-single-device-local-first-release-on-macbook.md`
+> **Archive Projection V1**: `tasks/notes/20260926-1435-production-test-single-device-local-first-release-on-macbook.notes.md` => `tasks/archive/notes-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
+> **Archive Projection V1**: `tasks/contracts/20260926-1435-production-test-single-device-local-first-release-on-macbook.contract.md` => `tasks/archive/contract-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
+> **Archive Projection V1**: `tasks/reviews/20260926-1435-production-test-single-device-local-first-release-on-macbook.review.md` => `tasks/archive/review-20260927-0256-production-test-single-device-local-first-release-on-macbook.md`
+
+> **Status**: Archived
 > **Created**: 20260926-1435
 > **Slug**: production-test-single-device-local-first-release-on-macbook
 > **Planning Source**: repo-harness-sprint
@@ -8,9 +18,9 @@
 > **Promotion Reason**: worktree_boundary
 > **Verification Boundary**: Local First static/release verifier + isolated Compose resolution + Jazz focused tests + clean-revision Apple Silicon production build + container/browser egress controls + dedicated Chromium release E2E + strict Repo Harness verification.
 > **Rollback Surface**: revert the single row-5 release-gate commit; runtime verification uses unique temporary Compose projects and ignored `_ops/` evidence.
-> **Task Contract**: tasks/contracts/20260926-1435-production-test-single-device-local-first-release-on-macbook.contract.md
-> **Task Review**: tasks/reviews/20260926-1435-production-test-single-device-local-first-release-on-macbook.review.md
-> **Implementation Notes**: tasks/notes/20260926-1435-production-test-single-device-local-first-release-on-macbook.notes.md
+> **Task Contract**: tasks/archive/contract-20260927-0256-production-test-single-device-local-first-release-on-macbook.md
+> **Task Review**: tasks/archive/review-20260927-0256-production-test-single-device-local-first-release-on-macbook.md
+> **Implementation Notes**: tasks/archive/notes-20260927-0256-production-test-single-device-local-first-release-on-macbook.md
 
 # Plan: production-test single-device Local First release on MacBook
 

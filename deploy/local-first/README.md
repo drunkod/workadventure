@@ -95,3 +95,19 @@ claim in the host temporary directory fails closed and must be inspected before 
 ## Release boundary
 
 This row proves packaging, source-image build, bounded service health, and server durability/backup/restore tooling. Full browser/product runtime, `ru-RU`, Jazz reload persistence, restart persistence, browser/container Internet isolation, and network-destination auditing are validated in Sprint row 5.
+
+## Single-device release gate
+
+Run the production release gate only from a clean committed worktree:
+
+```sh
+bash deploy/local-first/release-smoke.sh
+```
+
+The gate builds the committed Local First images before isolation, then starts a unique temporary Compose project with `release-isolation.yml`. The application/default network is internal and Traefik alone also joins an ingress bridge with Docker IP masquerading disabled, preserving `127.0.0.1:80` while denying public container egress.
+
+The Chromium test uses a fresh `ru-RU` context and installs HTTP(S) and WS(S) interception before product navigation. Only loopback, `localhost`, and `*.localhost` are allowed. External browser destinations are recorded and aborted. Any Jazz peer/cloud/Matrix/provider fallback is a hard failure. The browser performs the normal anonymous first-run flow, verifies Russian locale persistence, then checks Jazz main-room text, image, edit, delete, and reload persistence.
+
+On Colima, temporary source-subnet-scoped `DOCKER-USER` LOG rules inventory new forwarded container destinations. Rules are logging-only and removed by exact match during cleanup. Runtime evidence is written under ignored `_ops/local-first-release/<run-id>/`, including exact Git revision, resolved Compose config, image/container/network identities, controls, browser evidence, container logs, destination inventory, and final summary. The runner removes only its unique project and volumes and never targets the canonical `workadventure-local-first` project.
+
+Image and dependency acquisition happen before isolation. This is a production-runtime egress gate, not an air-gapped build test.
