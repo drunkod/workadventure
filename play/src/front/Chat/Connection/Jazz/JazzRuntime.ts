@@ -54,6 +54,7 @@ export type { JazzLoadedItem, JazzLoadedList };
 
 type RoomSubscriptionState = {
     room: JazzLoadedList | undefined;
+    callback: (room: JazzLoadedList | undefined) => void;
     unsubscribe: () => void;
 };
 
@@ -201,40 +202,52 @@ export class JazzRuntime {
 
     subscribeRoom(roomId: string, callback: (room: JazzLoadedList | undefined) => void): () => void {
         const roomSchema = this.ensureRoomSchema();
+        const previousState = this.roomSubscriptions.get(roomId);
+        const state: RoomSubscriptionState = {
+            room: undefined,
+            callback,
+            unsubscribe: () => undefined,
+        };
+        this.roomSubscriptions.set(roomId, state);
 
-        const unsubscribeOrSubscription = roomSchema.subscribe(
-            roomId,
-            {
-                resolve: {
-                    $each: {
-                        text: true,
-                        image: true,
+        try {
+            const unsubscribeOrSubscription = roomSchema.subscribe(
+                roomId,
+                {
+                    resolve: {
+                        $each: {
+                            text: true,
+                            image: true,
+                        },
                     },
                 },
-            },
-            (value: JazzLoadedList | undefined) => {
-                const state = this.roomSubscriptions.get(roomId);
-                if (state) {
+                (value: JazzLoadedList | undefined) => {
                     state.room = value;
+                    callback(value);
                 }
-                callback(value);
+            );
+
+            state.unsubscribe =
+                typeof unsubscribeOrSubscription === "function"
+                    ? unsubscribeOrSubscription
+                    : unsubscribeOrSubscription.unsubscribe.bind(unsubscribeOrSubscription);
+            previousState?.unsubscribe();
+        } catch (error) {
+            if (this.roomSubscriptions.get(roomId) === state) {
+                if (previousState) {
+                    this.roomSubscriptions.set(roomId, previousState);
+                } else {
+                    this.roomSubscriptions.delete(roomId);
+                }
             }
-        );
-
-        const unsubscribe =
-            typeof unsubscribeOrSubscription === "function"
-                ? unsubscribeOrSubscription
-                : unsubscribeOrSubscription.unsubscribe.bind(unsubscribeOrSubscription);
-
-        this.roomSubscriptions.set(roomId, {
-            room: undefined,
-            unsubscribe,
-        });
+            throw error;
+        }
 
         return () => {
-            const state = this.roomSubscriptions.get(roomId);
-            state?.unsubscribe();
-            this.roomSubscriptions.delete(roomId);
+            state.unsubscribe();
+            if (this.roomSubscriptions.get(roomId) === state) {
+                this.roomSubscriptions.delete(roomId);
+            }
         };
     }
 
@@ -248,6 +261,7 @@ export class JazzRuntime {
             room.$jazz.owner
         );
         room.$jazz.push(message);
+        this.notifyRoomSubscription(roomId, room);
     }
 
     async sendImage(
@@ -273,6 +287,7 @@ export class JazzRuntime {
             room.$jazz.owner
         );
         room.$jazz.push(message);
+        this.notifyRoomSubscription(roomId, room);
     }
 
     async editMessage(roomId: string, messageId: string, newText: string): Promise<void> {
@@ -283,6 +298,7 @@ export class JazzRuntime {
         }
         const modules = this.ensureModules();
         message.$jazz.set("text", modules.CoPlainText.create(newText, room.$jazz.owner));
+        this.notifyRoomSubscription(roomId, room);
     }
 
     async removeMessage(roomId: string, messageId: string): Promise<void> {
@@ -292,6 +308,7 @@ export class JazzRuntime {
             return;
         }
         room.$jazz.remove(index);
+        this.notifyRoomSubscription(roomId, room);
     }
 
     async resolveImageUrl(imageDefinitionOrId: unknown): Promise<string | undefined> {
@@ -312,6 +329,14 @@ export class JazzRuntime {
             subscription.unsubscribe();
         }
         this.roomSubscriptions.clear();
+    }
+
+    private notifyRoomSubscription(roomId: string, room: JazzLoadedList): void {
+        const subscription = this.roomSubscriptions.get(roomId);
+        if (!subscription || subscription.room !== room || !room.$isLoaded) {
+            return;
+        }
+        subscription.callback(room);
     }
 
     private async confirmRoomPersistence(room: JazzLoadedList): Promise<void> {

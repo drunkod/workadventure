@@ -1,0 +1,62 @@
+CONSUMER_REGRESSION_GUARD=play/tests/front/Chat/Connection/Jazz/JazzChatRoomLocalMutation.test.ts
+
+
+> workadventure-play@1.0.0 test
+> PLAY_URL=http://play.workadventure.localhost ADMIN_URL= vitest --run tests/front/Chat/Connection/Jazz/JazzChatRoomLocalMutation.test.ts
+
+Sentry plugin disabled
+
+ RUN  v4.0.15 /Users/test/Documents/work/workadventure-wt-fix-jazz-local-mutation-live-refresh/play
+
+ ❯ tests/front/Chat/Connection/Jazz/JazzChatRoomLocalMutation.test.ts (2 tests | 2 failed) 2010ms
+     × updates the initialized room after text, image, edit, and delete mutations 1007ms
+     × does not repopulate the room after destroy 1002ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/front/Chat/Connection/Jazz/JazzChatRoomLocalMutation.test.ts > JazzChatRoom local mutation live projection > updates the initialized room after text, image, edit, and delete mutations
+AssertionError: expected [ , store: { …(3) }, …(4) ] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/front/Chat/Connection/Jazz/JazzChatRoomLocalMutation.test.ts:139:54
+    137|     it("updates the initialized room after text, image, edit, and dele…
+    138|         await runtime.sendText("room-1", payload);
+    139|         await vi.waitFor(() => expect(room.messages).toHaveLength(1));
+       |                                                      ^
+    140|         expect(get(room.messages[0].content).body).toBe("hello");
+    141| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/front/Chat/Connection/Jazz/JazzChatRoomLocalMutation.test.ts > JazzChatRoom local mutation live projection > does not repopulate the room after destroy
+AssertionError: expected [ , store: { …(3) }, …(4) ] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/front/Chat/Connection/Jazz/JazzChatRoomLocalMutation.test.ts:164:54
+    162|     it("does not repopulate the room after destroy", async () => {
+    163|         await runtime.sendText("room-1", payload);
+    164|         await vi.waitFor(() => expect(room.messages).toHaveLength(1));
+       |                                                      ^
+    165| 
+    166|         await room.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  00:51:37
+   Duration  4.01s (transform 1.16s, setup 32ms, import 1.57s, tests 2.01s, environment 297ms)
+
+
+CONSUMER_PRE_FIX_EXIT=1

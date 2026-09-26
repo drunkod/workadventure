@@ -66,6 +66,7 @@ export class JazzChatRoom
     lastMessageTimestamp = 0;
     private syncVersion = 0;
     private unsubscribeRoom: (() => void) | undefined;
+    private destroyed = false;
 
     constructor(
         private readonly connection: JazzChatConnectionContext,
@@ -83,38 +84,52 @@ export class JazzChatRoom
     }
 
     async init(signal?: AbortSignal): Promise<void> {
+        this.destroyed = false;
         await new Promise<void>((resolve, reject) => {
-            let settled = false;
-            const abort = () => {
-                if (settled) return;
-                settled = true;
+            let initializationSettled = false;
+            const abortInitialization = () => {
+                if (initializationSettled) return;
+                initializationSettled = true;
                 this.unsubscribeRoom?.();
                 this.unsubscribeRoom = undefined;
                 reject(new Error(`Jazz room ${this.id} initialization aborted`));
             };
-            signal?.addEventListener("abort", abort, { once: true });
+            signal?.addEventListener("abort", abortInitialization, { once: true });
             this.unsubscribeRoom = this.runtime.subscribeRoom(this.id, (room) => {
-                if (settled || signal?.aborted || !room?.$isLoaded) return;
+                if (this.destroyed || !room?.$isLoaded) return;
+                if (!initializationSettled && signal?.aborted) {
+                    abortInitialization();
+                    return;
+                }
+
                 void this.syncMessages(room)
                     .then(() => {
-                        if (settled || signal?.aborted) return abort();
-                        settled = true;
-                        signal?.removeEventListener("abort", abort);
+                        if (initializationSettled) return;
+                        if (signal?.aborted) {
+                            abortInitialization();
+                            return;
+                        }
+                        initializationSettled = true;
+                        signal?.removeEventListener("abort", abortInitialization);
                         resolve();
                     })
                     .catch((error) => {
-                        if (!settled) {
-                            settled = true;
-                            signal?.removeEventListener("abort", abort);
+                        if (!initializationSettled) {
+                            initializationSettled = true;
+                            signal?.removeEventListener("abort", abortInitialization);
                             reject(error);
+                            return;
                         }
+                        console.error(`Failed to sync Jazz room ${this.id} after initialization`, error);
                     });
             });
-            if (signal?.aborted) abort();
+            if (signal?.aborted) abortInitialization();
         });
     }
 
     async destroy(): Promise<void> {
+        this.destroyed = true;
+        this.syncVersion += 1;
         this.unsubscribeRoom?.();
         this.unsubscribeRoom = undefined;
         this.clearMessages();

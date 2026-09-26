@@ -1,0 +1,46 @@
+REGRESSION_GUARD=play/tests/front/Chat/Connection/Jazz/JazzRuntimeLocalMutation.test.ts
+
+> workadventure-play@1.0.0 test
+> PLAY_URL=http://play.workadventure.localhost ADMIN_URL= vitest --run tests/front/Chat/Connection/Jazz/JazzRuntimeLocalMutation.test.ts
+
+Sentry plugin disabled
+
+ RUN  v4.0.15 /Users/test/Documents/work/workadventure-wt-fix-jazz-local-mutation-live-refresh/play
+
+ ❯ tests/front/Chat/Connection/Jazz/JazzRuntimeLocalMutation.test.ts (2 tests | 2 failed) 7ms
+     × notifies the active room projection after text and image pushes 6ms
+     × notifies only successful edit and remove mutations 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/front/Chat/Connection/Jazz/JazzRuntimeLocalMutation.test.ts > JazzRuntime local mutation projection > notifies the active room projection after text and image pushes
+AssertionError: expected "vi.fn()" to be called 2 times, but got 1 times
+ ❯ tests/front/Chat/Connection/Jazz/JazzRuntimeLocalMutation.test.ts:112:26
+    110|         await runtime.sendText("room-1", payload);
+    111|         expect(room).toHaveLength(1);
+    112|         expect(observer).toHaveBeenCalledTimes(2);
+       |                          ^
+    113|         expect(observer).toHaveBeenLastCalledWith(room);
+    114|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/front/Chat/Connection/Jazz/JazzRuntimeLocalMutation.test.ts > JazzRuntime local mutation projection > notifies only successful edit and remove mutations
+AssertionError: expected "vi.fn()" to be called 2 times, but got 1 times
+ ❯ tests/front/Chat/Connection/Jazz/JazzRuntimeLocalMutation.test.ts:131:26
+    129|         await runtime.editMessage("room-1", item.$jazz.id, "edited");
+    130|         expect(item.text).toBe("edited");
+    131|         expect(observer).toHaveBeenCalledTimes(2);
+       |                          ^
+    132|
+    133|         await runtime.editMessage("room-1", "missing", "ignored");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  19:58:14
+   Duration  643ms (transform 70ms, setup 44ms, import 45ms, tests 7ms, environment 388ms)
+
+PRE_FIX_EXIT=1
