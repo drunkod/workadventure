@@ -113,7 +113,9 @@
                     return;
                 }
                 const runtimeScript = runtimeScriptTag.textContent?.trim() ?? "";
-                if (!runtimeScript || runtimeScript === "{{{ script }}}") {
+                const unrenderedScriptPlaceholder =
+                    String.fromCharCode(123, 123, 123) + " script " + String.fromCharCode(125, 125, 125);
+                if (!runtimeScript || runtimeScript === unrenderedScriptPlaceholder) {
                     return;
                 }
                 try {

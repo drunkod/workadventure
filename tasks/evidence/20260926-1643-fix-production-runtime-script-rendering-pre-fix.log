@@ -1,0 +1,41 @@
+REGRESSION_GUARD=play/tests/pusher/FrontControllerRuntimeScript.test.ts
+
+> workadventure-play@1.0.0 test
+> PLAY_URL=http://play.workadventure.localhost ADMIN_URL= vitest --run tests/pusher/FrontControllerRuntimeScript.test.ts
+
+Sentry plugin disabled
+
+ RUN  v4.0.15 /Users/test/Documents/work/workadventure-wt-fix-production-runtime-script-rendering/play
+
+ ❯ tests/pusher/FrontControllerRuntimeScript.test.ts (2 tests | 1 failed) 11ms
+     × renders and executes a quote-bearing runtime payload without corrupting the loader 9ms
+     ✓ keeps the raw template placeholder as a no-op 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/pusher/FrontControllerRuntimeScript.test.ts > production runtime script template > renders and executes a quote-bearing runtime payload without corrupting the loader
+AssertionError: expected [Function] to not throw an error but 'SyntaxError: Unexpected identifier \'…' was thrown
+
+- Expected:
+undefined
+
++ Received:
+"SyntaxError: Unexpected identifier 'DEBUG_MODE'"
+
+ ❯ tests/pusher/FrontControllerRuntimeScript.test.ts:35:48
+     33|
+     34|         expect(getRuntimePayload(rendered)).toBe(payload);
+     35|         expect(() => new Function(loader)).not.toThrow();
+       |                                                ^
+     36|
+     37|         const runtimeWindow: { env?: typeof runtimeEnv } = {};
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  17:28:23
+   Duration  467ms (transform 40ms, setup 40ms, import 16ms, tests 11ms, environment 261ms)
+
+PRE_FIX_EXIT=1
