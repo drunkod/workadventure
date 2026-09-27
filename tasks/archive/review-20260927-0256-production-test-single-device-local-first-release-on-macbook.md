@@ -24,38 +24,33 @@
 
 ## Human Review Card
 
-- Verdict: pending
-- Change type: code-change | docs-only | ledger-closeout | migration | eval-only | delegated-run | frontend
-- Intended files changed:
-- Actual files changed:
-- Commands passed:
-- Residual risks:
-- Reviewer action required: inspect diff and card
-- Rollback:
+- Verdict: accepted via owner waiver
+- Change type: code-change
+- Intended files changed: Local First release isolation/verification/docs plus dedicated Playwright release spec
+- Actual files changed: matched the archived contract Allowed Paths
+- Commands passed: exact contract verification 15/15, declared verification 7/7, clean production release smoke
+- Residual risks: release isolation evidence was scoped to the mechanisms documented at acceptance; later post-publication audit findings are tracked by a separate hardening task
+- Reviewer action required: none for the archived row-5 acceptance
+- Rollback: revert the row-5 publication commit if the accepted release gate must be withdrawn
 
 ## Mode Evidence
 
-- Selected route:
-- P1/P2/P3 evidence:
-- Root cause or plan evidence:
+- Selected route: one Codex semantic review, correction of its raw P2 findings, then explicit owner waiver because the review budget was exhausted
+- P1/P2/P3 evidence: raw semantic-review P2 findings were treated as authoritative even though the wrapper reported PASS
+- Root cause or plan evidence: archived plan/notes and receipt-bound verification listed above
 
 ## Verification Evidence
 
-- Waza `/check` run:
-- Commands run:
-- Manual checks:
-- Supporting artifacts:
-- Implementation notes reviewed:
-- Run snapshot:
+- Waza `/check` run: not used as a separate authority
+- Commands run: Repo Harness exact verification plus `bash deploy/local-first/release-smoke.sh`
+- Manual checks: production browser/container evidence was exercised by the release smoke
+- Supporting artifacts: receipt-bound `.ai/harness/checks/latest.json` at acceptance and ignored release-run evidence on the execution host
+- Implementation notes reviewed: archived notes file listed above
+- Run snapshot: acceptance receipt binds verification evidence SHA256 `sha256:f4615a533acb0d2befd8c684cd386512735ed26eef0daaaf44cbf4675ca6d6fc`
 
 ## Manual Check Evidence
 
-Copy each non-built-in contract `manual_checks` requirement exactly. Check it only after
-the observation is complete and replace the placeholder with concrete command output,
-screenshot/artifact path, or reviewer observation.
-
-- [ ] Exact manual_checks requirement
-  - Evidence: concrete observation, command output, screenshot path, or reviewer note
+- No additional standalone manual-check requirement remained outside the declared release smoke and verification plan at final acceptance.
 
 ## Acceptance Receipt Projection
 
@@ -83,34 +78,26 @@ screenshot/artifact path, or reviewer observation.
 
 ## Residual Risks / Follow-ups
 
-- The one Codex semantic-review attempt is consumed. Its raw transcript reported two P2 findings; the wrapper's empty-findings/PASS summary is not authoritative.
-- P2: static verification allowed an application service to join an arbitrary extra external network. Corrected by exact service-network-set validation.
-- P2: any HTTPS fetch failure could satisfy the container egress control. Corrected by a numeric TCP reachability probe with explicit expected blocking reasons.
-- No second semantic review will be attempted; final acceptance must use the contract's owner-waiver path after fresh exact verification and a clean production gate.
-- Startup logs may still contain legacy MatrixProvider invalid-URL errors; acceptance remains based on observed network requests/sockets, not log text alone.
+- Historical semantic-review findings: exact service-network membership and generic HTTPS-failure egress proof were both corrected before final acceptance.
+- Final acceptance used the contract's owner-waiver path after fresh exact verification and a clean production gate; that waiver is recorded above.
+- Startup logs could still contain legacy MatrixProvider invalid-URL errors; row-5 acceptance was based on observed network requests/sockets rather than log text alone.
+- A later read-only post-publication audit identified additional release-evidence hardening opportunities. Those do not reopen this accepted row; they are handled in the separate `harden-local-first-release-gate` task.
 
 ## Scorecard
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Functionality | 0/10 | |
-| Product depth | 0/10 | |
-| Design quality | 0/10 | |
-| Code quality | 0/10 | |
+The archived row-5 review did not use a numeric score as acceptance authority. The typed AcceptanceReceipt and its bound verification evidence are authoritative.
 
 ## Failing Items
 
-- External semantic review of exact subject `sha256:2f17d4d8b39e89047bae9339e7133740e5c2a4afb79632d96b5774c3220b43ab` found two P2 isolation-evidence weaknesses. Both are corrected in the current uncommitted candidate.
-- Acceptance remains pending until the corrected candidate passes the full clean production gate and fresh revision-bound verification; the review will not be retried.
+- None remained open at final row-5 acceptance.
+- Historical P2 findings from the consumed semantic review were corrected before the receipt was issued.
+- Later post-publication audit findings are explicitly follow-up hardening work, not retroactive row-5 failures.
 
 ## Retest Steps
 
-- Commit the two isolation hardenings and workflow notes, then run `bash deploy/local-first/release-smoke.sh` from that exact clean revision.
-- Confirm the resolved topology contains only `default` for application services and exactly `default` + `ingress` for reverse-proxy.
-- Confirm `container-control.json` records `container_public_egress_blocked=true` with an expected blocking reason from the numeric TCP probe.
-- Re-check anonymous gameplay, `ru-RU`, Jazz text/image/edit/delete/reload persistence, browser public-egress blocking, and zero Jazz/Matrix/provider fallback attempts.
-- Run fresh `verify-sprint --prepare-acceptance`; if green, request an explicit row-5 owner waiver for that exact corrected subject.
+- Historical retest completed before acceptance: clean production release smoke, exact topology checks, numeric container egress control, anonymous gameplay, `ru-RU`, Jazz text/image/edit/delete/reload persistence, and provider-fallback checks.
+- Further hardening is verified independently by the follow-up task rather than mutating this archived acceptance.
 
 ## Summary
 
-- Production behavior on `58e2f5ddb` passed the full release gate, but the exact semantic review found two P2 weaknesses in how isolation was statically/procedurally proven. Both are being corrected within row-5 scope. The external review is exhausted, so acceptance remains pending fresh exact verification plus explicit owner waiver.
+- Row 5 was accepted via the recorded owner waiver after the consumed semantic-review P2 findings were corrected and fresh exact deterministic plus production evidence passed. The receipt above is the final acceptance state; earlier pending language in this review was historical pre-acceptance text.

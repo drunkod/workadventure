@@ -4,6 +4,7 @@ import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 type Evidence = {
     httpExternalAttempts: string[];
+    wsAttempts: string[];
     wsExternalAttempts: string[];
     consoleErrors: string[];
     pageErrors: string[];
@@ -11,6 +12,9 @@ type Evidence = {
 };
 
 const origin = process.env.LOCAL_FIRST_RELEASE_ORIGIN ?? "http://play.workadventure.localhost";
+const originUrl = new URL(origin);
+const browserControlUrl = "https://example.com/";
+const browserWebSocketControlUrl = `ws://${originUrl.host}/__local_first_ws_control__`;
 const evidencePath = process.env.LOCAL_FIRST_BROWSER_EVIDENCE;
 
 function isLocal(url: string): boolean {
@@ -18,6 +22,14 @@ function isLocal(url: string): boolean {
     return host === "localhost" || host.endsWith(".localhost") || host === "127.0.0.1" || host === "::1";
 }
 
+function isAllowedWorkAdventureWebSocket(url: string): boolean {
+    const parsed = new URL(url);
+    return (
+        (parsed.protocol === "ws:" || parsed.protocol === "wss:") &&
+        parsed.host.toLowerCase() === originUrl.host.toLowerCase() &&
+        parsed.pathname === "/ws/room"
+    );
+}
 
 function writeEvidence(evidence: Evidence) {
     if (!evidencePath) return;
@@ -34,11 +46,16 @@ async function installIsolation(context: BrowserContext, evidence: Evidence) {
     });
     await context.routeWebSocket(/.*/, async (ws) => {
         const url = ws.url();
-        if (isLocal(url)) {
+        evidence.wsAttempts.push(url);
+        if (url === browserWebSocketControlUrl) {
+            await ws.close();
+            return;
+        }
+        if (isAllowedWorkAdventureWebSocket(url)) {
             ws.connectToServer();
             return;
         }
-        evidence.wsExternalAttempts.push(url);
+        if (!isLocal(url)) evidence.wsExternalAttempts.push(url);
         await ws.close();
     });
 }
@@ -85,11 +102,12 @@ async function openJazzMainRoom(page: Page) {
 test("single-device local-first release", async ({ browser }) => {
     test.setTimeout(180_000);
     const evidence: Evidence = {
-        httpExternalAttempts: [], wsExternalAttempts: [], consoleErrors: [], pageErrors: [], assertions: {},
+        httpExternalAttempts: [], wsAttempts: [], wsExternalAttempts: [], consoleErrors: [], pageErrors: [], assertions: {},
     };
     const context = await browser.newContext({
         locale: "ru-RU",
         permissions: ["microphone", "camera", "notifications"],
+        serviceWorkers: "block",
     });
     await installIsolation(context, evidence);
     const page = await context.newPage();
@@ -99,14 +117,47 @@ test("single-device local-first release", async ({ browser }) => {
     page.on("pageerror", (error) => evidence.pageErrors.push(String(error)));
 
     await page.goto("about:blank");
-    const blocked = await page.evaluate(async () => {
+    const blocked = await page.evaluate(async (url) => {
         try {
-            await fetch("https://example.com", { signal: AbortSignal.timeout(5000) });
+            await fetch(url, { signal: AbortSignal.timeout(5000) });
             return false;
-        } catch { return true; }
-    });
+        } catch {
+            return true;
+        }
+    }, browserControlUrl);
     expect(blocked).toBeTruthy();
-    Object.assign(evidence.assertions, { browserPublicEgressBlocked: true });
+    expect(evidence.httpExternalAttempts).toContain(browserControlUrl);
+
+    const webSocketControlBlocked = await page.evaluate(
+        async (url) =>
+            await new Promise<boolean>((resolve) => {
+                const socket = new WebSocket(url);
+                const timer = setTimeout(() => resolve(false), 5_000);
+                const blocked = () => {
+                    clearTimeout(timer);
+                    resolve(true);
+                };
+                socket.addEventListener("error", blocked, { once: true });
+                socket.addEventListener("close", blocked, { once: true });
+                socket.addEventListener(
+                    "open",
+                    () => {
+                        clearTimeout(timer);
+                        socket.close();
+                        resolve(false);
+                    },
+                    { once: true },
+                );
+            }),
+        browserWebSocketControlUrl,
+    );
+    expect(webSocketControlBlocked).toBeTruthy();
+    expect(evidence.wsAttempts).toContain(browserWebSocketControlUrl);
+    Object.assign(evidence.assertions, {
+        browserHttpControlIntercepted: true,
+        browserWebSocketControlIntercepted: true,
+        browserPublicEgressBlocked: true,
+    });
 
     await enterStarterMap(page, true);
     Object.assign(evidence.assertions, { anonymousStarterFlow: true });
@@ -159,11 +210,22 @@ test("single-device local-first release", async ({ browser }) => {
     await expect(page.getByText(deleted, { exact: true })).not.toBeAttached();
     Object.assign(evidence.assertions, { jazzReloadPersistence: true });
 
-    const forbidden = [...evidence.httpExternalAttempts, ...evidence.wsExternalAttempts].filter((url) =>
+    const unexpectedWebSockets = evidence.wsAttempts.filter(
+        (url) => url !== browserWebSocketControlUrl && !isAllowedWorkAdventureWebSocket(url),
+    );
+    expect(
+        unexpectedWebSockets,
+        `unexpected WebSocket attempts: ${unexpectedWebSockets.join(", ")}`,
+    ).toEqual([]);
+
+    const forbidden = [...evidence.httpExternalAttempts, ...evidence.wsAttempts].filter((url) =>
         /jazz|matrix|stale-jazz-peer/i.test(url),
     );
     expect(forbidden, `provider fallback attempts: ${forbidden.join(", ")}`).toEqual([]);
-    Object.assign(evidence.assertions, { noProviderFallback: true });
+    Object.assign(evidence.assertions, {
+        onlyExpectedWorkAdventureWebSockets: true,
+        noProviderFallback: true,
+    });
     writeEvidence(evidence);
     await context.close();
 });
