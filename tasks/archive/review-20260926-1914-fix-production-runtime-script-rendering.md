@@ -24,14 +24,14 @@
 
 ## Human Review Card
 
-- Verdict: pending
-- Change type: code-change | docs-only | ledger-closeout | migration | eval-only | delegated-run | frontend
-- Intended files changed:
-- Actual files changed:
-- Commands passed:
-- Residual risks:
-- Reviewer action required: inspect diff and card
-- Rollback:
+- Verdict: accepted via owner waiver
+- Change type: code-change
+- Intended files changed: as defined by the archived contract scope
+- Actual files changed: the receipt-bound accepted subject recorded below
+- Commands passed: receipt-bound verification evidence passed before acceptance
+- Residual risks: acceptance is limited to the exact waiver scope stated in the receipt summary; it does not imply broader acceptance or push authorization
+- Reviewer action required: none; the receipt below records the explicit `user_waiver`
+- Rollback: use the rollback strategy recorded in the archived contract/plan
 
 ## Mode Evidence
 
