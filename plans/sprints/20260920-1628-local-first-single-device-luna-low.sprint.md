@@ -1,9 +1,9 @@
 # Sprint: Local-first single-device release — Luna-low fast cycle
 
-> **Status**: Approved
+> **Status**: Done
 > **Slug**: local-first-single-device-luna-low
 > **Created**: 2026-09-20 16:28
-> **Updated**: 2026-09-27 02:57
+> **Updated**: 2026-09-27 09:30
 > **Source PRD**: `plans/prds/20260917-1435-jazz-runtime-compatibility.prd.md`
 > **Source Spec**: `docs/spec.md`
 > **Source Research**: `docs/researches/20260920-local-first-jazz-audit.md`; `docs/researches/20260920-local-first-container-architecture.md`
