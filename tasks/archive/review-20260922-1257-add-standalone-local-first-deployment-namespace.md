@@ -35,27 +35,22 @@
 
 ## Mode Evidence
 
-- Selected route:
-- P1/P2/P3 evidence:
-- Root cause or plan evidence:
+- Selected route: receipt-bound acceptance (accepted) under the archived contract
+- P1/P2/P3 evidence: see the archived plan, contract, notes, and receipt-bound verification evidence
+- Root cause or plan evidence: see the archived workflow artifacts referenced at the top of this review
 
 ## Verification Evidence
 
-- Waza `/check` run:
-- Commands run:
-- Manual checks:
-- Supporting artifacts:
-- Implementation notes reviewed:
-- Run snapshot:
+- Waza `/check` run: not separately recorded in this review template
+- Commands run: see the receipt-bound verification evidence SHA and archived implementation notes
+- Manual checks: no additional standalone manual-check record is duplicated here
+- Supporting artifacts: the AcceptanceReceipt projection below is authoritative for the accepted subject and verification evidence
+- Implementation notes reviewed: use the archived notes file referenced at the top of this review
+- Run snapshot: use the archived workflow/run evidence referenced by the receipt and notes
 
 ## Manual Check Evidence
 
-Copy each non-built-in contract `manual_checks` requirement exactly. Check it only after
-the observation is complete and replace the placeholder with concrete command output,
-screenshot/artifact path, or reviewer observation.
-
-- [ ] Exact manual_checks requirement
-  - Evidence: concrete observation, command output, screenshot path, or reviewer note
+- No additional manual-check entry was recorded in this review template. This section is not acceptance authority; use the archived contract plus the receipt-bound verification evidence below.
 
 ## Acceptance Receipt Projection
 
@@ -74,30 +69,24 @@ screenshot/artifact path, or reviewer observation.
 
 ## Behavior Diff Notes
 
-- ...
+- No additional behavior-diff note was recorded in this template section; use the archived plan/notes and the receipt-bound accepted subject for the exact change.
 
 ## Residual Risks / Follow-ups
 
-- ...
+- No additional residual-risk text was recorded in this template section. Task-specific residual risks, if any, remain in the archived plan/contract/notes.
 
 ## Scorecard
 
-| Dimension | Score | Notes |
-|-----------|-------|-------|
-| Functionality | 0/10 | |
-| Product depth | 0/10 | |
-| Design quality | 0/10 | |
-| Code quality | 0/10 | |
+- Numeric template scores were not used as acceptance authority. The typed AcceptanceReceipt and its bound verification evidence are authoritative.
 
 ## Failing Items
 
-- ...
+- No open acceptance blocker is recorded at final acceptance. Historical findings or waiver limits remain governed by the receipt summary and archived task notes.
 
 ## Retest Steps
 
-- Re-run:
-- Re-check:
+- Historical verification completed before acceptance. Reproduce from the archived contract verification plan and implementation notes if a future audit requires a rerun.
 
 ## Summary
 
-- ...
+- Final state: accepted via accepted by recorded reviewer from recorded source. The AcceptanceReceipt projection above defines the authoritative subject, verification evidence, scope, and findings.
