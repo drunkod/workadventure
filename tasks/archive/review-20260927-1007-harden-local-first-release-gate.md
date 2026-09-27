@@ -24,14 +24,14 @@
 
 ## Human Review Card
 
-- Verdict: pending
-- Change type: code-change | docs-only | ledger-closeout | migration | eval-only | delegated-run | frontend
-- Intended files changed:
-- Actual files changed:
-- Commands passed:
-- Residual risks:
-- Reviewer action required: inspect diff and card
-- Rollback:
+- Verdict: accepted via external review
+- Change type: code-change
+- Intended files changed: Local First release gate instrumentation, release documentation, and the dedicated Playwright release specification; no application source
+- Actual files changed: matched the contract Allowed Paths and the reviewed path set
+- Commands passed: four current-exact verification checks, including the full production release smoke
+- Residual risks: coverage remains deliberately scoped to documented Playwright HTTP(S)/WS(S) interception and Colima forwarded-container auditing; it is not WebRTC/STUN or general air-gap certification
+- Reviewer action required: none; the receipt below records Codex `external_pass` with zero findings
+- Rollback: revert publication commit `31fb443cca31d197231f6c182a1f142c6fba8f22` if the hardening publication must be withdrawn
 
 ## Mode Evidence
 
